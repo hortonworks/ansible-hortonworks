@@ -1,0 +1,19 @@
+---
+- set_fact: outer_loop="{{ item }}"
+
+- name: Create {{ outer_loop.key }} nodes
+  os_server:
+    name: "{{ cloud_config.hostname_prefix|default('') }}{{ outer_loop.key }}-{{ local_loop.0 }}{{ cloud_config.domain|default('') }}"
+    image: "{{ outer_loop.value.image }}"
+    flavor: "{{ outer_loop.value.flavor }}"
+    key_name: "{{ cloud_config.ssh.keyname }}"
+    availability_zone: "{{ cloud_config.zone }}"
+    state: present
+    wait: true
+    timeout: 900
+    validate_certs: false
+    meta:
+      group: "{{ outer_loop.value.group }}"
+  loop_control:
+    loop_var: local_loop
+  with_sequence: count="{{ outer_loop.value.count }}"

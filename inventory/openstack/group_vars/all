@@ -1,0 +1,20 @@
+---
+cloud_config:
+  hostname_prefix: 'mytestcluster-'
+  domain: '.localnet'
+  zone: PS
+  ssh:
+    keyname: field
+    keyfile: ~/.ssh/id_rsa.pub
+
+nodes:
+  master:
+    count: 1
+    image: CentOS 7.2
+    flavor: m3.xlarge
+    group: "{{ cloud_config.hostname_prefix }}master"
+  slave:
+    count: 1
+    image: CentOS 7.2
+    flavor: m3.large
+    group: "{{ cloud_config.hostname_prefix }}slave"

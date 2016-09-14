@@ -1,0 +1,11 @@
+---
+- name: Build the environment
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  vars_files:
+    - ../inventory/openstack/group_vars/all
+  tasks:
+    - name: Build Openstack Nodes
+      include: build_openstack_nodes.yml
+      with_dict: "{{ nodes }}"
