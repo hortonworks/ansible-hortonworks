@@ -8,13 +8,12 @@ cloud_config:
     keyfile: ~/.ssh/id_rsa.pub
 
 nodes:
-  master:
+  - group: "{{ cloud_config.hostname_prefix }}master"
     count: 1
     image: CentOS 7.2
     flavor: m3.xlarge
-    group: "{{ cloud_config.hostname_prefix }}master"
-  slave:
+
+  - group: "{{ cloud_config.hostname_prefix }}slave"
     count: 1
     image: CentOS 7.2
     flavor: m3.large
-    group: "{{ cloud_config.hostname_prefix }}slave"

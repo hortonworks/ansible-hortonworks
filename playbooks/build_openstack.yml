@@ -8,4 +8,4 @@
   tasks:
     - name: Build Openstack Nodes
       include: build_openstack_nodes.yml
-      with_dict: "{{ nodes }}"
+      with_items: "{{ nodes }}"
