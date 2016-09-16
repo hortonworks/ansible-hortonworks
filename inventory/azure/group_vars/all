@@ -1,0 +1,44 @@
+---
+cloud_config:
+  hostname_prefix: 'mytestcluster-'
+  domain: '.localnet'
+  location: 'West Europe'
+  admin_username: azure-user
+  ssh:
+    keyfile: ~/.ssh/id_rsa.pub
+  resource_group: Testing
+  storage_account:
+    name: teststorage000111111
+    type: Standard_LRS
+  network:
+    name: testnetwork
+    address: "10.10.0.0/16"
+  subnet:
+    name: testsubnet
+    address: "10.10.0.0/24"
+  security_groups:
+    - name: ssh_access
+      port: 22
+
+nodes:
+  - group: "{{ cloud_config.hostname_prefix }}master"
+    count: 1
+    image:
+      offer: CentOS
+      publisher: OpenLogic
+      sku: '7.2'
+      version: latest
+    flavor: Standard_D3_v2
+    public_ip: true
+    security_group: ssh_access
+
+  - group: "{{ cloud_config.hostname_prefix }}slave"
+    count: 1
+    image:
+      offer: CentOS
+      publisher: OpenLogic
+      sku: '7.2'
+      version: latest
+    flavor: Standard_D2_v2
+    public_ip: true
+    security_group: ssh_access

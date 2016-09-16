@@ -1,0 +1,51 @@
+---
+- name: Build the environment
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  vars_files:
+    - ../inventory/azure/group_vars/all
+  tasks:
+    - name: Build {{ cloud_config.resource_group }} Resource Group
+      azure_rm_resourcegroup:
+        name: "{{ cloud_config.resource_group }}"
+        location: "{{ cloud_config.location }}"
+        state: present
+        force: yes
+      ignore_errors: yes
+
+    - name: Create {{ cloud_config.storage_account.name }} Storage Account
+      azure_rm_storageaccount:
+       resource_group: "{{ cloud_config.resource_group }}"
+       name: "{{ cloud_config.storage_account.name }}"
+       type: "{{ cloud_config.storage_account.type }}"
+
+    - name: Create {{ cloud_config.network.name }} Virtual Network
+      azure_rm_virtualnetwork:
+        resource_group: "{{ cloud_config.resource_group }}"
+        name: "{{ cloud_config.network.name }}"
+        address_prefixes: "{{ cloud_config.network.address }}"
+
+    - name: Create {{ cloud_config.subnet.name }} Subnet
+      azure_rm_subnet:
+        resource_group: "{{ cloud_config.resource_group }}"
+        virtual_network_name: "{{ cloud_config.network.name }}"
+        name: "{{ cloud_config.subnet.name }}"
+        address_prefix: "{{ cloud_config.subnet.address }}"
+
+    - name: Create security groups
+      azure_rm_securitygroup:
+        resource_group: "{{ cloud_config.resource_group }}"
+        name: "{{ item.name }}"
+        rules:
+          - name: "AllowPort_{{ item.port }}"
+            protocol: Tcp
+            destination_port_range: "{{ item.port }}"
+            access: Allow
+            direction: Inbound
+            priority: 101
+      with_items: "{{ cloud_config.security_groups }}"
+
+    - name: Build Azure Nodes
+      include: build_azure_nodes.yml
+      with_items: "{{ nodes }}"
