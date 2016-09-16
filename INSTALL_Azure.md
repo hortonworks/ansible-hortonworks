@@ -27,6 +27,28 @@ This node must be able to connect to the cluster nodes via SSH and to the Azure 
 1. Fix an Ansible bug:
 
   ```
+  sed -i s/result._task.loop_control.get\(\'loop_var\'\)/result._task.loop_control.loop_var/g /usr/lib/python2.7/site-packages/ansible/executor/process/result.py
+  ```
+
+1. Generate SSH public/private key pair if this node doesn't have one (press Enter for defaults):
+
+  ```
+  ssh-keygen -q -t rsa
+  ```
+
+## Ubuntu 16+
+
+1. Install Ansible and git:
+
+  ```
+  sudo su -
+  apt update; apt -y install unzip python-pip python-dev sshpass git libffi-dev libssl-dev vim
+  pip install ansible "azure==2.0.0rc5" --upgrade
+  ```
+
+1. Fix an Ansible bug:
+
+  ```
   sed -i s/result._task.loop_control.get\(\'loop_var\'\)/result._task.loop_control.loop_var/g /usr/local/lib/python2.7/dist-packages/ansible/executor/process/result.py
   ```
 
@@ -36,18 +58,19 @@ This node must be able to connect to the cluster nodes via SSH and to the Azure 
   ssh-keygen -q -t rsa
   ```
 
+
 # Setup the Azure credentials file
 
-1. Create a service principal:
+1. Create a service principal
 
 Use the following [guide](https://azure.microsoft.com/en-us/documentation/articles/resource-group-create-service-principal-portal) to create a Service Principal.
 
 After the tutorial the following should have been obtained:
 
-- Subscription ID (from the Subscription page in the Azure portal)
-- Client ID
-- Secret key (generated when the application was created)
-- Tenant ID
+  * Subscription ID (from the Subscription page in the Azure portal)
+  * Client ID
+  * Secret key (generated when the application was created)
+  * Tenant ID
 
 
 1. Create the credentials file
@@ -74,7 +97,7 @@ cat > ~/.azure/credentials
 On the same build node / workstation, run the following or manually download the repository and upload it (especially if it's private):
 
 ```
-cd; git clone https://github.com/hortonworks/ansible-hdp.git
+cd && git clone https://github.com/hortonworks/ansible-hdp.git
 ```
 
 
