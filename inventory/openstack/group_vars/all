@@ -3,17 +3,26 @@ cloud_config:
   hostname_prefix: 'mytestcluster-'
   domain: '.localnet'
   zone: PS
+  admin_username: centos
   ssh:
     keyname: field
-    keyfile: ~/.ssh/id_rsa.pub
+    privatekey: ~/.ssh/field.pem
 
 nodes:
   - group: "{{ cloud_config.hostname_prefix }}master"
     count: 1
     image: CentOS 7.2
     flavor: m3.xlarge
+    public_ip: false
 
   - group: "{{ cloud_config.hostname_prefix }}slave"
+    count: 2
+    image: CentOS 7.2
+    flavor: m3.large
+    public_ip: false
+
+  - group: "{{ cloud_config.hostname_prefix }}ambari"
     count: 1
     image: CentOS 7.2
     flavor: m3.large
+    public_ip: false
