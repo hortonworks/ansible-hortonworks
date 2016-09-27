@@ -99,3 +99,14 @@
 - name: Configure tuned (RHEL/CentOS 7)
   include: tuned.yml
   when: ansible_os_family|lower == "redhat" and ansible_distribution_major_version == "7"
+
+- name: Download the Ambari repository definition
+  get_url:
+    url: "{{ ambari_repo_url }}"
+    dest: "{{ ambari_repo_destination }}"
+
+- name: Add Ambari repository key (apt)
+  apt_key:
+    keyserver: "{{ ambari_repo_keyserver }}"
+    id: "{{ ambari_repo_key }}"
+  when: ansible_os_family|lower == "debian"

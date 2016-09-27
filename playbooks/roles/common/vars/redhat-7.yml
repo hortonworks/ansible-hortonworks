@@ -14,3 +14,6 @@ ntp_service_name: chronyd
 update_grub_command: 'grub2-mkconfig -o "$(readlink -n /etc/grub2.cfg)"'
 
 epel_url: "http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
+
+ambari_repo_url: "http://public-repo-1.hortonworks.com/ambari/centos{{ ansible_distribution_major_version }}/2.x/updates/{{ ambari_version }}/ambari.repo"
+ambari_repo_destination: "/etc/yum.repos.d/ambari.repo"
