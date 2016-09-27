@@ -223,7 +223,7 @@ def main():
             inventory_args.update(dict(
                 config_key='ansible',
                 config_defaults={
-                    'use_hostnames': False,
+                    'use_hostnames': True,
                     'expand_hostvars': False,
                     'fail_on_errors': True,
                 }
