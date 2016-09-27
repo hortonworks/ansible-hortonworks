@@ -14,6 +14,7 @@ nodes:
     image: CentOS 7.2
     flavor: m3.xlarge
     public_ip: false
+    ambari_server: true
 
   - group: "{{ cloud_config.name_prefix }}slave"
     count: 2
@@ -21,8 +22,8 @@ nodes:
     flavor: m3.large
     public_ip: false
 
-  - group: "{{ cloud_config.name_prefix }}ambari"
-    count: 1
+  - group: "{{ cloud_config.name_prefix }}edge"
+    count: 0
     image: CentOS 7.2
-    flavor: m3.large
+    flavor: m3.medium
     public_ip: false
