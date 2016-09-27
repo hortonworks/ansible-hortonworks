@@ -25,7 +25,7 @@
     state: present
     regexp: '^ROOT=.*$'
     line: 'export ROOT="/"'
-  when: ansible_os_family|lower == "redhat" and ansible_distribution_major_version == "7"
+  when: ansible_os_family|lower == "redhat" and ansible_distribution_major_version|int == 7
 
 - name: Make sure the ambari-server service is started
   service:

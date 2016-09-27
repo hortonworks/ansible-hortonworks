@@ -91,14 +91,14 @@
     dest: /etc/default/grub
     state: present
     line: 'GRUB_CMDLINE_LINUX=$GRUB_CMDLINE_LINUX" transparent_hugepage=never"'
-  when: (ansible_os_family|lower == "redhat" or ansible_os_family|lower == "debian") and (ansible_distribution_major_version >= "7")
+  when: (ansible_os_family|lower == "redhat" or ansible_os_family|lower == "debian") and (ansible_distribution_major_version|int >= 7)
   notify: Generate the Grub config file
 
 - meta: flush_handlers
 
 - name: Configure tuned (RHEL/CentOS 7)
   include: tuned.yml
-  when: ansible_os_family|lower == "redhat" and ansible_distribution_major_version == "7"
+  when: ansible_os_family|lower == "redhat" and ansible_distribution_major_version|int == 7
 
 - name: Download the Ambari repository definition
   get_url:
