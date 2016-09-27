@@ -32,3 +32,25 @@
     name: ambari-server
     state: started
     enabled: yes
+
+- name: Wait for Ambari Server to start listening on port 8080
+  wait_for:
+    port: 8080
+    host: 0.0.0.0
+    delay: 1
+
+- name: Make sure all of the Ambari Agents have registered
+  uri:
+    url: http://{{ ansible_nodename }}:8080/api/v1/hosts/{{ hostvars[item]['ansible_nodename']|lower }}
+    method: GET
+    force_basic_auth: yes
+    user: admin
+    password: admin
+    headers: '{"X-Requested-By":"ambari"}'
+    status_code: 200,201,202,404
+    return_content: no
+  with_items: "{{ groups['hadoop-cluster'] }}"
+  register: result
+  until: "result.status != 404"
+  retries: 100
+  delay: 5
