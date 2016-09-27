@@ -1,0 +1,12 @@
+#
+# tuned configuration
+#
+
+[main]
+include=throughput-performance
+
+[sysctl]
+vm.swappiness={{ swappiness }}
+
+[vm]
+transparent_hugepages=never

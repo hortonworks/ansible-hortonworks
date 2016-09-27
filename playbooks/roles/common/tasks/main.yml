@@ -1,0 +1,101 @@
+---
+- name: Load variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}-{{ ansible_distribution_major_version }}.yml"
+        - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}.yml"
+        - "{{ ansible_os_family|lower }}-{{ ansible_distribution_major_version }}.yml"
+        - "{{ ansible_os_family|lower }}.yml"
+        - defaults.yml
+      paths:
+        - ../vars
+
+- name: Install epel
+  yum:
+    name: epel-release
+    state: installed
+  ignore_errors: true
+  register: epel_result
+  when: ansible_os_family|lower == "redhat"
+
+- name: Install epel from rpm
+  yum:
+    name: "{{ epel_url }}"
+    state: installed
+  when: ansible_os_family|lower == "redhat" and epel_result|failed
+
+- name: Install required packages (yum)
+  yum:
+    name: "{{ item }}"
+    update_cache: yes
+    state: installed
+  with_items: "{{ packages|default([]) }}"
+  when: ansible_os_family|lower == "redhat"
+
+- name: Install required packages (apt)
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    state: present
+  with_items: "{{ packages|default([]) }}"
+  when: ansible_os_family|lower == "debian"
+
+- name: Make sure the NTP service is started
+  service:
+    name: "{{ ntp_service_name }}"
+    state: started
+    enabled: yes
+
+- name: Add mappings to /etc/hosts
+  lineinfile:
+    dest: /etc/hosts
+    line: "{{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }} {{ hostvars[item]['ansible_nodename'] }}"
+    insertafter: "^127..*$"
+    state: present
+  with_items:
+    - "{{ groups['hadoop-cluster']|sort(reverse=True) }}"
+
+- name: Set nofile and nproc limits
+  blockinfile:
+    dest: /etc/security/limits.d/99-hadoop.conf
+    create: yes
+    mode: 0644
+    block: |
+      * soft nofile 32768
+      * hard nofile 32768
+      * soft nproc 32768
+      * hard nproc 32768
+    marker: "# {mark} ANSIBLE MANAGED BLOCK"
+
+- name: Set swappiness to {{ swappiness }}
+  sysctl:
+    name: vm.swappiness
+    value: "{{ swappiness }}"
+    state: present
+    reload: yes
+    ignoreerrors: yes
+
+- name: Disable selinux
+  selinux:
+    state: disabled
+  when: ansible_os_family|lower == "redhat"
+
+- name: Disable Transparent Huge Pages until the next reboot
+  shell: echo never > /sys/kernel/mm/transparent_hugepage/enabled && echo never > /sys/kernel/mm/transparent_hugepage/defrag
+  args:
+    removes: /sys/kernel/mm/transparent_hugepage/enabled
+
+- name: Disable Transparent Huge Pages in Grub 2
+  lineinfile:
+    dest: /etc/default/grub
+    state: present
+    line: 'GRUB_CMDLINE_LINUX=$GRUB_CMDLINE_LINUX" transparent_hugepage=never"'
+  when: (ansible_os_family|lower == "redhat" or ansible_os_family|lower == "debian") and (ansible_distribution_major_version >= "7")
+  notify: Generate the Grub config file
+
+- meta: flush_handlers
+
+- name: Configure tuned (RHEL/CentOS 7)
+  include: tuned.yml
+  when: ansible_os_family|lower == "redhat" and ansible_distribution_major_version == "7"

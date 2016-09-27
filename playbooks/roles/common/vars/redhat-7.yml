@@ -1,0 +1,16 @@
+---
+packages:
+  - python-httplib2         # required for calling Ambari API from Ansible
+  - openssh-clients         # scp required by Ambari
+  - curl                    # curl required by Ambari
+  - unzip                   # unzip required by Ambari
+  - tar                     # tar required by Ambari
+  - wget                    # wget required by Ambari
+  - openssl                 # openssl required by Ambari
+  - chrony                  # ntp required by Hadoop
+
+ntp_service_name: chronyd
+
+update_grub_command: 'grub2-mkconfig -o "$(readlink -n /etc/grub2.cfg)"'
+
+epel_url: "http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
