@@ -1,0 +1,34 @@
+---
+- name: Install the ambari-server package (yum)
+  yum:
+    name: ambari-server
+    update_cache: yes
+    state: latest
+  notify: Reload systemd
+  when: ansible_os_family|lower == "redhat"
+
+- name: Install the ambari-server package (apt)
+  apt:
+    name: ambari-server
+    update_cache: yes
+    state: latest
+  when: ansible_os_family|lower == "debian"
+
+- meta: flush_handlers
+
+- name: Run Ambari Server setup
+  shell: /usr/sbin/ambari-server setup -s
+
+- name: Fix Ambari 2.4 bug in RHEL/CentOS 7
+  lineinfile:
+    dest: /etc/rc.d/init.d/ambari-server
+    state: present
+    regexp: '^ROOT=.*$'
+    line: 'export ROOT="/"'
+  when: ansible_os_family|lower == "redhat" and ansible_distribution_major_version == "7"
+
+- name: Make sure the ambari-server service is started
+  service:
+    name: ambari-server
+    state: started
+    enabled: yes
