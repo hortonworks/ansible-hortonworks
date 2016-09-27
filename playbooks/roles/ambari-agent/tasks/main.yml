@@ -1,0 +1,30 @@
+---
+- name: Install the ambari-agent package (yum)
+  yum:
+    name: ambari-agent
+    update_cache: yes
+    state: latest
+  notify: Reload systemd
+  when: ansible_os_family|lower == "redhat"
+
+- name: Install the ambari-agent package (apt)
+  apt:
+    name: ambari-agent
+    update_cache: yes
+    state: latest
+  when: ansible_os_family|lower == "debian"
+
+- name: Configure the Ambari agent
+  lineinfile: dest=/etc/ambari-agent/conf/ambari-agent.ini
+              regexp='^hostname='
+              line='hostname={{ hostvars[groups['ambari-server'][0]]['ansible_nodename'] }}'
+              state=present
+  notify: Restart ambari-agent
+
+- meta: flush_handlers
+
+- name: Make sure the ambari-agent service is started
+  service:
+    name: ambari-agent
+    state: started
+    enabled: yes
