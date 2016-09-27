@@ -32,7 +32,7 @@ As OpenStack environments are usually private, you might need to build such a no
    ```
 
 
-1. Install the required Python inside the virtualenv
+1. Install the required Python packages inside the virtualenv
 
    ```
    pip install setuptools --upgrade
@@ -52,9 +52,9 @@ As OpenStack environments are usually private, you might need to build such a no
 
   The build node / workstation will need to login via SSH to the cluster nodes.
   
-  For this to succeed, the SSH private key needs to be downloaded from the OpenStack Dashboard (usually found on `Compute` -> `Access and Security` under the `Key Pairs` tab).
+  For this to succeed, the SSH private key needs to be placed on the build node / workstation, normally under .ssh, for example: `~/.ssh/field.pem`. It can be placed under any path as this file will be referenced later.
   
-  Then it needs to be placed on the build node / workstation, normally under .ssh, for example: `~/.ssh/field.pem`.
+  The SSH public key must be present on the OpenStack environment as it will be referenced when the nodes will be built (this can be checked on the Dashboard, under `Compute` -> `Access and Security` -> `Key Pairs` tab).
 
 
 ## Ubuntu 14+
@@ -74,7 +74,7 @@ As OpenStack environments are usually private, you might need to build such a no
    ```
 
 
-1. Install the required Python inside the virtualenv
+1. Install the required Python packages inside the virtualenv
 
    ```
    pip install setuptools --upgrade
@@ -94,9 +94,9 @@ As OpenStack environments are usually private, you might need to build such a no
 
   The build node / workstation will need to login via SSH to the cluster nodes.
   
-  For this to succeed, the SSH private key needs to be downloaded from the OpenStack Dashboard (usually found on `Compute` -> `Access and Security` under the `Key Pairs` tab).
+  For this to succeed, the SSH private key needs to be placed on the build node / workstation, normally under .ssh, for example: `~/.ssh/field.pem`. It can be placed under any path as this file will be referenced later.
   
-  Then it needs to be placed on the build node / workstation, normally under .ssh, for example: `~/.ssh/field.pem`.
+  The SSH public key must be present on the OpenStack environment as it will be referenced when the nodes will be built (this can be checked on the Dashboard, under `Compute` -> `Access and Security` -> `Key Pairs` tab).
 
 
 # Setup the OpenStack credentials
@@ -128,7 +128,9 @@ As OpenStack environments are usually private, you might need to build such a no
 
 # Clone the repository
 
-On the same build node / workstation, run the following or manually download the repository and upload it (especially if it's private):
+Upload the ansible-hdp repository to the build node / workstation, preferable under the home folder.
+
+If the build node / workstation can directly download the repository, run the following:
 
 ```
 cd && git clone https://github.com/hortonworks/ansible-hdp.git
@@ -151,12 +153,12 @@ This section contains variables that are cluster specific and are used by all no
 
 | Variable        | Description                                                                                                |
 | --------------- | ---------------------------------------------------------------------------------------------------------- |
-| hostname_prefix | A prefix that will precede the name of all nodes. Usually the cluster name to uniquely identify the nodes. |
-| domain          | A suffix that will be appended to the name of all nodes. Usually it's a domain, but can be anything or even the empty string `''`. |
+| name_prefix     | A prefix that will precede the name of all nodes. Usually the cluster name to uniquely identify the nodes. |
+| name_suffix     | A suffix that will be appended to the name of all nodes. Usually it's a domain, but can be anything or even the empty string `''`. |
 | zone            | The name of the OpenStack zone.                         |
 | admin_username  | The Linux user with sudo permissions. This user is specific to the image used. For example, in a CentOS image, it can be `centos` or in a Ubuntu image it can be `ubuntu`. |
 | ssh.keyname     | The name of the SSH key that will be placed on cluster nodes at build time. This SSH key must already exist in the OpenStack environment. |
-| ssh.privatekey  | Local path to the SSH private key that will be used to login into the nodes. This is the key downloaded as part of the Build Setup, step 5. |
+| ssh.privatekey  | Local path to the SSH private key that will be used to login into the nodes. This is the key uploaded to the build node as part of the Build Setup, step 5. |
 
 
 ## nodes config
@@ -165,16 +167,19 @@ This section contains variables that are node specific.
 
 Nodes are separated by groups, for example master, slave, edge.
 
-Groups can have any names and any number of nodes and they should correspond with the host groups in the Ambari Blueprint.
+There can be any number of groups.
+
+And groups can have any names and any number of nodes but they should correspond with the host groups in the Ambari Blueprint.
 
 
 | Variable        | Description                                                               |
 | --------------- | ------------------------------------------------------------------------- |
-| group           | The name of the group. Must be unique in the OpenStack Zone hence the default contains the `hostname_prefix`. Other groups can be added to correspond with the required architecture. |
+| group           | The name of the group. Must be unique in the OpenStack Zone. This is the reason why the default contains the `name_prefix`. Other groups can be added to correspond with the required architecture. |
 | count           | The number of nodes to be built in this group. |
-| image           | The OS image to be used. A list of the available images can be found by running `nova --insecure image-list`. |
-| flavor          | The flavor / size of the node. A list of all the available flavors can be found by running `nova --insecure flavor-list`. |                                                      |
+| image           | The name or ID of the OS image to be used. A list of the available images can be found by running `nova --insecure image-list`. |
+| flavor          | The name or ID of the flavor / size of the node. A list of all the available flavors can be found by running `nova --insecure flavor-list`. |                                                      |
 | public_ip       | If the Public IP of the cluster node should be used when connecting to it. Required if the build node does not have access to the private IP range of the cluster nodes. |
+| ambari_server   | Set it to `true` if the group also runs an Ambari Server. The number of nodes in this group should be 1. If there are more than 1 node, ambari-server will be installed on all of them, but only the first one (in alphabetical order) will be used by the Ambari Agents. |
 
 
 # Build the Cloud environment
@@ -183,6 +188,47 @@ Run the script that will build the Cloud environment:
 
 ```
 cd ~/ansible-hdp*/ && bash build_openstack.sh
+```
+
+You may need to load the environment variables if this is a new session:
+
+```
+source ~/ansible/bin/activate
+source ~/*-openrc.sh
+```
+
+
+# Set the cluster variables
+
+Modify the file at `~/ansible-hdp/playbooks/group_vars/all` to set the cluster configuration.
+
+| Variable        | Description                                                                                                |
+| --------------- | ---------------------------------------------------------------------------------------------------------- |
+| ambari_version  | The Ambari version, in the full, 4-number form, for example: `2.4.1.0`. |
+
+
+# Prepare the nodes
+
+Run the script that will prepare the nodes for the Ambari installation:
+
+```
+cd ~/ansible-hdp*/ && bash prepare_nodes_openstack.sh
+```
+
+You may need to load the environment variables if this is a new session:
+
+```
+source ~/ansible/bin/activate
+source ~/*-openrc.sh
+```
+
+
+# Install Ambari
+
+Run the script that will install and configure Ambari Agents and Ambari Server:
+
+```
+cd ~/ansible-hdp*/ && bash install_ambari_openstack.sh
 ```
 
 You may need to load the environment variables if this is a new session:
