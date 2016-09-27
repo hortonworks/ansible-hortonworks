@@ -15,10 +15,11 @@
   when: ansible_os_family|lower == "debian"
 
 - name: Configure the Ambari agent
-  lineinfile: dest=/etc/ambari-agent/conf/ambari-agent.ini
-              regexp='^hostname='
-              line='hostname={{ hostvars[groups['ambari-server'][0]]['ansible_nodename'] }}'
-              state=present
+  lineinfile:
+    dest: /etc/ambari-agent/conf/ambari-agent.ini
+    regexp: "^hostname="
+    line: "hostname={{ hostvars[groups['ambari-server']|sort|list|first]['ansible_nodename'] }}"
+    state: present
   notify: Restart ambari-agent
 
 - meta: flush_handlers
