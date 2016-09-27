@@ -3,7 +3,7 @@
 
 - name: Create {{ outer_loop.group }} nodes
   os_server:
-    name: "{{ outer_loop.group }}-{{ local_loop.0 }}{{ cloud_config.name_suffix|default('') }}"
+    name: "{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}{{ cloud_config.name_suffix|default('') }}"
     image: "{{ outer_loop.image }}"
     flavor: "{{ outer_loop.flavor }}"
     key_name: "{{ cloud_config.ssh.keyname }}"
@@ -16,4 +16,4 @@
       group: "{{ outer_loop.group }}"
   loop_control:
     loop_var: local_loop
-  with_sequence: count="{{ outer_loop.count }}"
+  with_sequence: count="{{ outer_loop.count }}" format=-%02x
