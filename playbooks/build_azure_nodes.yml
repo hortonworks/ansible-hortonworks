@@ -5,58 +5,58 @@
   azure_rm_publicipaddress:
     resource_group: "{{ cloud_config.resource_group }}"
     allocation_method: Static
-    name: "{{ outer_loop.group }}-{{ local_loop.0 }}IP"
+    name: "{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}-IP"
   loop_control:
     loop_var: local_loop
-  with_sequence: count="{{ outer_loop.count }}"
+  with_sequence: count="{{ outer_loop.count }}" format=-%02x
   when: "{{ outer_loop.public_ip }}"
 
 - name: Create NICs (public IP)
   azure_rm_networkinterface:
     resource_group: "{{ cloud_config.resource_group }}"
-    name: "{{ outer_loop.group }}-{{ local_loop.0 }}NIC"
-    public_ip_address_name: "{{ outer_loop.group }}-{{ local_loop.0 }}IP"
+    name: "{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}-NIC"
+    public_ip_address_name: "{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}-IP"
     virtual_network_name: "{{ cloud_config.network.name }}"
     subnet_name: "{{ cloud_config.subnet.name }}"
     security_group_name: "{{ outer_loop.security_group }}"
   loop_control:
     loop_var: local_loop
-  with_sequence: count="{{ outer_loop.count }}"
+  with_sequence: count="{{ outer_loop.count }}" format=-%02x
   when: "{{ outer_loop.public_ip|default(false)|bool }}"
 
 - name: Create NICs (private IP)
   azure_rm_networkinterface:
     resource_group: "{{ cloud_config.resource_group }}"
-    name: "{{ outer_loop.group }}-{{ local_loop.0 }}NIC"
+    name: "{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}-NIC"
     public_ip: false
     virtual_network_name: "{{ cloud_config.network.name }}"
     subnet_name: "{{ cloud_config.subnet.name }}"
     security_group_name: "{{ outer_loop.security_group }}"
   loop_control:
     loop_var: local_loop
-  with_sequence: count="{{ outer_loop.count }}"
+  with_sequence: count="{{ outer_loop.count }}" format=-%02x
   when: "not {{ outer_loop.public_ip|default(false)|bool }}"
 
 - name: Create {{ outer_loop.group }} nodes
   azure_rm_virtualmachine:
     resource_group: "{{ cloud_config.resource_group }}"
     storage_account_name: "{{ cloud_config.storage_account.name }}"
-    name: "{{ outer_loop.group }}-{{ local_loop.0 }}{{ cloud_config.name_suffix|default('') }}"
+    name: "{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}{{ cloud_config.name_suffix|default('') }}"
     image:
       offer:  "{{ outer_loop.image.offer }}"
       publisher: "{{ outer_loop.image.publisher }}"
       sku: "{{ outer_loop.image.sku }}"
       version: "{{ outer_loop.image.version }}"
     vm_size: "{{ outer_loop.flavor }}"
-    network_interface_names: "{{ outer_loop.group }}-{{ local_loop.0 }}NIC"
+    network_interface_names: "{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}-NIC"
     ssh_password_enabled: false
     admin_username: "{{ cloud_config.admin_username }}"
     ssh_public_keys:
       - path: /home/azure-user/.ssh/authorized_keys
-        key_data: "{{ lookup('file', cloud_config.ssh.keyfile) }}"
+        key_data: "{{ lookup('file', cloud_config.ssh.publickey) }}"
     state: present
     tags:
       group: "{{ outer_loop.group }}"
   loop_control:
     loop_var: local_loop
-  with_sequence: count="{{ outer_loop.count }}"
+  with_sequence: count="{{ outer_loop.count }}" format=-%02x
