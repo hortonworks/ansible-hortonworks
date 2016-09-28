@@ -1,11 +1,12 @@
 ---
 cloud_config:
   name_prefix: 'mytestcluster-'
-  name_suffix: '.localnet'              # useful if a domain name is needed
+  name_suffix: ''                       # useful if a domain name is needed
   location: 'West Europe'
   admin_username: azure-user
   ssh:
-    keyfile: ~/.ssh/id_rsa.pub
+    publickey: '~/.ssh/id_rsa.pub'
+    privatekey: '~/.ssh/id_rsa'
   resource_group: Testing
   storage_account:
     name: teststorage000111111
@@ -31,14 +32,26 @@ nodes:
     flavor: Standard_D3_v2
     public_ip: true
     security_group: ssh_access
+    ambari_server: true
 
   - group: "{{ cloud_config.name_prefix }}slave"
-    count: 1
+    count: 2
     image:
       offer: CentOS
       publisher: OpenLogic
       sku: '7.2'
       version: latest
-    flavor: Standard_D2_v2
+    flavor: Standard_A5
+    public_ip: false
+    security_group: ssh_access
+
+  - group: "{{ cloud_config.name_prefix }}edge"
+    count: 0
+    image:
+      offer: CentOS
+      publisher: OpenLogic
+      sku: '7.2'
+      version: latest
+    flavor: Standard_A2
     public_ip: true
     security_group: ssh_access
