@@ -19,7 +19,7 @@ This node must be able to connect to the cluster nodes via SSH and to the Azure 
 
   ```
   sudo yum -y install epel-release || sudo yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-  sudo yum -y install gcc gcc-c++ python-pip python-devel libffi-devel openssl-devel sshpass git vim-enhanced
+  sudo yum -y install gcc gcc-c++ python-virtualenv python-pip python-devel libffi-devel openssl-devel sshpass git vim-enhanced
   ```
 
 
@@ -35,7 +35,7 @@ This node must be able to connect to the cluster nodes via SSH and to the Azure 
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade   
-   pip install ansible "azure==2.0.0rc5"
+   pip install ansible "azure==2.0.0rc5" msrest msrestazure
    ```
 
 
@@ -59,7 +59,7 @@ This node must be able to connect to the cluster nodes via SSH and to the Azure 
 
   ```
   sudo apt-get update
-  sudo apt-get -y install unzip python-pip python-dev sshpass git libffi-dev libssl-dev vim
+  sudo apt-get -y install unzip python-virtualenv python-pip python-dev sshpass git libffi-dev libssl-dev vim
   ```
 
 
@@ -75,14 +75,14 @@ This node must be able to connect to the cluster nodes via SSH and to the Azure 
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade
-   pip install ansible "azure==2.0.0rc5"
+   pip install ansible "azure==2.0.0rc5" msrest msrestazure
    ```
 
 
 1. Fix an Ansible bug affecting the azure library:
 
   ```
-  sed -i s/result._task.loop_control.get\(\'loop_var\'\)/result._task.loop_control.loop_var/g ~/ansible/lib64/python2.7/site-packages/os_client_config/defaults.json
+  sed -i s/result._task.loop_control.get\(\'loop_var\'\)/result._task.loop_control.loop_var/g ~/ansible/lib/python2.7/site-packages/ansible/executor/process/result.py
   ```
 
 
@@ -157,7 +157,8 @@ This section contains variables that are cluster specific and are used by all no
 | name_suffix     | A suffix that will be appended to the name of all nodes. Usually it's a domain, but can be anything or even the empty string `''`. |
 | location        | The Azure Region as described [here](https://azure.microsoft.com/en-gb/regions/).                          |
 | admin_username  | The Linux user with sudo permissions. Can be changed in Azure.                                             |
-| ssh.keyfile     | The SSH keyfile that will be placed on cluster nodes at build time.                                        |
+| ssh.privatekey  | Local path to the SSH private key that will be used to login into the nodes. This can be the key generated as part of the Build Setup, step 5. |
+| ssh.publickey   | Local path to the SSH public key that will be placed on cluster nodes at build time.                                        |
 | resource_group  | A container that holds related resources for an application. It will be created if it doesn't exist. Details [here](https://azure.microsoft.com/en-gb/documentation/articles/resource-group-overview/). |
 | storage_account | A namespace to store and access Azure Storage data objects. Must be an unique name across all Azure. Details [here](https://azure.microsoft.com/en-gb/documentation/articles/storage-create-storage-account/). |
 | network         | The Azure virtual network (VNet). It will be created if it doesn't exist. The address range can be customized. Details [here](https://azure.microsoft.com/en-gb/documentation/articles/virtual-networks-overview/). |
