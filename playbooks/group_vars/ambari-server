@@ -1,0 +1,12 @@
+---
+cluster_name: 'mytestcluster'
+ambari_admin_user: 'admin'
+ambari_admin_password: 'admin'
+wait: true                                                      # wait for the cluster to finish installing
+wait_timeout: 3600                                              # 60 minutes
+
+blueprint_name: 'mytestcluster_blueprint'
+blueprint_file: 'blueprint_hdfs_only.j2'
+cluster_template_file: 'cluster_template.j2'
+default_password: 'AsdQwe123'                                   # a default password for all required passwords which are not specified in the blueprint
+config_recommendation_strategy: 'NEVER_APPLY'
