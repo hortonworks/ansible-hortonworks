@@ -1,0 +1,23 @@
+{
+  "blueprint" : "{{ blueprint_name }}",
+  "config_recommendation_strategy" : "{{ config_recommendation_strategy }}",
+  "default_password" : "{{ default_password }}",
+  "host_groups" :[
+    {% for node_group in nodes if node_group.count > 0 -%}
+
+    {
+      "name" : "{{ node_group.group }}",
+      "hosts" : [
+        {% for node in groups[node_group.group]|sort -%}
+
+        { "fqdn" : "{{ hostvars[node]['ansible_nodename'] | lower }}" }{% if not loop.last %},{% endif %}
+
+        {% endfor %}
+
+      ]
+    }{% if not loop.last and node_group.count > 0 %},{% endif %}
+
+    {% endfor %}
+
+  ]
+}

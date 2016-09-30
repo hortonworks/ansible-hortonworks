@@ -1,0 +1,84 @@
+{
+  "configurations" : [
+    {
+      "core-site": {
+        "hadoop.proxyuser.hcat.groups" : "*",
+        "hadoop.proxyuser.hcat.hosts" : "*",
+        "hadoop.proxyuser.hue.groups" : "*",
+        "hadoop.proxyuser.hue.hosts" : "*"
+      }
+    },
+    {
+      "hadoop-env" : {
+        "dtnode_heapsize" : "1024m",
+        "namenode_heapsize" : "2048m",
+        "namenode_opt_maxnewsize" : "384m",
+        "namenode_opt_newsize" : "384m"
+      }
+    },
+    {
+      "hdfs-site" : {
+        "dfs.datanode.data.dir" : "/hadoop/hdfs/data",
+        "dfs.datanode.failed.volumes.tolerated" : "0",
+        "dfs.replication" : "3"
+      }
+    }
+  ],
+  "host_groups" : [
+    {
+      "name" : "aanghelmytestcluster-slave",
+      "configurations" : [ ],
+      "components" : [
+        {
+          "name" : "ZOOKEEPER_CLIENT"
+        },
+        {
+          "name" : "HDFS_CLIENT"
+        },
+        {
+          "name" : "DATANODE"
+        },
+        {
+          "name" : "METRICS_MONITOR"
+        }
+      ]
+    },
+    {
+      "name" : "aanghelmytestcluster-master",
+      "configurations" : [ ],
+      "components" : [
+        {
+          "name" : "ZOOKEEPER_CLIENT"
+        },
+        {
+          "name" : "HDFS_CLIENT"
+        },
+        {
+          "name" : "ZOOKEEPER_SERVER"
+        },
+        {
+          "name" : "SECONDARY_NAMENODE"
+        },
+        {
+          "name" : "NAMENODE"
+        },
+        {
+          "name" : "AMBARI_SERVER"
+        },
+        {
+          "name" : "METRICS_COLLECTOR"
+        },
+        {
+          "name" : "METRICS_GRAFANA"
+        },
+        {
+          "name" : "METRICS_MONITOR"
+        }
+      ]
+    }
+  ],
+  "Blueprints" : {
+    "stack_name" : "HDP",
+    "stack_version" : "2.5"
+  }
+}
