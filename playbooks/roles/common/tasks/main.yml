@@ -79,7 +79,7 @@
 - name: Disable selinux
   selinux:
     state: disabled
-  when: ansible_os_family|lower == "redhat"
+  when: ansible_os_family|lower == "redhat" and ansible_distribution|lower != "amazon"
 
 - name: Disable Transparent Huge Pages until the next reboot
   shell: echo never > /sys/kernel/mm/transparent_hugepage/enabled && echo never > /sys/kernel/mm/transparent_hugepage/defrag
