@@ -1,0 +1,66 @@
+---
+- name: Build the Cloud Environment
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  vars_files:
+    - ../inventory/aws/group_vars/all
+  tasks:
+    - name: Create the VPC
+      ec2_vpc:
+        region: "{{ cloud_config.region }}"
+        cidr_block: "{{ cloud_config.vpc_cidr }}"
+        internet_gateway: "{{ cloud_config.internet_gateway }}"
+        resource_tags:
+          Name: "{{ cloud_config.vpc_name }}"
+        state: present
+        wait: yes
+      register: cluster_vpc
+
+    - name: Create the Subnet
+      ec2_vpc_subnet:
+        region: "{{ cloud_config.region }}"
+        az: "{{ cloud_config.zone }}"
+        vpc_id: "{{ cluster_vpc.vpc.id }}"
+        cidr: "{{ cloud_config.subnet_cidr }}"
+        resource_tags:
+          Name: "{{ name_prefix }}-subnet"
+        state: present
+      register: cluster_subnet
+
+    - name: Add the Default Route if Internet Gateway is present
+      ec2_vpc_route_table:
+        region: "{{ cloud_config.region }}"
+        vpc_id: "{{ cluster_vpc.vpc.id }}"
+        subnets: "{{ cluster_subnet.subnet.id }}"
+        routes:
+          - dest: 0.0.0.0/0
+            gateway_id: "{{ cluster_vpc.igw_id }}"
+        tags:
+          Name: "{{ name_prefix }}-Public"
+        state: present
+      when: "{{ cloud_config.internet_gateway }}"
+
+    - name: Create Security Groups
+      ec2_group:
+        region: "{{ cloud_config.region }}"
+        name: "{{ item.name }}"
+        vpc_id: "{{ cluster_vpc.vpc.id }}"
+        description: "{{ item.description }}"
+        purge_rules: false
+        purge_rules_egress: false
+        rules: "{{ item.rules }}"
+      with_items: "{{ cloud_config.security_groups }}"
+      register: cluster_security_groups
+
+    - name: Upload the SSH Key
+      ec2_key:
+        region: "{{ cloud_config.region }}"
+        name: "{{ cloud_config.ssh.keyname }}"
+        key_material: "{{ lookup('file', cloud_config.ssh.publickey) }}"
+        state: present
+        wait: yes
+
+    - name: Build AWS Nodes
+      include: build_aws_nodes.yml
+      with_items: "{{ nodes }}"

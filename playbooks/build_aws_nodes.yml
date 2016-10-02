@@ -1,0 +1,32 @@
+---
+- set_fact: outer_loop="{{ item }}"
+
+- name: Get AMI information
+  ec2_ami_find:
+    region: "{{ cloud_config.region }}"
+    ami_id: "{{ outer_loop.image }}"
+  register: current_ami
+
+- name: Create {{ outer_loop.group }} nodes (EBS root volume)
+  ec2:
+    region: "{{ cloud_config.region }}"
+    zone: "{{ cloud_config.zone }}"
+    image: "{{ outer_loop.image }}"
+    instance_type: "{{ outer_loop.type }}"
+    vpc_subnet_id: "{{ cluster_subnet.subnet.id }}"
+    groups: "{{ outer_loop.security_groups }}"
+    assign_public_ip: "{{ outer_loop.public_ip }}"
+    key_name: "{{ cloud_config.ssh.keyname }}"
+    exact_count: "{{ outer_loop.count }}"
+    volumes:
+      - device_name: "{{ current_ami['results'][0]['root_device_name'] }}"
+        volume_type: "{{ outer_loop.root_volume.type }}"
+        volume_size: "{{ outer_loop.root_volume.size }}"
+        delete_on_termination: true
+    count_tag:
+      group: "{{ outer_loop.group }}"
+    instance_tags:
+      group: "{{ outer_loop.group }}"
+    wait: yes
+    wait_timeout: 600
+  when: "{{ outer_loop.root_volume.ebs }}"

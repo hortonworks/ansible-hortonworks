@@ -1,0 +1,60 @@
+---
+name_prefix: 'mytestcluster'
+
+cloud_config:
+  region: 'eu-west-1'
+  zone: 'eu-west-1a'
+  vpc_name: "{{ name_prefix }}-VPC"
+  vpc_cidr: '10.0.0.0/16'
+  subnet_cidr: '10.0.10.0/24'
+  internet_gateway: true                                           # Only set to false if using local repos
+  admin_username: ec2-user
+  ssh:
+    keyname: "{{ name_prefix }}-key"
+    publickey: '~/.ssh/id_rsa.pub'
+    privatekey: '~/.ssh/id_rsa'
+  security_groups:
+    - name: ambari_access
+      rules:
+        - {"proto":"tcp", "from_port":"8080", "to_port":"8080", "cidr_ip":"0.0.0.0/0"}
+      description: "Ambari access - {{ name_prefix }}"
+    - name: default_cluster_access
+      rules:
+        - {"proto":"tcp", "from_port":"22", "to_port":"22", "cidr_ip":"0.0.0.0/0"}
+        - {"proto":"all", "group_name":"default_cluster_access"}
+      description: "SSH and inter-nodes access - {{ name_prefix }}"
+
+nodes:
+  - group: "{{ name_prefix }}-master"
+    count: 1
+    image: ami-d41d58a7                                            # Amazon Linux AMI 2016.09.0 in eu-west-1
+    type: r3.xlarge
+    public_ip: true                                                # wait for Ansible 2.2 before setting this to false
+    security_groups: default_cluster_access,ambari_access
+    root_volume:
+      ebs: true                                                    # non-EBS root volumes are not supported at the moment
+      type: gp2
+      size: 15
+    ambari_server: true
+
+  - group: "{{ name_prefix }}-slave"
+    count: 2
+    image: ami-d41d58a7                                            # Amazon Linux AMI 2016.09.0 in eu-west-1
+    type: r3.large
+    public_ip: true                                                # wait for Ansible 2.2 before setting this to false
+    root_volume:
+      ebs: true                                                    # non-EBS root volumes are not supported at the moment
+      type: gp2
+      size: 15
+    security_groups: default_cluster_access
+
+  - group: "{{ name_prefix }}-edge"
+    count: 0
+    image: ami-d41d58a7                                            # Amazon Linux AMI 2016.09.0 in eu-west-1
+    type: m3.medium
+    public_ip: true                                                # wait for Ansible 2.2 before setting this to false
+    root_volume:
+      ebs: true                                                    # non-EBS root volumes are not supported at the moment
+      type: gp2
+      size: 10
+    security_groups: default_cluster_access
