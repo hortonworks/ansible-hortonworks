@@ -8,6 +8,7 @@ The aim is to first build the nodes in a Cloud environment, prepare them (OS set
 
 ## [Installation] (id:installation)
 
+- AWS: See [INSTALL.md](../master/INSTALL_AWS.md) for AWS specific build instructions.
 - Azure: See [INSTALL.md](../master/INSTALL_Azure.md) for Azure specific build instructions.
 - OpenStack: See [INSTALL.md](../master/INSTALL_OpenStack.md) for OpenStack specific build instructions.
 
@@ -25,16 +26,29 @@ Currently, these playbooks are divided into the following parts:
  
 1. Build the Cloud nodes
 
-  Run the Cloud specific `build_` script to build the nodes. Refer to the Cloud specific INSTALL guides for more information.
+  Run the `build_cloud.sh` script to build the nodes. Refer to the Cloud specific INSTALL guides for more information.
 
+1. Install HDP
+
+  Run the `install_hdp.sh` script that will install the HDP cluster using Blueprints while taking care of the necessary prerequisites.
+
+
+...or alternatively, run each step separately:
+ 
 1. Prepare the Cloud nodes
 
-  Run the Cloud specific `prepare_nodes_` script to prepare the nodes.
+  Run the `prepare_nodes.sh` script to prepare the nodes.
   
   This installs the required OS packages, applies the recommended OS settings and adds the Ambari repositories.
 
 1. Install Ambari
 
-  Run the Cloud specific `install_ambari_` script to install Ambari on the nodes.
+  Run the `install_ambari.sh` script to install Ambari on the nodes.
   
   This installs the Ambari Agent on all nodes and the Ambari Server on the designated node. Ambari Agents are configured to register to the Ambari Server.
+
+1. Apply Blueprint
+
+  Run the `apply_blueprint.sh` script to install HDP based on an Ambari Blueprint.
+  
+  This uploads the Ambari Blueprint and Cluster Creation Template and launches a cluster create request to Ambari. It can also wait for the cluster to be built
