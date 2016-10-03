@@ -39,13 +39,6 @@ This node must be able to connect to the cluster nodes via SSH and to the Azure 
    ```
 
 
-1. Fix an Ansible bug affecting the azure library:
-
-  ```
-  sed -i s/result._task.loop_control.get\(\'loop_var\'\)/result._task.loop_control.loop_var/g ~/ansible/lib64/python2.7/site-packages/ansible/executor/process/result.py
-  ```
-
-
 1. Generate the SSH public/private key pair that will be loaded onto the cluster nodes (if none exists):
 
   ```
@@ -77,13 +70,6 @@ This node must be able to connect to the cluster nodes via SSH and to the Azure 
    pip install pip --upgrade
    pip install pycparser===2.13 ansible "azure==2.0.0rc5" msrest msrestazure
    ```
-
-
-1. Fix an Ansible bug affecting the azure library:
-
-  ```
-  sed -i s/result._task.loop_control.get\(\'loop_var\'\)/result._task.loop_control.loop_var/g ~/ansible/lib/python2.7/site-packages/ansible/executor/process/result.py
-  ```
 
 
 1. Generate the SSH public/private key pair that will be loaded onto the cluster nodes (if none exists):
@@ -161,7 +147,7 @@ This section contains variables that are cluster specific and are used by all no
 | name_suffix     | A suffix that will be appended to the name of all nodes. Usually it's a domain, but can be anything or even the empty string `''`. |
 | location        | The Azure Region as described [here](https://azure.microsoft.com/en-gb/regions/).                          |
 | admin_username  | The Linux user with sudo permissions. Can be customized in Azure as it's used when building the nodes.     |
-| ssh.privatekey  | Local path to the SSH private key that will be used to login into the nodes. This can be the key generated as part of the Build Setup, step 5. |
+| ssh.privatekey  | Local path to the SSH private key that will be used to login into the nodes. This can be the key generated as part of the Build Setup, step 4. |
 | ssh.publickey   | Local path to the SSH public key that will be placed on cluster nodes at build time.                                        |
 | resource_group  | A container that holds related resources for an application. It will be created if it doesn't exist. Details [here](https://azure.microsoft.com/en-gb/documentation/articles/resource-group-overview/). |
 | storage_account | A namespace to store and access Azure Storage data objects. It will be created if it doesn't exist. Must be an unique name across all Azure. Details [here](https://azure.microsoft.com/en-gb/documentation/articles/storage-create-storage-account/). |

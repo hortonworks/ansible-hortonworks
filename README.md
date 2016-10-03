@@ -15,9 +15,9 @@ The aim is to first build the nodes in a Cloud environment, prepare them (OS set
 
 ## [Requirements] (id:requirements)
 
-- Ansible >= 2.1.1
+- Ansible >= 2.1.2
 
-- Expects CentOS/RHEL 7 or Ubuntu 14 hosts
+- Expects CentOS/RHEL 7 or Ubuntu 14 hosts (also supports Amazon Linux AMI)
 
 
 ## [Description] (id:description)
@@ -33,8 +33,12 @@ Currently, these playbooks are divided into the following parts:
   Run the `install_hdp.sh` script that will install the HDP cluster using Blueprints while taking care of the necessary prerequisites.
 
 
-...or alternatively, run each step separately:
- 
+...or, alternatively, run each step separately:
+
+1. Build the Cloud nodes
+
+  Run the `build_cloud.sh` script to build the nodes. Refer to the Cloud specific INSTALL guides for more information.
+
 1. Prepare the Cloud nodes
 
   Run the `prepare_nodes.sh` script to prepare the nodes.
