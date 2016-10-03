@@ -1,7 +1,8 @@
 ---
+name_prefix: 'mytestcluster'
+
 cloud_config:
-  name_prefix: 'mytestcluster-'
-  name_suffix: ''                       # useful if a domain name is needed
+  name_suffix: ''
   location: 'West Europe'
   admin_username: azure-user
   ssh:
@@ -15,14 +16,14 @@ cloud_config:
     name: testnetwork
     address: "10.10.0.0/16"
   subnet:
-    name: testsubnet
+    name: "{{ name_prefix }}-testsubnet"
     address: "10.10.0.0/24"
   security_groups:
     - name: ssh_access
       port: 22
 
 nodes:
-  - group: "{{ cloud_config.name_prefix }}master"
+  - group: "{{ name_prefix }}-master"
     count: 1
     image:
       offer: CentOS
@@ -34,7 +35,7 @@ nodes:
     security_group: ssh_access
     ambari_server: true
 
-  - group: "{{ cloud_config.name_prefix }}slave"
+  - group: "{{ name_prefix }}-slave"
     count: 2
     image:
       offer: CentOS
@@ -45,7 +46,7 @@ nodes:
     public_ip: false
     security_group: ssh_access
 
-  - group: "{{ cloud_config.name_prefix }}edge"
+  - group: "{{ name_prefix }}-edge"
     count: 0
     image:
       offer: CentOS
