@@ -1,5 +1,4 @@
 ---
-cluster_name: 'mytestcluster'
 ambari_admin_user: 'admin'
 ambari_admin_password: 'admin'
 wait: true                                                      # wait for the cluster to finish installing
