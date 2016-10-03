@@ -1,7 +1,7 @@
 ansible-hdp installation guide
 ------------------------------
 
-* These Ansible playbooks can build a Cloud environment in Azure.
+* These Ansible playbooks can build a Cloud environment in AWS.
 
 ---
 
@@ -10,7 +10,7 @@ ansible-hdp installation guide
 
 Before building anything, the build node / workstation from where Ansible will run should be prepared.
 
-This node must be able to connect to the cluster nodes via SSH and to the Azure APIs via HTTPS.
+This node must be able to connect to the cluster nodes via SSH and to the AWS APIs via HTTPS.
 
 
 ## CentOS/RHEL 7
@@ -35,15 +35,8 @@ This node must be able to connect to the cluster nodes via SSH and to the Azure 
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade   
-   pip install pycparser===2.13 ansible "azure==2.0.0rc5" msrest msrestazure
+   pip install pycparser===2.13 ansible boto
    ```
-
-
-1. Fix an Ansible bug affecting the azure library:
-
-  ```
-  sed -i s/result._task.loop_control.get\(\'loop_var\'\)/result._task.loop_control.loop_var/g ~/ansible/lib64/python2.7/site-packages/ansible/executor/process/result.py
-  ```
 
 
 1. Generate the SSH public/private key pair that will be loaded onto the cluster nodes (if none exists):
@@ -53,7 +46,7 @@ This node must be able to connect to the cluster nodes via SSH and to the Azure 
   ```
 
 
-## Ubuntu 16+
+## Ubuntu 14+
 
 1. Install required packages:
 
@@ -75,15 +68,8 @@ This node must be able to connect to the cluster nodes via SSH and to the Azure 
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade
-   pip install pycparser===2.13 ansible "azure==2.0.0rc5" msrest msrestazure
+   pip install pycparser===2.13 ansible boto
    ```
-
-
-1. Fix an Ansible bug affecting the azure library:
-
-  ```
-  sed -i s/result._task.loop_control.get\(\'loop_var\'\)/result._task.loop_control.loop_var/g ~/ansible/lib/python2.7/site-packages/ansible/executor/process/result.py
-  ```
 
 
 1. Generate the SSH public/private key pair that will be loaded onto the cluster nodes (if none exists):
@@ -93,36 +79,27 @@ This node must be able to connect to the cluster nodes via SSH and to the Azure 
   ```
 
 
-# Setup the Azure credentials file
+# Setup the AWS credentials file
 
-1. Create a service principal
-
-  Use the following [guide](https://azure.microsoft.com/en-us/documentation/articles/resource-group-create-service-principal-portal) to create a Service Principal.
-
-  After the tutorial the following should have been obtained:
-
-    * Subscription ID (from the Subscription page in the Azure portal)
-    * Client ID
-    * Secret key (generated when the application was created)
-    * Tenant ID
+Ansible AWS modules use the boto Python library. Boto can manage credentials using a config file (more details [here](http://boto.readthedocs.io/en/latest/boto_config_tut.html) but for the purpose of this guide we'll use environment variables.
 
 
-1. Create the credentials file
+1. Get the AWS access key and secret
 
-  Store the obtained credentials in a file and save this file as `.azure/credentials` under the home folder of the user running the playbook.
-
-  ```
-  [default]
-  subscription_id=xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-  client_id=xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-  secret=xxxxxxxxxxxxxxxxx
-  tenant=xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-  ```
+  Decide on the account you want to use for the purpose of these scripts or create a new one in IAM (with a `PowerUserAccess` policy attached to it).
   
+  [Create](http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html#Using_CreateAccessKey) an Access Key if none is present.
   
+  Obtain the `Access Key ID` and the `Secret Access Key`.
+
+
+1. Export the environment variables
+
+  With the Access Key details obtained, export them as environment variables:
+
   ```
-  mkdir -p ~/.azure/
-  cat > ~/.azure/credentials
+  export AWS_ACCESS_KEY_ID='AK123'
+  export AWS_SECRET_ACCESS_KEY='abc123'
   ```
 
 
@@ -143,12 +120,12 @@ cd && git clone git@github.com:hortonworks/ansible-hdp.git
 ```
 
 
-# Set the Azure variables
+# Set the AWS variables
 
-Modify the file at `~/ansible-hdp/inventory/azure/group_vars/all` to set the Azure configuration.
+Modify the file at `~/ansible-hdp/inventory/aws/group_vars/all` to set the AWS configuration.
 
 ## name_prefix
-A helper variable that can be used to precede the name of the nodes nodes and other cluster specific Azure resources (such as the subnet or NICs).
+A helper variable that can be used to precede the name of the nodes nodes and other AWS resources (such as the subnet or NICs).
 
 Node names are derived from the group name (more details about groups bellow) and this variable can be used to uniquely identify a certain cluster, especially if the Resource Group is shared.
 
@@ -156,18 +133,19 @@ Node names are derived from the group name (more details about groups bellow) an
 ## cloud_config
 This section contains variables that are cluster specific and are used by all nodes:
 
-| Variable        | Description                                                                                                |
-| --------------- | ---------------------------------------------------------------------------------------------------------- |
-| name_suffix     | A suffix that will be appended to the name of all nodes. Usually it's a domain, but can be anything or even the empty string `''`. |
-| location        | The Azure Region as described [here](https://azure.microsoft.com/en-gb/regions/).                          |
-| admin_username  | The Linux user with sudo permissions. Can be customized in Azure as it's used when building the nodes.     |
-| ssh.privatekey  | Local path to the SSH private key that will be used to login into the nodes. This can be the key generated as part of the Build Setup, step 5. |
-| ssh.publickey   | Local path to the SSH public key that will be placed on cluster nodes at build time.                                        |
-| resource_group  | A container that holds related resources for an application. It will be created if it doesn't exist. Details [here](https://azure.microsoft.com/en-gb/documentation/articles/resource-group-overview/). |
-| storage_account | A namespace to store and access Azure Storage data objects. It will be created if it doesn't exist. Must be an unique name across all Azure. Details [here](https://azure.microsoft.com/en-gb/documentation/articles/storage-create-storage-account/). |
-| network         | The Azure virtual network (VNet). It will be created if it doesn't exist. The address range can be customized. Details [here](https://azure.microsoft.com/en-gb/documentation/articles/virtual-networks-overview/). |
-| subnet          | Subnet is a range of IP addresses in the VNet previously set. By default it uses the `name_prefix` in the name as the subnet should be dedicated to only one cluster. It will be created if it doesn't exist. Details [here](https://azure.microsoft.com/en-gb/documentation/articles/virtual-networks-overview/#subnets). |
-| security_groups | A list of Access Control List (ACL) associated with the subnet. Details [here](https://azure.microsoft.com/en-gb/documentation/articles/virtual-networks-nsg/). |
+| Variable           | Description                                                                                             |
+| ------------------ | ------------------------------------------------------------------------------------------------------- |
+| name_suffix        | A suffix that will be appended to the name of all nodes. Usually it's a domain, but can be anything or even the empty string `''`. |
+| region             | The AWS Region as described [here](http://docs.aws.amazon.com/general/latest/gr/rande.html#ec2_region). |
+| zone               | The AWS Availability Zone from the previously set Region. More details [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html#using-regions-availability-zones-describe). |
+| vpc_name /vpc_cidr | The Amazon Virtual Private Cloud as described [here](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Introduction.html). It will be created if it doesn't exist. The name and the CIDR uniquely identify a VPC so set these variables accordingly if you want to build in an existing VPC. |
+| subnet_cidr        | Subnet is a range of IP addresses in the VPC as described [here](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Subnets.html). |
+| internet_gateway   | Set this to `true` if the VPC has an Internet Gateway. Without one, the cluster nodes cannot reach the Internet (useful to download packages) so only set this to `false` if the nodes will use repositories located in the same VPC. More details about Internet Gateways [here](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Internet_Gateway.html). |
+| admin_username     | The Linux user with sudo permissions. Usually this is `ec2-user`.                                          |
+| ssh.keyname        | The name of the AWS SSH key that will be placed on cluster nodes at build time. Can be an existing one otherwise a new key will be uploaded. |
+| ssh.privatekey     | Local path to the SSH private key that will be used to login into the nodes. This can be the key generated as part of the Build Setup, step 5. |
+| ssh.publickey      | Local path to the SSH public key that will be placed on cluster nodes at build time. This public key will be uploaded to AWS if one doesn't exist. |
+| security_groups    | A list of Access Control List (ACL) associated with the subnet. Details [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-network-security.html#vpc-security-groups). By default, nodes in the same security group are not allowed to communicate to each other unless there is a rule to allow traffic originating from the same group. This rule is defined in the `default_cluster_access` security group and should be kept as it is. |
 
 
 ## nodes config
@@ -176,18 +154,19 @@ This section contains variables that are node specific.
 
 Nodes are separated by groups, for example master, slave, edge.
 
-There can be any number of groups so other groups can be added to correspond with the required architecture.
+There can be any number of groups.
 
-And groups can have any name and any number of nodes but group names should correspond with the host groups in the Ambari Blueprint.
+And groups can have any names and any number of nodes but they should correspond with the host groups in the Ambari Blueprint.
 
 | Variable        | Description                                                               |
 | --------------- | ------------------------------------------------------------------------- |
-| group           | The name of the group. Must be unique in the Azure Resource Group so this is the reason why the default contains the `name_prefix`. It's used to derive the nodes names (if node count is greater than 1, numbers will be appended to the group name to uniquely identify nodes). |
+| group           | The name of the group. Must be unique in the AWS VPC. This is the reason why the default contains the `name_prefix`. Other groups can be added to correspond with the required architecture. |
 | count           | The number of nodes to be built in this group. |
-| image           | The OS image to be used. More details [here](https://azure.microsoft.com/en-gb/documentation/articles/virtual-machines-linux-cli-ps-findimage/). |
-| flavor          | The flavor / size of the node. A list of all the flavors can be found [here](https://azure.microsoft.com/en-gb/documentation/articles/virtual-machines-linux-sizes/) and the pricing [here](https://azure.microsoft.com/en-gb/pricing/details/virtual-machines/linux/#Windows). |
+| image           | The AMI ID of the OS image to be used. More details [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html). The easiest way to find out the ID is by using the EC2 console and clicking on the `Launch Instance` button. |
+| type            | The instance-type / size of the node. A list of all the instance-types can be found [here](https://aws.amazon.com/ec2/instance-types/) and the pricing [here](https://aws.amazon.com/ec2/pricing/). |
 | public_ip       | If the VM should have a Public IP assigned to it. Required if the build node does not have access to the private IP range of the cluster nodes. |
-| security_group  | The security group that should be applied to the node.                                                             |
+| security_groups | The security groups that should be applied to the node. The nodes should have at least the default security group that allows traffic in the same group. |
+| root_volume     | The vast majority of AMIs require an EBS root volume. The default size of this root volume is small, irrespective of the instance-type, so use this variable to set the size of the root volume to the desired value. More details about root devices [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/RootDeviceStorage.html) and about types of EBS Volumes [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html). |
 | ambari_server   | Set it to `true` if the group also runs an Ambari Server. The number of nodes in this group should be 1. If there are more than 1 node, ambari-server will be installed on all of them, but only the first one (in alphabetical order) will be used by the Ambari Agents. |
 
 
@@ -195,10 +174,10 @@ And groups can have any name and any number of nodes but group names should corr
 
 Run the script that will build the Cloud environment.
 
-Set first the `CLOUD_TO_USE` environment variable to `azure`.
+Set first the `CLOUD_TO_USE` environment variable to `aws`.
 
 ```
-export CLOUD_TO_USE=azure
+export CLOUD_TO_USE=aws
 cd ~/ansible-hdp*/ && bash build_cloud.sh
 ```
 
@@ -242,10 +221,10 @@ Modify the file at `~/ansible-hdp/playbooks/group_vars/ambari-server` to set the
 
 Run the script that will install the HDP cluster using Blueprints while taking care of the necessary prerequisites.
 
-Make sure you set the `CLOUD_TO_USE` environment variable to `azure`.
+Make sure you set the `CLOUD_TO_USE` environment variable to `aws`.
 
 ```
-export CLOUD_TO_USE=azure
+export CLOUD_TO_USE=aws
 cd ~/ansible-hdp*/ && bash install_hdp.sh
 ```
 

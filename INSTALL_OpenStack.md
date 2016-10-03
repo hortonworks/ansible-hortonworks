@@ -21,7 +21,7 @@ As OpenStack environments are usually private, you might need to build such a no
 
   ```
   sudo yum -y install epel-release || sudo yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-  sudo yum install gcc gcc-c++ python-virtualenv python-pip python-devel libffi-devel openssl-devel libyaml-devel sshpass git vim-enhanced -y
+  sudo yum -y install gcc gcc-c++ python-virtualenv python-pip python-devel libffi-devel openssl-devel libyaml-devel sshpass git vim-enhanced
   ```
 
 
@@ -37,7 +37,7 @@ As OpenStack environments are usually private, you might need to build such a no
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade   
-   pip install functools32 pytz ansible shade
+   pip install pycparser===2.13 functools32 pytz ansible shade
    ```
 
 
@@ -79,7 +79,7 @@ As OpenStack environments are usually private, you might need to build such a no
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade
-   pip install functools32 pytz ansible shade
+   pip install pycparser===2.13 functools32 pytz ansible shade
    ```
 
 
@@ -147,13 +147,19 @@ cd && git clone git@github.com:hortonworks/ansible-hdp.git
 
 Modify the file at `~/ansible-hdp/inventory/openstack/group_vars/all` to set the OpenStack configuration.
 
+## name_prefix
+A helper variable that can be used to precede the name of all nodes.
+
+Node names are derived from the group name (more details about groups bellow).
+
+You can modify the group names so they don't use this variable, the choice is yours, but names must be unique in the same OpenStack Zone as it's shared by other users.
+
 
 ## cloud_config
 This section contains variables that are cluster specific and are used by all nodes:
 
 | Variable        | Description                                                                                                |
 | --------------- | ---------------------------------------------------------------------------------------------------------- |
-| name_prefix     | A prefix that will precede the name of all nodes. Usually the cluster name to uniquely identify the nodes. |
 | name_suffix     | A suffix that will be appended to the name of all nodes. Usually it's a domain, but can be anything or even the empty string `''`. |
 | zone            | The name of the OpenStack zone.                         |
 | admin_username  | The Linux user with sudo permissions. This user is specific to the image used. For example, in a CentOS image, it can be `centos` or in a Ubuntu image it can be `ubuntu`. |
@@ -167,14 +173,13 @@ This section contains variables that are node specific.
 
 Nodes are separated by groups, for example master, slave, edge.
 
-There can be any number of groups.
+There can be any number of groups so other groups can be added to correspond with the required architecture.
 
-And groups can have any names and any number of nodes but they should correspond with the host groups in the Ambari Blueprint.
-
+And groups can have any name and any number of nodes but group names should correspond with the host groups in the Ambari Blueprint.
 
 | Variable        | Description                                                               |
 | --------------- | ------------------------------------------------------------------------- |
-| group           | The name of the group. Must be unique in the OpenStack Zone. This is the reason why the default contains the `name_prefix`. Other groups can be added to correspond with the required architecture. |
+| group           | The name of the group. Must be unique in the OpenStack Zone so this is the reason why the default contains the `name_prefix`. It's used to derive the nodes names (if node count is greater than 1, numbers will be appended to the group name to uniquely identify nodes). |
 | count           | The number of nodes to be built in this group. |
 | image           | The name or ID of the OS image to be used. A list of the available images can be found by running `nova --insecure image-list`. |
 | flavor          | The name or ID of the flavor / size of the node. A list of all the available flavors can be found by running `nova --insecure flavor-list`. |                                                      |
@@ -184,10 +189,13 @@ And groups can have any names and any number of nodes but they should correspond
 
 # Build the Cloud environment
 
-Run the script that will build the Cloud environment:
+Run the script that will build the Cloud environment.
+
+Set first the `CLOUD_TO_USE` environment variable to `openstack`.
 
 ```
-cd ~/ansible-hdp*/ && bash build_openstack.sh
+export CLOUD_TO_USE=openstack
+cd ~/ansible-hdp*/ && bash build_cloud.sh
 ```
 
 You may need to load the environment variables if this is a new session:
@@ -200,19 +208,42 @@ source ~/*-openrc.sh
 
 # Set the cluster variables
 
+## all config
+
 Modify the file at `~/ansible-hdp/playbooks/group_vars/all` to set the cluster configuration.
 
-| Variable        | Description                                                                                                |
-| --------------- | ---------------------------------------------------------------------------------------------------------- |
-| ambari_version  | The Ambari version, in the full, 4-number form, for example: `2.4.1.0`. |
+| Variable          | Description                                                                                                |
+| ----------------- | ---------------------------------------------------------------------------------------------------------- |
+| ambari_version    | The Ambari version, in the full, 4-number form, for example: `2.4.1.0`.                                    |
+| hdp_major_version | The HDP version, in the major, 2-number form, for example: `2.5`.                                          |
+| cluster_name      | The name of the HDP cluster.                                                                               |
 
 
-# Prepare the nodes
+## ambari-server config
 
-Run the script that will prepare the nodes for the Ambari installation:
+Modify the file at `~/ansible-hdp/playbooks/group_vars/ambari-server` to set the Ambari Server specific configuration.
+
+| Variable                       | Description                                                                                                |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| ambari_admin_user              | The Ambari admin username, normally `admin`.                                                               |
+| ambari_admin_password          | The Ambari password of the `ambari_admin_user` user previously set.                                        |
+| wait / wait_timeout            | Set this to `true` if you want the playbook to wait for the cluster to be successfully built after applying the blueprint. The timeout setting controls for how long (in seconds) should it wait for the cluster build. |
+| blueprint_name                 | The name of the blueprint as it will be stored in Ambari.                                                  |
+| blueprint_file                 | The path to the blueprint file that will be uploaded to Ambari. It can be an absolute path or relative to the `roles/ambari-blueprint/templates`  folder. It can also contain [Jinja2 Template](http://jinja.pocoo.org/docs/dev/templates/) variables. |
+| cluster_template_file          | The path to the cluster creation template file that will be used to build the cluster. It can be an absolute path or relative to the `ambari-blueprint/templates`  folder. The default should be sufficient for cloud builds as it uses the `cloud_config` variables and [Jinja2 Template](http://jinja.pocoo.org/docs/dev/templates/) to generate the file. |
+| default_password               | A default password for all required passwords which are not specified in the blueprint.                                                                               |
+| config_recommendation_strategy | Configuration field which specifies the strategy of applying configuration recommendations to a cluster as explained in the [documentation](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-ClusterCreationTemplateStructure). |
+
+
+# Install the HDP cluster
+
+Run the script that will install the HDP cluster using Blueprints while taking care of the necessary prerequisites.
+
+Make sure you set the `CLOUD_TO_USE` environment variable to `openstack`.
 
 ```
-cd ~/ansible-hdp*/ && bash prepare_nodes_openstack.sh
+export CLOUD_TO_USE=openstack
+cd ~/ansible-hdp*/ && bash install_hdp.sh
 ```
 
 You may need to load the environment variables if this is a new session:
@@ -223,17 +254,8 @@ source ~/*-openrc.sh
 ```
 
 
-# Install Ambari
+This script will apply all the required playbooks in one run, but you can also apply the individual playbooks by running the following wrapper scripts:
 
-Run the script that will install and configure Ambari Agents and Ambari Server:
-
-```
-cd ~/ansible-hdp*/ && bash install_ambari_openstack.sh
-```
-
-You may need to load the environment variables if this is a new session:
-
-```
-source ~/ansible/bin/activate
-source ~/*-openrc.sh
-```
+- Prepare the nodes: `prepare_nodes.sh`
+- Install Ambari: `install_ambari.sh`
+- Apply Blueprint: `apply_blueprint.sh`
