@@ -232,7 +232,6 @@ You may need to load the environment variables if this is a new session:
 
 ```
 source ~/ansible/bin/activate
-source ~/*-openrc.sh
 ```
 
 
