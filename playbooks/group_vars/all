@@ -1,3 +1,4 @@
 ---
 ambari_version: '2.4.1.0'
+hdp_major_version: '2.5'
 cluster_name: 'mytestcluster'
