@@ -8,7 +8,7 @@
     name: "IP-{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
   loop_control:
     loop_var: local_loop
-  with_sequence: count="{{ outer_loop.count }}" format=%02x
+  with_sequence: count="{{ outer_loop.count }}" format=-%02x
   when: "{{ outer_loop.public_ip }}"
   register: current_public_ips
 
