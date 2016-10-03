@@ -4,7 +4,7 @@ name_prefix: 'mytestcluster'
 cloud_config:
   region: 'eu-west-1'
   zone: 'eu-west-1a'
-  vpc_name: "{{ name_prefix }}-VPC"
+  vpc_name: "Hadoop-Testing"
   vpc_cidr: '10.0.0.0/16'
   subnet_cidr: '10.0.10.0/24'
   internet_gateway: true                                           # Only set to false if using local repos
@@ -42,19 +42,19 @@ nodes:
     image: ami-d41d58a7                                            # Amazon Linux AMI 2016.09.0 in eu-west-1
     type: r3.large
     public_ip: true                                                # wait for Ansible 2.2 before setting this to false
+    security_groups: default_cluster_access
     root_volume:
       ebs: true                                                    # non-EBS root volumes are not supported at the moment
       type: gp2
       size: 15
-    security_groups: default_cluster_access
 
   - group: "{{ name_prefix }}-edge"
     count: 0
     image: ami-d41d58a7                                            # Amazon Linux AMI 2016.09.0 in eu-west-1
     type: m3.medium
     public_ip: true                                                # wait for Ansible 2.2 before setting this to false
+    security_groups: default_cluster_access
     root_volume:
       ebs: true                                                    # non-EBS root volumes are not supported at the moment
       type: gp2
       size: 10
-    security_groups: default_cluster_access

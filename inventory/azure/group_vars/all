@@ -43,7 +43,7 @@ nodes:
       sku: '7.2'
       version: latest
     flavor: Standard_A5
-    public_ip: false
+    public_ip: true
     security_group: ssh_access
 
   - group: "{{ name_prefix }}-edge"
