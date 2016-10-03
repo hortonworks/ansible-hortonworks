@@ -29,4 +29,16 @@
       group: "{{ outer_loop.group }}"
     wait: yes
     wait_timeout: 600
+  register: current_ec2
   when: "{{ outer_loop.root_volume.ebs }}"
+
+- name: Wait for SSH to start
+  wait_for:
+    host: "{{ (outer_loop.public_ip|default(false)== true) | ternary(local_loop.public_ip,local_loop.private_ip) }}"
+    port: 22
+    state: started
+    delay: 30
+    timeout: 300
+  loop_control:
+    loop_var: local_loop
+  with_items: '{{ current_ec2.instances }}'
