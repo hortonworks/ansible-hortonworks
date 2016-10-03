@@ -1,42 +1,80 @@
 ---
 - set_fact: outer_loop="{{ item }}"
 
-- name: Create Public IPs
-  azure_rm_publicipaddress:
-    resource_group: "{{ cloud_config.resource_group }}"
-    allocation_method: Static
-    name: "IP-{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
-  loop_control:
-    loop_var: local_loop
-  with_sequence: count="{{ outer_loop.count }}" format=-%02x
-  when: "{{ outer_loop.public_ip }}"
-  register: current_public_ips
+- block:
+    - name: Create Public IPs
+      azure_rm_publicipaddress:
+        resource_group: "{{ cloud_config.resource_group }}"
+        allocation_method: Static
+        name: "IP-{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
+      loop_control:
+        loop_var: local_loop
+      with_sequence: count="{{ outer_loop.count }}" format=-%02x
+      async: 1000
+      poll: 0
+      register: current_ips_async
 
-- name: Create NICs (with public IP)
-  azure_rm_networkinterface:
-    resource_group: "{{ cloud_config.resource_group }}"
-    name: "NIC-{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
-    public_ip_address_name: "IP-{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
-    virtual_network_name: "{{ cloud_config.network.name }}"
-    subnet_name: "{{ cloud_config.subnet.name }}"
-    security_group_name: "{{ outer_loop.security_group }}"
-  loop_control:
-    loop_var: local_loop
-  with_sequence: count="{{ outer_loop.count }}" format=-%02x
+    - name: Wait for Public IPs to be built
+      async_status:
+        jid: "{{ local_loop.ansible_job_id }}"
+      loop_control:
+        loop_var: local_loop
+      with_items: "{{ current_ips_async.results }}"
+      register: current_public_ips
+      until: current_public_ips.finished
+      retries: 120
+
+    - name: Create NICs (with public IP)
+      azure_rm_networkinterface:
+        resource_group: "{{ cloud_config.resource_group }}"
+        name: "NIC-{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
+        public_ip_address_name: "IP-{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
+        virtual_network_name: "{{ cloud_config.network.name }}"
+        subnet_name: "{{ cloud_config.subnet.name }}"
+        security_group_name: "{{ outer_loop.security_group }}"
+      loop_control:
+        loop_var: local_loop
+      with_sequence: count="{{ outer_loop.count }}" format=-%02x
+      async: 1000
+      poll: 0
+      register: current_public_nics_async
+
+    - name: Wait for NICs to be built
+      async_status:
+        jid: "{{ local_loop.ansible_job_id }}"
+      loop_control:
+        loop_var: local_loop
+      with_items: "{{ current_public_nics_async.results }}"
+      register: current_public_nics
+      until: current_public_nics.finished
+      retries: 120
   when: "{{ outer_loop.public_ip|default(false)|bool }}"
-  register: current_nics
 
-- name: Create NICs (with private IP only)
-  azure_rm_networkinterface:
-    resource_group: "{{ cloud_config.resource_group }}"
-    name: "NIC-{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
-    public_ip: false
-    virtual_network_name: "{{ cloud_config.network.name }}"
-    subnet_name: "{{ cloud_config.subnet.name }}"
-    security_group_name: "{{ outer_loop.security_group }}"
-  loop_control:
-    loop_var: local_loop
-  with_sequence: count="{{ outer_loop.count }}" format=-%02x
+- block:
+    - name: Create NICs (with private IP only)
+      azure_rm_networkinterface:
+        resource_group: "{{ cloud_config.resource_group }}"
+        name: "NIC-{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
+        public_ip: false
+        virtual_network_name: "{{ cloud_config.network.name }}"
+        subnet_name: "{{ cloud_config.subnet.name }}"
+        security_group_name: "{{ outer_loop.security_group }}"
+      loop_control:
+        loop_var: local_loop
+      with_sequence: count="{{ outer_loop.count }}" format=-%02x
+      async: 1000
+      poll: 0
+      register: current_private_nics_async
+
+    - name: Wait for NICs to be built
+      async_status:
+        jid: "{{ local_loop.ansible_job_id }}"
+      loop_control:
+        loop_var: local_loop
+      with_items: "{{ current_private_nics_async.results }}"
+      register: current_private_nics
+      until: current_private_nics.finished
+      retries: 120
   when: "not {{ outer_loop.public_ip|default(false)|bool }}"
 
 - name: Create {{ outer_loop.group }} nodes
@@ -62,3 +100,16 @@
   loop_control:
     loop_var: local_loop
   with_sequence: count="{{ outer_loop.count }}" format=-%02x
+  async: 1000
+  poll: 0
+  register: current_nodes_async
+
+- name: Wait for {{ outer_loop.group }} nodes to be built
+  async_status:
+    jid: "{{ local_loop.ansible_job_id }}"
+  loop_control:
+    loop_var: local_loop
+  with_items: "{{ current_nodes_async.results }}"
+  register: current_nodes
+  until: current_nodes.finished
+  retries: 120
