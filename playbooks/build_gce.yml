@@ -1,0 +1,39 @@
+---
+- name: Build the Cloud Environment
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  vars_files:
+    - ../inventory/gce/group_vars/all
+  tasks:
+    - name: Create {{ cloud_config.network.name }} Network
+      gce_net:
+        name: "{{ cloud_config.network.name }}"
+        ipv4_range: "{{ cloud_config.network.address }}"
+
+    - name: Create firewall rules
+      gce_net:
+        name: "{{ cloud_config.network.name }}"
+        fwname: "{{ item.name }}"
+        allowed: "{{ item.allowed }}"
+        src_range: "{{ item.src_range }}"
+        target_tags: "{{ item.target_groups }}"
+      with_items: "{{ firewall_rules }}"
+      async: 1000
+      poll: 0
+      register: current_firewall_rules_async
+
+    - name: Wait for firewall rules to be applied
+      async_status:
+        jid: "{{ local_loop.ansible_job_id }}"
+      loop_control:
+        loop_var: local_loop
+      with_items: "{{ current_firewall_rules_async.results }}"
+      register: current_firewall_rules
+      until: current_firewall_rules.finished
+      retries: 120
+
+    - name: Build GCE Nodes
+      include: build_gce_nodes.yml
+      when: item.count > 0
+      with_items: "{{ nodes }}"

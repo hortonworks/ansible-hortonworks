@@ -10,6 +10,7 @@ The aim is to first build the nodes in a Cloud environment, prepare them (OS set
 
 - AWS: See [INSTALL.md](../master/INSTALL_AWS.md) for AWS specific build instructions.
 - Azure: See [INSTALL.md](../master/INSTALL_Azure.md) for Azure specific build instructions.
+- Google Compute Engine: See [INSTALL.md](../master/INSTALL_GCE.md) for GCE specific build instructions.
 - OpenStack: See [INSTALL.md](../master/INSTALL_OpenStack.md) for OpenStack specific build instructions.
 
 

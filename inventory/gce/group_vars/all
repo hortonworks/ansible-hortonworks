@@ -1,0 +1,58 @@
+---
+name_prefix: 'mytestcluster'
+
+cloud_config:
+  name_suffix: ''
+  zone: 'europe-west1-d'
+  admin_username: google-user
+  ssh:
+    privatekey: '~/.ssh/id_rsa'
+  network:
+    name: testnetwork
+    address: '10.10.0.0/16'
+
+firewall_rules:
+  - name: "{{ cloud_config.network.name }}-allow-internal"            # default firewall rule - do not change
+    allowed: 'tcp:0-65535;udp:0-65535;icmp'
+    src_range: "{{ cloud_config.network.address }}"
+    target_groups:
+      -
+  - name: "{{ cloud_config.network.name }}-ssh-access"
+    allowed: 'tcp:22'
+    src_range: '0.0.0.0/0'
+    target_groups:
+      -
+  - name: "{{ cloud_config.network.name }}-ambari-access"
+    allowed: 'tcp:8080,8443'
+    src_range: '0.0.0.0/0'
+    target_groups:
+      - "{{ name_prefix }}-master"
+
+nodes:
+  - group: "{{ name_prefix }}-master"
+    count: 1
+    image: centos-7
+    type: n1-highmem-2
+    public_ip: true
+    root_disk:
+      type: pd-ssd
+      size: 15
+    ambari_server: true
+
+  - group: "{{ name_prefix }}-slave"
+    count: 0
+    image: centos-7
+    type: n1-standard-1
+    public_ip: true
+    root_disk:
+      type: pd-ssd
+      size: 15
+
+  - group: "{{ name_prefix }}-edge"
+    count: 0
+    image: centos-7
+    type: n1-standard-1
+    public_ip: true
+    root_disk:
+      type: pd-standard
+      size: 20
