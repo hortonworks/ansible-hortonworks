@@ -48,4 +48,5 @@
 
     - name: Build Azure Nodes
       include: build_azure_nodes.yml
+      when: item.count > 0
       with_items: "{{ nodes }}"
