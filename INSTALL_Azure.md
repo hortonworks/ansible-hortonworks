@@ -1,7 +1,7 @@
 ansible-hdp installation guide
 ------------------------------
 
-* These Ansible playbooks can build a Cloud environment in Azure.
+* These Ansible playbooks can build a Cloud environment on Azure.
 
 ---
 
@@ -201,11 +201,13 @@ source ~/ansible/bin/activate
 
 Modify the file at `~/ansible-hdp/playbooks/group_vars/all` to set the cluster configuration.
 
-| Variable          | Description                                                                                                |
-| ----------------- | ---------------------------------------------------------------------------------------------------------- |
-| ambari_version    | The Ambari version, in the full, 4-number form, for example: `2.4.1.0`.                                    |
-| hdp_major_version | The HDP version, in the major, 2-number form, for example: `2.5`.                                          |
-| cluster_name      | The name of the HDP cluster.                                                                               |
+| Variable          | Description                                                                                                 |
+| ----------------- | ----------------------------------------------------------------------------------------------------------- |
+| cluster_name      | The name of the HDP cluster.                                                                                |
+| ambari_version    | The Ambari version, in the full, 4-number form, for example: `2.4.1.0`.                                     |
+| hdp_version       | The HDP version, in the full, 4-number form, for example: `2.5.0.0`.                                        |
+| hdp_utils_version | The HDP-UTILS version exactly as displayed on the [repositories page](http://docs.hortonworks.com/HDPDocuments/Ambari-2.4.1.0/bk_ambari-installation/content/hdp_stack_repositories.html). This should be set to `1.1.0.21` for HDP 2.5 and to `1.1.0.20` for any HDP less than 2.5.|
+| hdp_base_url      | The base URL for the HDP repositories. Change this to the local web server url if using a Local Repository. `/HDP/<OS>/2.x/updates/<latest.version>` will be appended to this value to set it accordingly if there are additional URL paths. |
 
 
 ## ambari-server config
@@ -246,4 +248,5 @@ This script will apply all the required playbooks in one run, but you can also a
 
 - Prepare the nodes: `prepare_nodes.sh`
 - Install Ambari: `install_ambari.sh`
+- Configure Ambari: `configure_ambari.sh`
 - Apply Blueprint: `apply_blueprint.sh`

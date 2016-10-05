@@ -1,7 +1,7 @@
 ansible-hdp installation guide
 ------------------------------
 
-* These Ansible playbooks can build a Cloud environment in a private OpenStack.
+* These Ansible playbooks can build a Cloud environment on a private OpenStack.
 
 ---
 
@@ -44,7 +44,7 @@ As OpenStack environments are usually private, you might need to build such a no
 1. Turn off SSL validation (required if your OpenStack endpoints don't use trusted certs)
   
   ```
-  sed -i '/{$/a "verify": false,' ~/ansible/lib64/python2.7/site-packages/os_client_config/defaults.json
+  defaults_json_path=~/ansible/lib64/python2.7/site-packages/os_client_config/defaults.json; grep -q verify $defaults_json_path || sed -i '/{$/a "verify": false,' $defaults_json_path
   ```
 
 
@@ -86,7 +86,7 @@ As OpenStack environments are usually private, you might need to build such a no
 1. Turn off SSL validation (required if your OpenStack endpoints don't use trusted certs)
   
   ```
-  sed -i '/{$/a "verify": false,' ~/ansible/local/lib/python2.7/site-packages/os_client_config/defaults.json
+  defaults_json_path=~/ansible/local/lib/python2.7/site-packages/os_client_config/defaults.json; grep -q verify $defaults_json_path || sed -i '/{$/a "verify": false,' $defaults_json_path
   ```
 
 
@@ -212,11 +212,13 @@ source ~/*-openrc.sh
 
 Modify the file at `~/ansible-hdp/playbooks/group_vars/all` to set the cluster configuration.
 
-| Variable          | Description                                                                                                |
-| ----------------- | ---------------------------------------------------------------------------------------------------------- |
-| ambari_version    | The Ambari version, in the full, 4-number form, for example: `2.4.1.0`.                                    |
-| hdp_major_version | The HDP version, in the major, 2-number form, for example: `2.5`.                                          |
-| cluster_name      | The name of the HDP cluster.                                                                               |
+| Variable          | Description                                                                                                 |
+| ----------------- | ----------------------------------------------------------------------------------------------------------- |
+| cluster_name      | The name of the HDP cluster.                                                                                |
+| ambari_version    | The Ambari version, in the full, 4-number form, for example: `2.4.1.0`.                                     |
+| hdp_version       | The HDP version, in the full, 4-number form, for example: `2.5.0.0`.                                        |
+| hdp_utils_version | The HDP-UTILS version exactly as displayed on the [repositories page](http://docs.hortonworks.com/HDPDocuments/Ambari-2.4.1.0/bk_ambari-installation/content/hdp_stack_repositories.html). This should be set to `1.1.0.21` for HDP 2.5 and to `1.1.0.20` for any HDP less than 2.5.|
+| hdp_base_url      | The base URL for the HDP repositories. Change this to the local web server url if using a Local Repository. `/HDP/<OS>/2.x/updates/<latest.version>` will be appended to this value to set it accordingly if there are additional URL paths. |
 
 
 ## ambari-server config
@@ -258,4 +260,5 @@ This script will apply all the required playbooks in one run, but you can also a
 
 - Prepare the nodes: `prepare_nodes.sh`
 - Install Ambari: `install_ambari.sh`
+- Configure Ambari: `configure_ambari.sh`
 - Apply Blueprint: `apply_blueprint.sh`

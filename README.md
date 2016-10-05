@@ -52,6 +52,12 @@ Currently, these playbooks are divided into the following parts:
   
   This installs the Ambari Agent on all nodes and the Ambari Server on the designated node. Ambari Agents are configured to register to the Ambari Server.
 
+1. Configure Ambari
+
+  Run the `configure_ambari.sh` script to configure Ambari.
+  
+  This playbook is used to set the HDP repository URLs in Ambari but will be used for other settings such as the Alert options or the admin user password.
+
 1. Apply Blueprint
 
   Run the `apply_blueprint.sh` script to install HDP based on an Ambari Blueprint.
