@@ -104,6 +104,7 @@
   get_url:
     url: "{{ ambari_repo_url }}"
     dest: "{{ ambari_repo_destination }}"
+    force: yes
 
 - name: Add Ambari repository key (apt)
   apt_key:
