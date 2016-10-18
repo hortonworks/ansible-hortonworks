@@ -30,7 +30,7 @@
 - name: Create {{ outer_loop.group }} nodes
   gce:
     zone: "{{ cloud_config.zone }}"
-    name: "{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}{{ name_suffix|default('') }}"
+    name: "{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}{{ cloud_config.name_suffix|default('') }}"
     image: "{{ outer_loop.image }}"
     machine_type: "{{ outer_loop.type }}"
     network: "{{ cloud_config.network.name }}"

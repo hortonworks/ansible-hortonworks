@@ -81,7 +81,7 @@
   azure_rm_virtualmachine:
     resource_group: "{{ cloud_config.resource_group }}"
     storage_account_name: "{{ cloud_config.storage_account.name }}"
-    name: "{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}{{ name_suffix|default('') }}"
+    name: "{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}{{ cloud_config.name_suffix|default('') }}"
     image:
       offer:  "{{ outer_loop.image.offer }}"
       publisher: "{{ outer_loop.image.publisher }}"
