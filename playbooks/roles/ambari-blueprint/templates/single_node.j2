@@ -1,0 +1,65 @@
+{
+  "configurations" : [
+    {
+      "core-site": {
+        "hadoop.proxyuser.hcat.groups" : "*",
+        "hadoop.proxyuser.hcat.hosts" : "*",
+        "hadoop.proxyuser.hue.groups" : "*",
+        "hadoop.proxyuser.hue.hosts" : "*"
+      }
+    },
+    {
+      "hadoop-env" : {
+        "dtnode_heapsize" : "1024m",
+        "namenode_heapsize" : "2048m",
+        "namenode_opt_maxnewsize" : "384m",
+        "namenode_opt_newsize" : "384m"
+      }
+    },
+    {
+      "hdfs-site" : {
+        "dfs.datanode.data.dir" : "/hadoop/hdfs/data",
+        "dfs.datanode.failed.volumes.tolerated" : "0",
+        "dfs.replication" : "3"
+      }
+    }
+  ],
+  "host_groups" : [
+    {
+      "name" : "{{ name_prefix }}-master",
+      "configurations" : [ ],
+      "components" : [
+        { "name" : "ZOOKEEPER_CLIENT" },
+        { "name" : "HDFS_CLIENT" },
+        { "name" : "PIG" },
+        { "name" : "SQOOP" },
+        { "name" : "HIVE_CLIENT" },
+        { "name" : "YARN_CLIENT" },
+        { "name" : "HCAT" },
+        { "name" : "MAPREDUCE2_CLIENT" },
+        { "name" : "TEZ_CLIENT" },
+        { "name" : "SLIDER" },
+        { "name" : "ZOOKEEPER_SERVER" },
+        { "name" : "SECONDARY_NAMENODE" },
+        { "name" : "NAMENODE" },
+        { "name" : "DATANODE" },
+        { "name" : "RESOURCEMANAGER" },
+        { "name" : "NODEMANAGER" },
+        { "name" : "APP_TIMELINE_SERVER" },
+        { "name" : "HISTORYSERVER" },
+        { "name" : "HIVE_SERVER" },
+        { "name" : "HIVE_METASTORE" },
+        { "name" : "WEBHCAT_SERVER" },
+        { "name" : "MYSQL_SERVER" },
+        { "name" : "AMBARI_SERVER" },
+        { "name" : "METRICS_COLLECTOR" },
+        { "name" : "METRICS_GRAFANA" },
+        { "name" : "METRICS_MONITOR" }
+      ]
+    }
+  ],
+  "Blueprints" : {
+    "stack_name" : "HDP",
+    "stack_version" : "{{ hdp_version | regex_replace('.[0-9]+.[0-9]+[0-9_-]*$','') }}"
+  }
+}
