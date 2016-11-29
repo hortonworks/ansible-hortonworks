@@ -1,7 +1,7 @@
 ---
 cluster_name: 'mytestcluster'
 
-ambari_version: '2.4.1.0'                                 # must be the 4-part full version number
+ambari_version: '2.4.2.0'                                 # must be the 4-part full version number
 
 hdp_version: '2.5.0.0'                                    # must be the 4-part full version number
 hdp_utils_version: '1.1.0.21'                             # set this to 1.1.0.20 for HDP < 2.5 and 1.1.0.21 for HDP 2.5
