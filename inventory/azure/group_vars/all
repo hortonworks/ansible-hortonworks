@@ -28,7 +28,7 @@ nodes:
     image:
       offer: CentOS
       publisher: OpenLogic
-      sku: '7.2'
+      sku: '7.3'
       version: latest
     flavor: Standard_D3_v2
     public_ip: true
@@ -40,7 +40,7 @@ nodes:
     image:
       offer: CentOS
       publisher: OpenLogic
-      sku: '7.2'
+      sku: '7.3'
       version: latest
     flavor: Standard_A5
     public_ip: true
@@ -51,7 +51,7 @@ nodes:
     image:
       offer: CentOS
       publisher: OpenLogic
-      sku: '7.2'
+      sku: '7.3'
       version: latest
     flavor: Standard_A2
     public_ip: true
