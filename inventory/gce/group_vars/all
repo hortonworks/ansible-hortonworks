@@ -13,15 +13,11 @@ cloud_config:
 
 firewall_rules:
   - name: "{{ cloud_config.network.name }}-allow-internal"            # default firewall rule - do not change
-    allowed: 'tcp:0-65535;udp:0-65535;icmp'
+    allowed: 'tcp:0-65535;udp:0-65535'
     src_range: "{{ cloud_config.network.address }}"
-    target_groups:
-      -
   - name: "{{ cloud_config.network.name }}-ssh-access"
     allowed: 'tcp:22'
     src_range: '0.0.0.0/0'
-    target_groups:
-      -
   - name: "{{ cloud_config.network.name }}-ambari-access"
     allowed: 'tcp:8080,8443'
     src_range: '0.0.0.0/0'

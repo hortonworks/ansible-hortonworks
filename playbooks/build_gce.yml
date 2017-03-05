@@ -17,7 +17,7 @@
         fwname: "{{ item.name }}"
         allowed: "{{ item.allowed }}"
         src_range: "{{ item.src_range }}"
-        target_tags: "{{ item.target_groups }}"
+        target_tags: "{{ item.target_groups|default(omit) }}"
       with_items: "{{ firewall_rules }}"
       async: 1000
       poll: 0
