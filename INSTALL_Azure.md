@@ -209,6 +209,7 @@ Modify the file at `~/ansible-hdp/playbooks/group_vars/all` to set the cluster c
 | product.version   | The product version, in the full, 4-number form, for example: `2.5.3.0`.                                    |
 | utils_version     | The HDP-UTILS version exactly as displayed on the [repositories page](http://docs.hortonworks.com/HDPDocuments/Ambari-2.4.2.0/bk_ambari-installation/content/hdp_stack_repositories.html). This should be set to `1.1.0.21` for HDP 2.5 or HDF, and to `1.1.0.20` for any HDP less than 2.5.|
 | base_url          | The base URL for the repositories. Change this to the local web server url if using a Local Repository. `/HDP/<OS>/2.x/updates/<latest.version>` (or `/HDF/..`) will be appended to this value to set it accordingly if there are additional URL paths. |
+| mpack_filename    | The exact filename of the mpack to be installed as displayed on the [repositories page](http://docs.hortonworks.com/HDPDocuments/HDF2/HDF-2.1.2/bk_dataflow-release-notes/content/ch_hdf_relnotes.html#repo-location). Example for HDF 2.1.2: `hdf-ambari-mpack-2.1.2.0-10.tar.gz`. |
 
 
 ## ambari-server config

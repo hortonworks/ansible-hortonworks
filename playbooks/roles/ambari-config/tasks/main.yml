@@ -11,6 +11,15 @@
       paths:
         - ../vars
 
+- name: "Install the HDF Management Pack"
+  shell: "echo yes | ambari-server install-mpack --mpack={{ main_repo_url }}/tars/hdf_ambari_mp/{{ mpack_filename }} --purge"
+  when: product.name == "hdf"
+  notify: Restart ambari-server
+  args:
+    creates: "/var/lib/ambari-server/resources/mpacks/{{ mpack_filename | regex_replace('.tar.gz$','') }}"
+
+- meta: flush_handlers
+
 - name: "Modify the {{ product.name|upper }} base_url repository for {{ product.name|upper }} {{ major_version }}"
   uri:
     url: http://{{ ansible_nodename }}:8080/{{ main_repo_target }}
