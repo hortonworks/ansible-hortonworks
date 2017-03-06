@@ -37,7 +37,7 @@ As OpenStack environments are usually private, you might need to build such a no
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade   
-   pip install pycparser===2.13 functools32 pytz ansible shade
+   pip install pycparser functools32 pytz ansible shade
    ```
 
 
@@ -81,7 +81,7 @@ As OpenStack environments are usually private, you might need to build such a no
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade
-   pip install pycparser===2.13 functools32 pytz ansible shade
+   pip install pycparser functools32 pytz ansible shade
    ```
 
 

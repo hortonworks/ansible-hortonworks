@@ -35,7 +35,7 @@ This node must be able to connect to the cluster nodes via SSH and to the Azure 
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade   
-   pip install pycparser===2.13 ansible "azure==2.0.0rc5" msrest msrestazure
+   pip install pycparser ansible "azure==2.0.0rc5" msrest msrestazure
    ```
 
 
@@ -68,7 +68,7 @@ This node must be able to connect to the cluster nodes via SSH and to the Azure 
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade
-   pip install pycparser===2.13 ansible "azure==2.0.0rc5" msrest msrestazure
+   pip install pycparser ansible "azure==2.0.0rc5" msrest msrestazure
    ```
 
 
