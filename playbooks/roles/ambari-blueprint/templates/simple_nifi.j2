@@ -1,0 +1,37 @@
+{
+  "configurations" : [
+    {
+      "nifi-ambari-config" : {
+        "nifi.node.ssl.port": "9091",
+        "nifi.node.port": "9090",
+        "nifi.security.encrypt.configuration.password": "{{ default_password }}",
+        "nifi.sensitive.props.key": "{{ default_password }}"
+      }
+    },
+    {
+      "nifi-env" : {
+        "nifi_group" : "nifi",
+        "nifi_user" : "nifi"
+      }
+    }
+  ],
+  "host_groups" : [
+    {
+      "name" : "{{ name_prefix }}-master",
+      "configurations" : [ ],
+      "components" : [
+        { "name" : "ZOOKEEPER_CLIENT" },
+        { "name" : "ZOOKEEPER_SERVER" },
+        { "name" : "AMBARI_SERVER" },
+        { "name" : "NIFI_MASTER" },
+        { "name" : "METRICS_COLLECTOR" },
+        { "name" : "METRICS_GRAFANA" },
+        { "name" : "METRICS_MONITOR" }
+      ]
+    }
+  ],
+  "Blueprints" : {
+    "stack_name" : "HDF",
+    "stack_version" : "{{ product.version | regex_replace('.[0-9]+.[0-9]+[0-9_-]*$','') }}"
+  }
+}
