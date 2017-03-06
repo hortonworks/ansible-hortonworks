@@ -14,11 +14,6 @@
     state: latest
   when: ansible_os_family|lower == "debian"
 
-- meta: flush_handlers
-
-- name: Run Ambari Server setup
-  shell: /usr/sbin/ambari-server setup -s
-
 - name: Fix Ambari 2.4 bug in RHEL/CentOS 7
   lineinfile:
     dest: /etc/rc.d/init.d/ambari-server
@@ -27,17 +22,13 @@
     line: 'export ROOT="/"'
   when: ansible_os_family|lower == "redhat" and ansible_distribution_major_version|int == 7
 
-- name: Make sure the ambari-server service is started
-  service:
-    name: ambari-server
-    state: started
-    enabled: yes
+- meta: flush_handlers
 
-- name: Wait for Ambari Server to start listening on port 8080
-  wait_for:
-    port: 8080
-    host: 0.0.0.0
-    delay: 1
+- name: Run Ambari Server setup
+  shell: /usr/sbin/ambari-server setup -s
+  notify: Restart ambari-server
+
+- meta: flush_handlers
 
 - name: Make sure all of the Ambari Agents have registered
   uri:
