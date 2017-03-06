@@ -11,20 +11,20 @@
       paths:
         - ../vars
 
-- name: Modify the HDP base_url repository for HDP {{ hdp_major_version }}
+- name: "Modify the {{ product.name|upper }} base_url repository for {{ product.name|upper }} {{ major_version }}"
   uri:
-    url: http://{{ ansible_nodename }}:8080/{{ hdp_repo_target }}
+    url: http://{{ ansible_nodename }}:8080/{{ main_repo_target }}
     method: PUT
     force_basic_auth: yes
     user: "{{ ambari_admin_user }}"
     password: "{{ ambari_admin_password }}"
     headers: '{"X-Requested-By":"ambari"}'
-    body: " {\"Repositories\" : { \"base_url\" : \"{{ hdp_repo_url }}\", \"verify_base_url\": true } }"
+    body: " {\"Repositories\" : { \"base_url\" : \"{{ main_repo_url }}\", \"verify_base_url\": true } }"
     body_format: raw
     status_code: 200,201,202
     return_content: no
 
-- name: Modify the HDP-UTILS base_url repository for HDP {{ hdp_major_version }}
+- name: "Modify the HDP-UTILS base_url repository for {{ product.name|upper }} {{ major_version }}"
   uri:
     url: http://{{ ansible_nodename }}:8080/{{ utils_repo_target }}
     method: PUT

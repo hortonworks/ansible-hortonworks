@@ -1,8 +1,8 @@
 ---
-hdp_major_version: "{{ hdp_version | regex_replace('.[0-9]+.[0-9]+[0-9_-]*$','') }}"
+major_version: "{{ product.version | regex_replace('.[0-9]+.[0-9]+[0-9_-]*$','') }}"
 
-hdp_repo_url: "{{ hdp_base_url }}/HDP/centos6/2.x/updates/{{ hdp_version }}"
-hdp_repo_target: "api/v1/stacks/HDP/versions/{{ hdp_major_version }}/operating_systems/redhat6/repositories/HDP-{{ hdp_major_version }}"
+main_repo_url: "{{ base_url }}/{{ product.name|upper }}/centos6/2.x/updates/{{ product.version }}"
+main_repo_target: "api/v1/stacks/{{ product.name|upper }}/versions/{{ major_version }}/operating_systems/redhat6/repositories/{{ product.name|upper }}-{{ major_version }}"
 
-utils_repo_url: "{{ hdp_base_url }}/HDP-UTILS-{{ hdp_utils_version }}/repos/centos6"
-utils_repo_target: "api/v1/stacks/HDP/versions/{{ hdp_major_version }}/operating_systems/redhat6/repositories/HDP-UTILS-{{ hdp_utils_version }}"
+utils_repo_url: "{{ base_url }}/HDP-UTILS-{{ utils_version }}/repos/centos6"
+utils_repo_target: "api/v1/stacks/{{ product.name|upper }}/versions/{{ major_version }}/operating_systems/redhat6/repositories/HDP-UTILS-{{ utils_version }}"

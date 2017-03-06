@@ -29,9 +29,9 @@ Currently, these playbooks are divided into the following parts:
 
   Run the `build_cloud.sh` script to build the nodes. Refer to the Cloud specific INSTALL guides for more information.
 
-1. Install HDP
+1. Install the cluster
 
-  Run the `install_hdp.sh` script that will install the HDP cluster using Blueprints while taking care of the necessary prerequisites.
+  Run the `install_cluster.sh` script that will install the HDP or HDF cluster using Blueprints while taking care of the necessary prerequisites.
 
 
 ...or, alternatively, run each step separately:
@@ -56,10 +56,10 @@ Currently, these playbooks are divided into the following parts:
 
   Run the `configure_ambari.sh` script to configure Ambari.
   
-  This playbook is used to set the HDP repository URLs in Ambari but will be used for other settings such as the Alert options or the admin user password.
+  This playbook is used to set the repository URLs in Ambari but will be used for other settings such as the Alert options or the admin user password.
 
 1. Apply Blueprint
 
-  Run the `apply_blueprint.sh` script to install HDP based on an Ambari Blueprint.
+  Run the `apply_blueprint.sh` script to install HDP or HDF based on an Ambari Blueprint.
   
   This uploads the Ambari Blueprint and Cluster Creation Template and launches a cluster create request to Ambari. It can also wait for the cluster to be built
