@@ -1,7 +1,9 @@
 ansible-hdp
 -----------
 
-These Ansible playbooks will build a Hortonworks Data Platform cluster.
+These Ansible playbooks will build a Hortonworks cluster (either Hortonworks Data Platform or Hortonworks DataFlow) using Ambari Blueprints.
+
+This includes building the cloud infrastructure and taking care of the prerequisites.
 
 The aim is to first build the nodes in a Cloud environment, prepare them (OS settings, etc) and then install Ambari and create the cluster using Ambari Blueprints.
 
@@ -16,7 +18,7 @@ The aim is to first build the nodes in a Cloud environment, prepare them (OS set
 
 ## [Requirements] (id:requirements)
 
-- Ansible >= 2.1.2
+- Ansible >= 2.2.1
 
 - Expects CentOS/RHEL 7 or Ubuntu 14 hosts (also supports Amazon Linux AMI)
 
