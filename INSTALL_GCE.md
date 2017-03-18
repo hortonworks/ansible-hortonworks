@@ -17,20 +17,20 @@ This node must be able to connect to the cluster nodes via SSH and to the Google
 
 1. Install the required packages
 
-  ```
-  sudo yum -y install epel-release || sudo yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-  sudo yum -y install gcc gcc-c++ python-virtualenv python-pip python-devel libffi-devel openssl-devel sshpass git vim-enhanced
-  ```
+   ```
+   sudo yum -y install epel-release || sudo yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+   sudo yum -y install gcc gcc-c++ python-virtualenv python-pip python-devel libffi-devel openssl-devel sshpass git vim-enhanced
+   ```
 
 
-1. Create and source the Python virtual environment
+2. Create and source the Python virtual environment
 
    ```
    virtualenv ~/ansible; source ~/ansible/bin/activate 
    ```
 
 
-1. Install the required Python packages inside the virtualenv
+3. Install the required Python packages inside the virtualenv
 
    ```
    pip install setuptools --upgrade
@@ -39,31 +39,31 @@ This node must be able to connect to the cluster nodes via SSH and to the Google
    ```
 
 
-1. Generate the SSH public/private key pair that will be loaded onto the cluster nodes (if none exists). Replace `google-user` with the non-root administrative user you want to use to login to the cluster nodes. You can also specify a different path for the key. 
+4. Generate the SSH public/private key pair that will be loaded onto the cluster nodes (if none exists). Replace `google-user` with the non-root administrative user you want to use to login to the cluster nodes. You can also specify a different path for the key. 
 
-  ```
-  ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -C google-user
-  ```
+   ```
+   ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -C google-user
+   ```
 
 
 ## Ubuntu 14+
 
 1. Install required packages:
 
-  ```
-  sudo apt-get update
-  sudo apt-get -y install unzip python-virtualenv python-pip python-dev sshpass git libffi-dev libssl-dev vim
-  ```
+   ```
+   sudo apt-get update
+   sudo apt-get -y install unzip python-virtualenv python-pip python-dev sshpass git libffi-dev libssl-dev vim
+   ```
 
 
-1. Create and source the Python virtual environment
+2. Create and source the Python virtual environment
 
    ```
    virtualenv ~/ansible; source ~/ansible/bin/activate  
    ```
 
 
-1. Install the required Python packages inside the virtualenv
+3. Install the required Python packages inside the virtualenv
 
    ```
    pip install setuptools --upgrade
@@ -72,11 +72,11 @@ This node must be able to connect to the cluster nodes via SSH and to the Google
    ```
 
 
-1. Generate the SSH public/private key pair that will be loaded onto the cluster nodes (if none exists). Replace `google-user` with the non-root administrative user you want to use to login to the cluster nodes. You can also specify a different path for the key. 
+4. Generate the SSH public/private key pair that will be loaded onto the cluster nodes (if none exists). Replace `google-user` with the non-root administrative user you want to use to login to the cluster nodes. You can also specify a different path for the key. 
 
-  ```
-  ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -C google-user
-  ```
+   ```
+   ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -C google-user
+   ```
 
 
 # Setup the Google account and credentials
@@ -87,52 +87,52 @@ More details about how authentication to the Google Cloud Platform works is on t
 
 1. Create a Google Cloud Platform Service Account
 
-  1. Go to the [Service accounts page](https://console.developers.google.com/permissions/serviceaccounts) and login with your Google account.
+   1. Go to the [Service accounts page](https://console.developers.google.com/permissions/serviceaccounts) and login with your Google account.
+    
+   2. Decide on a project you want to use for the purpose of these scripts or create a new project in the `All projects` page.
+   
+   3. Once the project has been selected, click on the `CREATE SERVICE ACCOUNT` link.
+   
+   4. Give the Service account a name and a Role (recommended Role is `Project` -> `Editor`).
+   
+   5. Also select the `Furnish a new private key` option and `JSON` as the Key type. This will also initiate a download of the JSON file holding the service account's credentials. Save this file.
+   
+   6. If this is a new project, you'll also need to [associate a Billing Account](https://console.cloud.google.com/billing/projects) with the project (and create a [new Billing Account](https://console.cloud.google.com/billing) if none exists). If this was done, confirm that everything works by going to the [main Compute Engine page](https://console.cloud.google.com/compute/instances).
+
+
+2. Download JSON credentials
+
+   If you haven't downloaded the JSON credentials file from the above step, or you already have a Service Account, go to the [Credentials page](https://console.cloud.google.com/apis/credentials) and select `Create credentials` > `Service account key`.
+   
+   Select your Service Account and `Create` the `JSON` key.
+
+
+3. Upload the JSON credentials
+
+   Once the JSON credentials file is obtained, uploaded it to the build node / workstation in any folder you prefer.
+   
+   This location will be referenced by an environment variable.
+
+
+4. Export the environment variables
+
+   There are different ways to provide the credentials to the Ansible modules, each with its own advantages and disadvantages:
+   * set variables directly inside the Ansible playbooks
+   * populate a `secrets.py` file
+   * setting environment variables
+
+   All of these are explained in greater details on the [Ansible Guide](http://docs.ansible.com/ansible/guide_gce.html) but for the purpose of this guide we'll use the following environment variables:
   
-  1. Decide on a project you want to use for the purpose of these scripts or create a new project in the `All projects` page.
-  
-  1. Once the project has been selected, click on the `CREATE SERVICE ACCOUNT` link.
-  
-  1. Give the Service account a name and a Role (recommended Role is `Project` -> `Editor`).
-  
-  1. Also select the `Furnish a new private key` option and `JSON` as the Key type. This will also initiate a download of the JSON file holding the service account's credentials. Save this file.
-  
-  1. If this is a new project, you'll also need to [associate a Billing Account](https://console.cloud.google.com/billing/projects) with the project (and create a [new Billing Account](https://console.cloud.google.com/billing) if none exists). If this was done, confirm that everything works by going to the [main Compute Engine page](https://console.cloud.google.com/compute/instances).
+   * **GCE_EMAIL**: the email account associated with the project (can be found on the [Service accounts](https://console.cloud.google.com/iam-admin/serviceaccounts) page -> `Service account ID` column)
+   * **GCE_PROJECT**: the id of the project (can be found on the [All projects](https://console.cloud.google.com/iam-admin/projects) page)
+   * **GCE_CREDENTIALS_FILE_PATH**: the local path to the JSON credentials file
 
-  
-1. Download JSON credentials
-
-  If you haven't downloaded the JSON credentials file from the above step, or you already have a Service Account, go to the [Credentials page](https://console.cloud.google.com/apis/credentials) and select `Create credentials` > `Service account key`.
-  
-  Select your Service Account and `Create` the `JSON` key.
-
-
-1. Upload the JSON credentials
-
-  Once the JSON credentials file is obtained, uploaded it to the build node / workstation in any folder you prefer.
-  
-  This location will be referenced by an environment variable.
-
-
-1. Export the environment variables
-
-  There are different ways to provide the credentials to the Ansible modules, each with its own advantages and disadvantages:
-  * set variables directly inside the Ansible playbooks
-  * populate a `secrets.py` file
-  * setting environment variables
-
-  All of these are explained in greater details on the [Ansible Guide](http://docs.ansible.com/ansible/guide_gce.html) but for the purpose of this guide we'll use the following environment variables:
-  
-  * **GCE_EMAIL**: the email account associated with the project (can be found on the [Service accounts](https://console.cloud.google.com/iam-admin/serviceaccounts) page -> `Service account ID` column)
-  * **GCE_PROJECT**: the id of the project (can be found on the [All projects](https://console.cloud.google.com/iam-admin/projects) page)
-  * **GCE_CREDENTIALS_FILE_PATH**: the local path to the JSON credentials file
-
-  ```
-  export GCE_EMAIL=hadoop-test@hadoop-123456.iam.gserviceaccount.com
-  export GCE_PROJECT=hadoop-123456
-  export GCE_CREDENTIALS_FILE_PATH=~/Hadoop-12345cb6789d.json
-  export GCE_PEM_FILE_PATH=$GCE_CREDENTIALS_FILE_PATH
-  ```
+   ```
+   export GCE_EMAIL=hadoop-test@hadoop-123456.iam.gserviceaccount.com
+   export GCE_PROJECT=hadoop-123456
+   export GCE_CREDENTIALS_FILE_PATH=~/Hadoop-12345cb6789d.json
+   export GCE_PEM_FILE_PATH=$GCE_CREDENTIALS_FILE_PATH
+   ```
 
 
 # Upload the SSH public key to Google
@@ -143,24 +143,24 @@ This is based on Google's [guide](https://cloud.google.com/compute/docs/instance
 
 1. Obtain the SSH public key
 
-  Obtain the contents of the public key file (you can use the `cat` command).
-  
-  This can be an existing key or the one generated as part of the Build Setup, step 4:
-  
-  ```
-  cat ~/.ssh/id_rsa.pub
-  ```
+   Obtain the contents of the public key file (you can use the `cat` command).
+    
+   This can be an existing key or the one generated as part of the Build Setup, step 4:
+    
+   ```
+   cat ~/.ssh/id_rsa.pub
+   ```
 
 
-1. Add the key contents to Google Compute Engine
+2. Add the key contents to Google Compute Engine
 
-  Go to the [METADATA PAGE](https://console.cloud.google.com/compute/metadata) and click on the `SSH Keys` tab.
-  
-  Click `Edit` and add the new key. When you paste the contents of the public key file obtained at the previous step, Google Compute Engine will automatically generate the Username, which is the non-root administrative user that is used to login to the cluster nodes.
-  
-  If you've used a different key than the one generated as part of the Build Setup, step 4, or you want to use a different user to login to the cluster nodes, replace the last bit of the key with the desired username.
-  
-  In this guide, the username used is `google-user`.
+   Go to the [METADATA PAGE](https://console.cloud.google.com/compute/metadata) and click on the `SSH Keys` tab.
+   
+   Click `Edit` and add the new key. When you paste the contents of the public key file obtained at the previous step, Google Compute Engine will automatically generate the Username, which is the non-root administrative user that is used to login to the cluster nodes.
+   
+   If you've used a different key than the one generated as part of the Build Setup, step 4, or you want to use a different user to login to the cluster nodes, replace the last bit of the key with the desired username.
+   
+   In this guide, the username used is `google-user`.
 
 
 # Clone the repository

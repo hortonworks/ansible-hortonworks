@@ -17,20 +17,20 @@ This node must be able to connect to the cluster nodes via SSH and to the AWS AP
 
 1. Install the required packages
 
-  ```
-  sudo yum -y install epel-release || sudo yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-  sudo yum -y install gcc gcc-c++ python-virtualenv python-pip python-devel libffi-devel openssl-devel sshpass git vim-enhanced
-  ```
+   ```
+   sudo yum -y install epel-release || sudo yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    sudo yum -y install gcc gcc-c++ python-virtualenv python-pip python-devel libffi-devel openssl-devel sshpass git vim-enhanced
+   ```
 
 
-1. Create and source the Python virtual environment
+2. Create and source the Python virtual environment
 
    ```
    virtualenv ~/ansible; source ~/ansible/bin/activate 
    ```
 
 
-1. Install the required Python packages inside the virtualenv
+3. Install the required Python packages inside the virtualenv
 
    ```
    pip install setuptools --upgrade
@@ -39,31 +39,31 @@ This node must be able to connect to the cluster nodes via SSH and to the AWS AP
    ```
 
 
-1. Generate the SSH public/private key pair that will be loaded onto the cluster nodes (if none exists):
+4. Generate the SSH public/private key pair that will be loaded onto the cluster nodes (if none exists):
 
-  ```
-  ssh-keygen -q -t rsa
-  ```
+   ```
+   ssh-keygen -q -t rsa
+   ```
 
 
 ## Ubuntu 14+
 
 1. Install required packages:
 
-  ```
-  sudo apt-get update
-  sudo apt-get -y install unzip python-virtualenv python-pip python-dev sshpass git libffi-dev libssl-dev vim
-  ```
+   ```
+   sudo apt-get update
+   sudo apt-get -y install unzip python-virtualenv python-pip python-dev sshpass git libffi-dev libssl-dev vim
+   ```
 
 
-1. Create and source the Python virtual environment
+2. Create and source the Python virtual environment
 
    ```
    virtualenv ~/ansible; source ~/ansible/bin/activate  
    ```
 
 
-1. Install the required Python packages inside the virtualenv
+3. Install the required Python packages inside the virtualenv
 
    ```
    pip install setuptools --upgrade
@@ -72,11 +72,11 @@ This node must be able to connect to the cluster nodes via SSH and to the AWS AP
    ```
 
 
-1. Generate the SSH public/private key pair that will be loaded onto the cluster nodes (if none exists):
+4. Generate the SSH public/private key pair that will be loaded onto the cluster nodes (if none exists):
 
-  ```
-  ssh-keygen -q -t rsa
-  ```
+   ```
+   ssh-keygen -q -t rsa
+   ```
 
 
 # Setup the AWS credentials file
@@ -86,21 +86,21 @@ Ansible AWS modules use the boto Python library. Boto can manage credentials usi
 
 1. Get the AWS access key and secret
 
-  Decide on the account you want to use for the purpose of these scripts or create a new one in IAM (with a `PowerUserAccess` policy attached to it).
-  
-  [Create](http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html#Using_CreateAccessKey) an Access Key if none is present.
-  
-  Obtain the `Access Key ID` and the `Secret Access Key`.
+   Decide on the account you want to use for the purpose of these scripts or create a new one in IAM (with a `PowerUserAccess` policy attached to it).
+   
+   [Create](http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html#Using_CreateAccessKey) an Access Key if none is present.
+   
+   Obtain the `Access Key ID` and the `Secret Access Key`.
 
 
-1. Export the environment variables
+2. Export the environment variables
 
-  With the Access Key details obtained, export them as environment variables:
-
-  ```
-  export AWS_ACCESS_KEY_ID='AK123'
-  export AWS_SECRET_ACCESS_KEY='abc123'
-  ```
+   With the Access Key details obtained, export them as environment variables:
+ 
+   ```
+   export AWS_ACCESS_KEY_ID='AK123'
+   export AWS_SECRET_ACCESS_KEY='abc123'
+   ```
 
 
 # Clone the repository

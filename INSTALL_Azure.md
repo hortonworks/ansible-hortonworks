@@ -17,20 +17,20 @@ This node must be able to connect to the cluster nodes via SSH and to the Azure 
 
 1. Install the required packages
 
-  ```
-  sudo yum -y install epel-release || sudo yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-  sudo yum -y install gcc gcc-c++ python-virtualenv python-pip python-devel libffi-devel openssl-devel sshpass git vim-enhanced
-  ```
+   ```
+   sudo yum -y install epel-release || sudo yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+   sudo yum -y install gcc gcc-c++ python-virtualenv python-pip python-devel libffi-devel openssl-devel sshpass git vim-enhanced
+   ```
 
 
-1. Create and source the Python virtual environment
+2. Create and source the Python virtual environment
 
    ```
    virtualenv ~/ansible; source ~/ansible/bin/activate 
    ```
 
 
-1. Install the required Python packages inside the virtualenv
+3. Install the required Python packages inside the virtualenv
 
    ```
    pip install setuptools --upgrade
@@ -39,31 +39,31 @@ This node must be able to connect to the cluster nodes via SSH and to the Azure 
    ```
 
 
-1. Generate the SSH public/private key pair that will be loaded onto the cluster nodes (if none exists):
+4. Generate the SSH public/private key pair that will be loaded onto the cluster nodes (if none exists):
 
-  ```
-  ssh-keygen -q -t rsa
-  ```
+   ```
+   ssh-keygen -q -t rsa
+   ```
 
 
 ## Ubuntu 16+
 
 1. Install required packages:
 
-  ```
-  sudo apt-get update
-  sudo apt-get -y install unzip python-virtualenv python-pip python-dev sshpass git libffi-dev libssl-dev vim
-  ```
+   ```
+   sudo apt-get update
+   sudo apt-get -y install unzip python-virtualenv python-pip python-dev sshpass git libffi-dev libssl-dev vim
+   ```
 
 
-1. Create and source the Python virtual environment
+2. Create and source the Python virtual environment
 
    ```
    virtualenv ~/ansible; source ~/ansible/bin/activate  
    ```
 
 
-1. Install the required Python packages inside the virtualenv
+3. Install the required Python packages inside the virtualenv
 
    ```
    pip install setuptools --upgrade
@@ -72,44 +72,42 @@ This node must be able to connect to the cluster nodes via SSH and to the Azure 
    ```
 
 
-1. Generate the SSH public/private key pair that will be loaded onto the cluster nodes (if none exists):
+4. Generate the SSH public/private key pair that will be loaded onto the cluster nodes (if none exists):
 
-  ```
-  ssh-keygen -q -t rsa
-  ```
+   ```
+   ssh-keygen -q -t rsa
+   ```
 
 
 # Setup the Azure credentials file
 
 1. Create a service principal
 
-  Use the following [guide](https://azure.microsoft.com/en-us/documentation/articles/resource-group-create-service-principal-portal) to create a Service Principal.
+   Use the following [guide](https://azure.microsoft.com/en-us/documentation/articles/resource-group-create-service-principal-portal) to create a Service Principal.
 
-  After the tutorial the following should have been obtained:
+   After the tutorial the following should have been obtained:
+   * Subscription ID (from the Subscription page in the Azure portal)
+   * Client ID
+   * Secret key (generated when the application was created)
+   * Tenant ID
 
-    * Subscription ID (from the Subscription page in the Azure portal)
-    * Client ID
-    * Secret key (generated when the application was created)
-    * Tenant ID
 
+2. Create the credentials file
 
-1. Create the credentials file
+   Store the obtained credentials in a file and save this file as `.azure/credentials` under the home folder of the user running the playbook.
 
-  Store the obtained credentials in a file and save this file as `.azure/credentials` under the home folder of the user running the playbook.
-
-  ```
-  [default]
-  subscription_id=xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-  client_id=xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-  secret=xxxxxxxxxxxxxxxxx
-  tenant=xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-  ```
+   ```
+   [default]
+   subscription_id=xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+   client_id=xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+   secret=xxxxxxxxxxxxxxxxx
+   tenant=xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+   ```
   
-  
-  ```
-  mkdir -p ~/.azure/
-  cat > ~/.azure/credentials
-  ```
+   ```
+   mkdir -p ~/.azure/
+   cat > ~/.azure/credentials
+   ```
 
 
 # Clone the repository

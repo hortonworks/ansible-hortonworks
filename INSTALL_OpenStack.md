@@ -19,20 +19,20 @@ As OpenStack environments are usually private, you might need to build such a no
 
 1. Install the required packages
 
-  ```
-  sudo yum -y install epel-release || sudo yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-  sudo yum -y install gcc gcc-c++ python-virtualenv python-pip python-devel libffi-devel openssl-devel libyaml-devel sshpass git vim-enhanced
-  ```
+   ```
+   sudo yum -y install epel-release || sudo yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+   sudo yum -y install gcc gcc-c++ python-virtualenv python-pip python-devel libffi-devel openssl-devel libyaml-devel sshpass git vim-enhanced
+   ```
 
 
-1. Create and source the Python virtual environment
+2. Create and source the Python virtual environment
 
    ```
    virtualenv ~/ansible; source ~/ansible/bin/activate 
    ```
 
 
-1. Install the required Python packages inside the virtualenv
+3. Install the required Python packages inside the virtualenv
 
    ```
    pip install setuptools --upgrade
@@ -41,42 +41,42 @@ As OpenStack environments are usually private, you might need to build such a no
    ```
 
 
-1. Turn off SSL validation (required if your OpenStack endpoints don't use trusted certs)
+4. Turn off SSL validation (required if your OpenStack endpoints don't use trusted certs)
   
-  ```
-  defaults_json_path=~/ansible/lib64/python2.7/site-packages/os_client_config/defaults.json; grep -q verify $defaults_json_path || sed -i '/{$/a "verify": false,' $defaults_json_path
-  ```
+   ```
+   defaults_json_path=~/ansible/lib64/python2.7/site-packages/os_client_config/defaults.json; grep -q verify $defaults_json_path || sed -i '/{$/a "verify": false,' $defaults_json_path
+   ```
 
 
-1. Install the SSH private key
+5. Install the SSH private key
 
-  The build node / workstation will need to login via SSH to the cluster nodes.
-  
-  For this to succeed, the SSH private key needs to be placed on the build node / workstation, normally under .ssh, for example: `~/.ssh/field.pem`. It can be placed under any path as this file will be referenced later.
-  
-  It should have `400` permissions: `chmod 0400 ~/.ssh/field.pem`.
-  
-  The SSH public key must be present on the OpenStack environment as it will be referenced when the nodes will be built (this can be checked on the Dashboard, under `Compute` -> `Access and Security` -> `Key Pairs` tab).
+   The build node / workstation will need to login via SSH to the cluster nodes.
+   
+   For this to succeed, the SSH private key needs to be placed on the build node / workstation, normally under .ssh, for example: `~/.ssh/field.pem`. It can be placed under any path as this file will be referenced later.
+   
+   It should have `400` permissions: `chmod 0400 ~/.ssh/field.pem`.
+   
+   The SSH public key must be present on the OpenStack environment as it will be referenced when the nodes will be built (this can be checked on the Dashboard, under `Compute` -> `Access and Security` -> `Key Pairs` tab).
 
 
 ## Ubuntu 14+
 
 1. Install required packages:
 
-  ```
-  sudo apt-get update
-  sudo apt-get -y install unzip python-virtualenv python-pip python-dev sshpass git libffi-dev libssl-dev libyaml-dev vim
-  ```
+   ```
+   sudo apt-get update
+   sudo apt-get -y install unzip python-virtualenv python-pip python-dev sshpass git libffi-dev libssl-dev libyaml-dev vim
+   ```
 
 
-1. Create and source the Python virtual environment
+2. Create and source the Python virtual environment
 
    ```
    virtualenv ~/ansible; source ~/ansible/bin/activate  
    ```
 
 
-1. Install the required Python packages inside the virtualenv
+3. Install the required Python packages inside the virtualenv
 
    ```
    pip install setuptools --upgrade
@@ -85,49 +85,48 @@ As OpenStack environments are usually private, you might need to build such a no
    ```
 
 
-1. Turn off SSL validation (required if your OpenStack endpoints don't use trusted certs)
+4. Turn off SSL validation (required if your OpenStack endpoints don't use trusted certs)
   
-  ```
-  defaults_json_path=~/ansible/local/lib/python2.7/site-packages/os_client_config/defaults.json; grep -q verify $defaults_json_path || sed -i '/{$/a "verify": false,' $defaults_json_path
-  ```
+   ```
+   defaults_json_path=~/ansible/local/lib/python2.7/site-packages/os_client_config/defaults.json; grep -q verify $defaults_json_path || sed -i '/{$/a "verify": false,' $defaults_json_path
+   ```
 
+5. Install the SSH private key
 
-1. Install the SSH private key
-
-  The build node / workstation will need to login via SSH to the cluster nodes.
-  
-  For this to succeed, the SSH private key needs to be placed on the build node / workstation, normally under .ssh, for example: `~/.ssh/field.pem`. It can be placed under any path as this file will be referenced later.
-  
-  It should have `400` permissions: `chmod 0400 ~/.ssh/field.pem`.
-
-  The SSH public key must be present on the OpenStack environment as it will be referenced when the nodes will be built (this can be checked on the Dashboard, under `Compute` -> `Access and Security` -> `Key Pairs` tab).
+   The build node / workstation will need to login via SSH to the cluster nodes.
+   
+   For this to succeed, the SSH private key needs to be placed on the build node / workstation, normally under .ssh, for example: `~/.ssh/field.pem`. It can be placed under any path as this file will be referenced later.
+   
+   It should have `400` permissions: `chmod 0400 ~/.ssh/field.pem`.
+   
+   The SSH public key must be present on the OpenStack environment as it will be referenced when the nodes will be built (this can be checked on the Dashboard, under `Compute` -> `Access and Security` -> `Key Pairs` tab).
 
 
 # Setup the OpenStack credentials
 
 1. Download the OpenStack RC file
 
-  Login to your OpenStack dashboard, and download your user specific OpenStack RC file.
-  This is usually found on `Compute` -> `Access and Security` under the `API Access` tab. Download the v3 if available.
+   Login to your OpenStack dashboard, and download your user specific OpenStack RC file.
+   This is usually found on `Compute` -> `Access and Security` under the `API Access` tab. Download the v3 if available.
 
 
-1. Apply the OpenStack credentials
+2. Apply the OpenStack credentials
 
-  Copy the file to the build node / workstation in a private location (for example the user's home folder).
-
-  And `source` the file so it populates the existing session with the OpenStack environment variables.
-  Type your OpenStack account password when prompted.
-
-  ```
-  source ~/ansible/bin/activate
-  source ~/*-openrc.sh
-  Please enter your OpenStack Password: 
-  ```
-
-  You can verify if it worked by trying to list the existing OpenStack instances:
-  ```
-  nova --insecure list
-  ```
+   Copy the file to the build node / workstation in a private location (for example the user's home folder).
+   
+   And `source` the file so it populates the existing session with the OpenStack environment variables.
+   Type your OpenStack account password when prompted.
+   
+   ```
+   source ~/ansible/bin/activate
+   source ~/*-openrc.sh
+   Please enter your OpenStack Password: 
+   ```
+   
+   You can verify if it worked by trying to list the existing OpenStack instances:
+   ```
+   nova --insecure list
+   ```
 
 
 # Clone the repository
