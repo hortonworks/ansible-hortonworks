@@ -4,7 +4,7 @@
   connection: local
   gather_facts: False
   vars_files:
-    - ../inventory/gce/group_vars/all
+    - ../../inventory/gce/group_vars/all
   tasks:
     - name: Create {{ cloud_config.network.name }} Network
       gce_net:
