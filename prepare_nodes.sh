@@ -30,4 +30,4 @@ openstack)
 esac
 
 echo -e $message
-ansible-playbook -i inventory/$cloud_to_use -e "cloud_name=$cloud_to_use" playbooks/prepare_nodes_$cloud_to_use.yml
+ansible-playbook -i inventory/$cloud_to_use -e "cloud_name=$cloud_to_use" playbooks/prepare_nodes.yml
