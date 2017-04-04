@@ -1,7 +1,8 @@
 ansible-hdp installation guide
 ------------------------------
 
-* These Ansible playbooks can build a Cloud environment on Azure.
+* These Ansible playbooks will build a Cloud environment on Azure.
+* And then deploy a Hortonworks cluster (either Hortonworks Data Platform or Hortonworks DataFlow) using Ambari Blueprints.
 
 ---
 
