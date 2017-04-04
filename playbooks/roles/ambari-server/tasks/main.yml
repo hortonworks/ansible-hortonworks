@@ -14,14 +14,6 @@
     state: latest
   when: ansible_os_family|lower == "debian"
 
-- name: Fix Ambari 2.4 bug in RHEL/CentOS 7
-  lineinfile:
-    dest: /etc/rc.d/init.d/ambari-server
-    state: present
-    insertafter: '^export ROOT=`dirname.*$'
-    line: 'export ROOT="/"'
-  when: ansible_os_family|lower == "redhat" and ansible_distribution_major_version|int == 7
-
 - meta: flush_handlers
 
 - name: Run Ambari Server setup
