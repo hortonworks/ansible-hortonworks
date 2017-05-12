@@ -151,13 +151,6 @@ cd && git clone git@github.com:hortonworks/ansible-hdp.git
 
 Modify the file at `~/ansible-hdp/inventory/openstack/group_vars/all` to set the OpenStack configuration.
 
-## name_prefix
-A helper variable that can be used to precede the name of all nodes.
-
-Node names are derived from the group name (more details about groups bellow).
-
-You can modify the group names so they don't use this variable, the choice is yours, but names must be unique in the same OpenStack Zone as it's shared by other users.
-
 
 ## cloud_config
 This section contains variables that are cluster specific and are used by all nodes:
@@ -183,7 +176,7 @@ And groups can have any name and any number of nodes but group names should corr
 
 | Variable        | Description                                                               |
 | --------------- | ------------------------------------------------------------------------- |
-| group           | The name of the group. Must be unique in the OpenStack Zone so this is the reason why the default contains the `name_prefix`. It's used to derive the nodes names (if node count is greater than 1, numbers will be appended to the group name to uniquely identify nodes). |
+| group           | The name of the group. Must be unique in the OpenStack Zone. Usually it contains the cluster name. It's used to derive the nodes names (if node count is greater than 1, numbers will be appended to the group name to uniquely identify nodes). |
 | count           | The number of nodes to be built in this group. |
 | image           | The name or ID of the OS image to be used. A list of the available images can be found by running `nova --insecure image-list`. |
 | flavor          | The name or ID of the flavor / size of the node. A list of all the available flavors can be found by running `nova --insecure flavor-list`. |                                                      |

@@ -1,6 +1,4 @@
 ---
-name_prefix: 'mytestcluster'
-
 cloud_config:
   name_suffix: ''
   zone: PS
@@ -10,20 +8,20 @@ cloud_config:
     privatekey: ~/.ssh/field.pem
 
 nodes:
-  - group: "{{ name_prefix }}-master"
+  - group: "mytestcluster-master"
     count: 1
     image: CentOS 7.2
     flavor: m3.xlarge
     public_ip: false
     ambari_server: true
 
-  - group: "{{ name_prefix }}-slave"
+  - group: "mytestcluster-slave"
     count: 2
     image: CentOS 7.2
     flavor: m3.large
     public_ip: false
 
-  - group: "{{ name_prefix }}-edge"
+  - group: "mytestcluster-edge"
     count: 0
     image: CentOS 7.2
     flavor: m3.medium

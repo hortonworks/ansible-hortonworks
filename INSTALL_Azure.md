@@ -132,11 +132,6 @@ cd && git clone git@github.com:hortonworks/ansible-hdp.git
 
 Modify the file at `~/ansible-hdp/inventory/azure/group_vars/all` to set the Azure configuration.
 
-## name_prefix
-A helper variable that can be used to precede the name of the nodes nodes and other cluster specific Azure resources (such as the subnet or NICs).
-
-Node names are derived from the group name (more details about groups bellow) and this variable can be used to uniquely identify a certain cluster, especially if the Resource Group is shared.
-
 
 ## cloud_config
 This section contains variables that are cluster specific and are used by all nodes:
@@ -151,7 +146,7 @@ This section contains variables that are cluster specific and are used by all no
 | resource_group  | A container that holds related resources for an application. It will be created if it doesn't exist. Details [here](https://azure.microsoft.com/en-gb/documentation/articles/resource-group-overview/). |
 | storage_account | A namespace to store and access Azure Storage data objects. It will be created if it doesn't exist. Must be an unique name across all Azure. Details [here](https://azure.microsoft.com/en-gb/documentation/articles/storage-create-storage-account/). |
 | network         | The Azure virtual network (VNet). It will be created if it doesn't exist. The address range can be customized. Details [here](https://azure.microsoft.com/en-gb/documentation/articles/virtual-networks-overview/). |
-| subnet          | Subnet is a range of IP addresses in the VNet previously set. By default it uses the `name_prefix` in the name as the subnet should be dedicated to only one cluster. It will be created if it doesn't exist. Details [here](https://azure.microsoft.com/en-gb/documentation/articles/virtual-networks-overview/#subnets). |
+| subnet          | Subnet is a range of IP addresses in the VNet previously set. The subnet should be dedicated to only one cluster. It will be created if it doesn't exist. Details [here](https://azure.microsoft.com/en-gb/documentation/articles/virtual-networks-overview/#subnets). |
 | security_groups | A list of Access Control List (ACL) associated with the subnet. Details [here](https://azure.microsoft.com/en-gb/documentation/articles/virtual-networks-nsg/). |
 
 
@@ -167,7 +162,7 @@ And groups can have any name and any number of nodes but group names should corr
 
 | Variable        | Description                                                               |
 | --------------- | ------------------------------------------------------------------------- |
-| group           | The name of the group. Must be unique in the Azure Resource Group so this is the reason why the default contains the `name_prefix`. It's used to derive the nodes names (if node count is greater than 1, numbers will be appended to the group name to uniquely identify nodes). |
+| group           | The name of the group. Must be unique in the Azure Resource Group. Usually it contains the cluster name. It's used to derive the nodes names (if node count is greater than 1, numbers will be appended to the group name to uniquely identify nodes). |
 | count           | The number of nodes to be built in this group. |
 | image           | The OS image to be used. More details [here](https://azure.microsoft.com/en-gb/documentation/articles/virtual-machines-linux-cli-ps-findimage/). |
 | flavor          | The flavor / size of the node. A list of all the flavors can be found [here](https://azure.microsoft.com/en-gb/documentation/articles/virtual-machines-linux-sizes/) and the pricing [here](https://azure.microsoft.com/en-gb/pricing/details/virtual-machines/linux/#Windows). |

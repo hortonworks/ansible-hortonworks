@@ -1,6 +1,4 @@
 ---
-name_prefix: 'mytestcluster'
-
 cloud_config:
   name_suffix: ''
   location: 'West Europe'
@@ -13,17 +11,17 @@ cloud_config:
     name: teststorage000111111
     type: Standard_LRS
   network:
-    name: testnetwork
+    name: mytestcluster-network
     address: "10.10.0.0/16"
   subnet:
-    name: "{{ name_prefix }}-testsubnet"
+    name: "mytestcluster-subnet"
     address: "10.10.0.0/24"
   security_groups:
     - name: ssh_access
       port: 22
 
 nodes:
-  - group: "{{ name_prefix }}-master"
+  - group: "mytestcluster-master"
     count: 1
     image:
       offer: CentOS
@@ -35,7 +33,7 @@ nodes:
     security_group: ssh_access
     ambari_server: true
 
-  - group: "{{ name_prefix }}-slave"
+  - group: "mytestcluster-slave"
     count: 2
     image:
       offer: CentOS
@@ -46,7 +44,7 @@ nodes:
     public_ip: true
     security_group: ssh_access
 
-  - group: "{{ name_prefix }}-edge"
+  - group: "mytestcluster-edge"
     count: 0
     image:
       offer: CentOS

@@ -24,7 +24,7 @@
         vpc_id: "{{ cluster_vpc.vpc.id }}"
         cidr: "{{ cloud_config.subnet_cidr }}"
         resource_tags:
-          Name: "{{ name_prefix }}-subnet"
+          Name: "{{ cloud_config.subnet_name }}"
         state: present
       register: cluster_subnet
 
@@ -36,8 +36,6 @@
         routes:
           - dest: 0.0.0.0/0
             gateway_id: "{{ cluster_vpc.igw_id }}"
-        tags:
-          Name: "{{ name_prefix }}-Public"
         state: present
       when: "{{ cloud_config.internet_gateway }}"
 

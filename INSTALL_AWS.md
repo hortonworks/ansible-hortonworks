@@ -20,7 +20,7 @@ This node must be able to connect to the cluster nodes via SSH and to the AWS AP
 
    ```
    sudo yum -y install epel-release || sudo yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-    sudo yum -y install gcc gcc-c++ python-virtualenv python-pip python-devel libffi-devel openssl-devel sshpass git vim-enhanced
+   sudo yum -y install gcc gcc-c++ python-virtualenv python-pip python-devel libffi-devel openssl-devel sshpass git vim-enhanced
    ```
 
 
@@ -125,18 +125,12 @@ cd && git clone git@github.com:hortonworks/ansible-hdp.git
 
 Modify the file at `~/ansible-hdp/inventory/aws/group_vars/all` to set the AWS configuration.
 
-## name_prefix
-A helper variable that can be used to precede the name of the nodes nodes and other AWS resources (such as the subnet or NICs).
-
-Node names are derived from the group name (more details about groups bellow) and this variable can be used to uniquely identify a certain cluster, especially if the Resource Group is shared.
-
 
 ## cloud_config
 This section contains variables that are cluster specific and are used by all nodes:
 
 | Variable           | Description                                                                                             |
 | ------------------ | ------------------------------------------------------------------------------------------------------- |
-| name_suffix        | A suffix that will be appended to the name of all nodes. Usually it's a domain, but can be anything or even the empty string `''`. |
 | region             | The AWS Region as described [here](http://docs.aws.amazon.com/general/latest/gr/rande.html#ec2_region). |
 | zone               | The AWS Availability Zone from the previously set Region. More details [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html#using-regions-availability-zones-describe). |
 | vpc_name /vpc_cidr | The Amazon Virtual Private Cloud as described [here](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Introduction.html). It will be created if it doesn't exist. The name and the CIDR uniquely identify a VPC so set these variables accordingly if you want to build in an existing VPC. |
@@ -161,7 +155,7 @@ And groups can have any names and any number of nodes but they should correspond
 
 | Variable        | Description                                                               |
 | --------------- | ------------------------------------------------------------------------- |
-| group           | The name of the group. Must be unique in the AWS VPC. This is the reason why the default contains the `name_prefix`. Other groups can be added to correspond with the required architecture. |
+| group           | The name of the group. Must be unique in the AWS VPC. Usually it contains the cluster name. Other groups can be added to correspond with the required architecture. |
 | count           | The number of nodes to be built in this group. |
 | image           | The AMI ID of the OS image to be used. More details [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html). The easiest way to find out the ID is by using the EC2 console and clicking on the `Launch Instance` button. |
 | type            | The instance-type / size of the node. A list of all the instance-types can be found [here](https://aws.amazon.com/ec2/instance-types/) and the pricing [here](https://aws.amazon.com/ec2/pricing/). |

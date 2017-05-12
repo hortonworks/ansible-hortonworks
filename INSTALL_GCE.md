@@ -185,13 +185,6 @@ cd && git clone git@github.com:hortonworks/ansible-hdp.git
 
 Modify the file at `~/ansible-hdp/inventory/gce/group_vars/all` to set the GCE configuration.
 
-## name_prefix
-A helper variable that can be used to precede the name of all nodes.
-
-Node names are derived from the group name (more details about groups bellow).
-
-You can modify the group names so they don't use this variable, the choice is yours, but names must be unique in the same Google project.
-
 
 ## cloud_config
 This section contains variables that are cluster specific and are used by all nodes:
@@ -229,7 +222,7 @@ And groups can have any names and any number of nodes but they should correspond
 
 | Variable        | Description                                                               |
 | --------------- | ------------------------------------------------------------------------- |
-| group           | The name of the group. Must be unique in the same Google project. This is the reason why the default contains the `name_prefix`. Other groups can be added to correspond with the required architecture. |
+| group           | The name of the group. Must be unique in the same Google project. Usually it contains the cluster name. Other groups can be added to correspond with the required architecture. |
 | count           | The number of nodes to be built in this group. |
 | image           | The OS image to be used. More details [here](https://cloud.google.com/compute/docs/images). |
 | type            | The machine type / size of the node. A list of all the machine-types can be found [here](https://cloud.google.com/compute/docs/machine-types) and the pricing [here](https://cloud.google.com/compute/pricing#machinetype). |
