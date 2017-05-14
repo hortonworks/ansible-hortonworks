@@ -12,6 +12,7 @@
     groups: hadoop-cluster, {{ outer_loop.group }}
   loop_control:
     loop_var: local_loop
+  when: outer_loop.count > 0
   with_items: "{{ groups[outer_loop.group] }}"
 
 - name: Add node to ambari-server group
@@ -25,5 +26,5 @@
     groups: ambari-server
   loop_control:
     loop_var: local_loop
-  when: outer_loop.ambari_server is defined and outer_loop.ambari_server
+  when: outer_loop.count > 0 and outer_loop.ambari_server is defined and outer_loop.ambari_server
   with_items: "{{ groups[outer_loop.group] }}"

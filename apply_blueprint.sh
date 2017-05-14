@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -z "$CLOUD_TO_USE" ]; then
-    echo "CLOUD_TO_USE environment variable must be set to one of the following: aws, azure, gce, openstack"
+    echo "CLOUD_TO_USE environment variable must be set to one of the following: aws, azure, gce, openstack, static"
     exit 1
 fi
 
@@ -22,8 +22,11 @@ gce|google|gcp)
 openstack)
   message="Cloud to be used is OpenStack.\nMake sure you've sourced the OpenStack RC file."
   ;;
+static)
+  message="The static inventory will be used."
+  ;;
 *)
-  message="CLOUD_TO_USE environment variable was set to \"$CLOUD_TO_USE\" but must be set to one of the following: aws, azure, openstack"
+  message="CLOUD_TO_USE environment variable was set to \"$CLOUD_TO_USE\" but must be set to one of the following: aws, azure, gce, openstack, static"
   echo -e $message
   exit 1
   ;;

@@ -7,6 +7,8 @@ This includes building the cloud infrastructure and taking care of the prerequis
 
 The aim is to first build the nodes in a Cloud environment, prepare them (OS settings, etc) and then install Ambari and create the cluster using Ambari Blueprints.
 
+If the infrastructure already exists, it can also use a static inventory.
+
 
 ## [Installation](id:installation)
 
@@ -14,6 +16,7 @@ The aim is to first build the nodes in a Cloud environment, prepare them (OS set
 - Azure: See [INSTALL.md](../master/INSTALL_Azure.md) for Azure specific build instructions.
 - Google Compute Engine: See [INSTALL.md](../master/INSTALL_GCE.md) for GCE specific build instructions.
 - OpenStack: See [INSTALL.md](../master/INSTALL_OpenStack.md) for OpenStack specific build instructions.
+- Static inventory: See [INSTALL.md](../master/INSTALL_static.md) for specific build instructions.
 
 
 ## [Requirements](id:requirements)

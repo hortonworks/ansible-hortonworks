@@ -6,8 +6,7 @@
   tasks:
     - name: Add the nodes to hadoop-cluster and role specific groups
       include: "clouds/add_nodes_{{ cloud_name }}.yml"
-      when: item.count > 0
-      with_items: "{{ nodes }}"
+      with_items: "{{ nodes|default(omit) }}"
 
 - name: Gather facts from all nodes
   hosts: hadoop-cluster

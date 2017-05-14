@@ -2,6 +2,11 @@
   "blueprint" : "{{ blueprint_name }}",
   "config_recommendation_strategy" : "{{ config_recommendation_strategy }}",
   "default_password" : "{{ default_password }}",
+{#
+  The following checks if the inventory being used is static or a dynamic cloud inventory.
+  The 'nodes' variable would only exist in a cloud specific inventory.
+#}
+{% if nodes is defined %}
   "host_groups" :[
     {% for node_group in nodes if node_group.count > 0 -%}
 
@@ -20,4 +25,24 @@
     {% endfor %}
 
   ]
+{% else %}
+  "host_groups" :[
+    {% for node_group in groups if node_group not in ['all', 'ambari-server', 'hadoop-cluster', 'ungrouped'] and groups[node_group]|length > 0 -%}
+
+    {
+      "name" : "{{ node_group }}",
+      "hosts" : [
+        {% for node in groups[node_group]|sort -%}
+
+        { "fqdn" : "{{ hostvars[node]['ansible_nodename'] | lower }}" }{% if not loop.last %},{% endif %}
+
+        {% endfor %}
+
+      ]
+    }{% if not loop.last %},{% endif %}
+
+    {% endfor %}
+
+  ]
+{% endif %}
 }
