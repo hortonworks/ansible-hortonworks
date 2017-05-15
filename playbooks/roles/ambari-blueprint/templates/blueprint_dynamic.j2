@@ -1,0 +1,105 @@
+{
+  "configurations" : [
+    {
+      "hadoop-env" : {
+        "dtnode_heapsize" : "1024m",
+        "namenode_heapsize" : "2048m",
+        "namenode_opt_maxnewsize" : "384m",
+        "namenode_opt_newsize" : "384m"
+      }
+    },
+    {
+      "hdfs-site" : {
+        {% if namenodes|length > 1 -%}
+        "dfs.client.failover.proxy.provider.{{ cluster_name }}" : "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider",
+        "dfs.ha.automatic-failover.enabled" : "true",
+        "dfs.ha.fencing.methods" : "shell(/bin/true)",
+        "dfs.ha.namenodes.{{ cluster_name }}" : "nn1,nn2",
+        "dfs.namenode.http-address.{{ cluster_name }}.nn1" : "%HOSTGROUP::{{ namenodes[0] }}%:50070",
+        "dfs.namenode.http-address.{{ cluster_name }}.nn2" : "%HOSTGROUP::{{ namenodes[1] }}%:50070",
+        "dfs.namenode.https-address.{{ cluster_name }}.nn1" : "%HOSTGROUP::{{ namenodes[0] }}%:50470",
+        "dfs.namenode.https-address.{{ cluster_name }}.nn2" : "%HOSTGROUP::{{ namenodes[1] }}%:50470",
+        "dfs.namenode.rpc-address.{{ cluster_name }}.nn1" : "%HOSTGROUP::{{ namenodes[0] }}%:8020",
+        "dfs.namenode.rpc-address.{{ cluster_name }}.nn2" : "%HOSTGROUP::{{ namenodes[1] }}%:8020",
+        "dfs.namenode.shared.edits.dir" : "qjournal://{% for jn in journalnodes %}%HOSTGROUP::{{ jn }}%:8485{% if not loop.last %};{% endif %}{% endfor %}/{{ cluster_name }}",
+        "dfs.nameservices" : "{{ cluster_name }}",
+        {% endif -%}
+        "dfs.datanode.data.dir" : "/hadoop/hdfs/data",
+        "dfs.datanode.failed.volumes.tolerated" : "0",
+        "dfs.replication" : "3"
+      }
+    },
+    {
+      "yarn-site" : {
+        {% if resourcemanagers|length > 1 -%}
+        "hadoop.registry.zk.quorum": "{% for zk in zookeepers %}%HOSTGROUP::{{ zk }}%:2181{% if not loop.last %},{% endif %}{% endfor %}",
+        "yarn.resourcemanager.recovery.enabled": "true",
+        "yarn.resourcemanager.store.class" : "org.apache.hadoop.yarn.server.resourcemanager.recovery.ZKRMStateStore",
+        "yarn.resourcemanager.cluster-id" : "yarn-cluster",
+        "yarn.resourcemanager.ha.enabled" : "true",
+        "yarn.resourcemanager.ha.automatic-failover.zk-base-path" : "/yarn-leader-election",
+        "yarn.resourcemanager.ha.rm-ids" : "rm1,rm2",
+        "yarn.resourcemanager.address": "%HOSTGROUP::{{ namenodes[0] }}%:8050",
+        "yarn.resourcemanager.scheduler.address": "%HOSTGROUP::{{ namenodes[0] }}%:8030",
+        "yarn.resourcemanager.resource-tracker.address": "%HOSTGROUP::{{ namenodes[0] }}%:8025",
+        "yarn.resourcemanager.admin.address": "%HOSTGROUP::{{ namenodes[0] }}%:8141",
+        "yarn.resourcemanager.hostname": "%HOSTGROUP::{{ namenodes[0] }}%:8088",
+        "yarn.resourcemanager.hostname.rm1": "%HOSTGROUP::{{ namenodes[0] }}%",
+        "yarn.resourcemanager.hostname.rm2": "%HOSTGROUP::{{ namenodes[1] }}%",
+        "yarn.resourcemanager.webapp.address": "%HOSTGROUP::{{ namenodes[0] }}%:8088",
+        "yarn.resourcemanager.webapp.address.rm1": "%HOSTGROUP::{{ namenodes[0] }}%:8088",
+        "yarn.resourcemanager.webapp.address.rm2": "%HOSTGROUP::{{ namenodes[1] }}%:8088",
+        "yarn.resourcemanager.webapp.https.address": "%HOSTGROUP::{{ namenodes[0] }}%:8090",
+        "yarn.resourcemanager.webapp.https.address.rm1": "%HOSTGROUP::{{ namenodes[0] }}%:8090",
+        "yarn.resourcemanager.webapp.https.address.rm2": "%HOSTGROUP::{{ namenodes[1] }}%:8090",
+        "yarn.resourcemanager.zk-address": "{% for zk in zookeepers %}%HOSTGROUP::{{ zk }}%:2181{% if not loop.last %},{% endif %}{% endfor %}",
+        {% endif -%}
+        "yarn.client.nodemanager-connect.retry-interval-ms" : "10000"
+      }
+    },
+    {
+      "hbase-site" : {
+        {% if namenodes|length > 1 -%}
+        "hbase.rootdir": "hdfs://{{ cluster_name }}/apps/hbase/data",
+        {% endif -%}
+        "hbase.client.retries.number" : "35"
+      }
+    },
+    {
+      "core-site": {
+        {% if namenodes|length > 1 -%}
+        "fs.defaultFS" : "hdfs://{{ cluster_name }}",
+        "ha.zookeeper.quorum" : "{% for zk in zookeepers %}%HOSTGROUP::{{ zk }}%:2181{% if not loop.last %},{% endif %}{% endfor %}",
+        {% endif -%}
+        "fs.trash.interval" : "360"
+      }
+    }
+  ],
+
+  "host_groups" : [
+    {% for node_group in blueprint_dynamic if groups[node_group.group] is defined and groups[node_group.group]|length > 0 -%}
+
+    {
+      "name" : "{{ node_group.group }}",
+      "configurations" : [ ],
+      "components" : [
+        {% for client in node_group.clients -%}
+        { "name" : "{{ client }}" },
+        {% endfor %}
+
+        {% for service in node_group.services -%}
+        { "name" : "{{ service }}" }{% if not loop.last %},{% endif %}
+
+        {% endfor %}
+
+      ]
+    }{% if not loop.last and groups[node_group.group]|length > 0 %},{% endif %}
+
+    {% endfor %}
+
+  ],
+  "Blueprints" : {
+    "stack_name" : "HDP",
+    "stack_version" : "{{ product.version | regex_replace('.[0-9]+.[0-9]+[0-9_-]*$','') }}"
+  }
+}

@@ -1,4 +1,40 @@
 ---
+- name: Initialize the HA components lists
+  set_fact:
+    namenodes: []
+    resourcemanagers: []
+    journalnodes: []
+    zookeepers: []
+
+- name: Populate the namenodes list
+  set_fact:
+    namenodes: "{{ namenodes }} + [ '{{ item.group }}' ]"
+  when: blueprint_file == 'blueprint_dynamic.j2' and groups[item.group] is defined and groups[item.group]|length > 0 and 'NAMENODE' in item.services
+  with_items: "{{ blueprint_dynamic }}"
+
+- name: Populate the resourcemanagers list
+  set_fact:
+    resourcemanagers: "{{ resourcemanagers }} + [ '{{ item.group }}' ]"
+  when: blueprint_file == 'blueprint_dynamic.j2' and groups[item.group] is defined and groups[item.group]|length > 0 and 'RESOURCEMANAGER' in item.services
+  with_items: "{{ blueprint_dynamic }}"
+
+- name: Populate the journalnodes list
+  set_fact:
+    journalnodes: "{{ journalnodes }} + [ '{{ item.group }}' ]"
+  when: blueprint_file == 'blueprint_dynamic.j2' and groups[item.group] is defined and groups[item.group]|length > 0 and 'JOURNALNODE' in item.services
+  with_items: "{{ blueprint_dynamic }}"
+
+- name: Populate the ookeepers list
+  set_fact:
+    zookeepers: "{{ zookeepers }} + [ '{{ item.group }}' ]"
+  when: blueprint_file == 'blueprint_dynamic.j2' and groups[item.group] is defined and groups[item.group]|length > 0 and 'ZOOKEEPER_SERVER' in item.services
+  with_items: "{{ blueprint_dynamic }}"
+
+- name: Fail if HA NameNode prerequisites are not met
+  fail:
+    msg: "HA NameNode has been requested but there are less than 3 JournalNodes."
+  when: product.name|lower == 'hdp' and blueprint_file == 'blueprint_dynamic.j2' and namenodes|length > 1 and journalnodes|length < 3
+
 - name: Upload the blueprint and the cluster creation template
   template:
     src: "{{ item.src }}"

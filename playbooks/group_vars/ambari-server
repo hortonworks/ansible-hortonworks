@@ -4,8 +4,37 @@ ambari_admin_password: 'admin'
 wait: true                                                      # wait for the cluster to finish installing
 wait_timeout: 3600                                              # 60 minutes
 
-blueprint_name: 'mytestcluster_blueprint'
-blueprint_file: 'blueprint_hdfs_only.j2'
-cluster_template_file: 'cluster_template.j2'
 default_password: 'AsdQwe123456'                                # a default password for all required passwords which are not specified in the blueprint
 config_recommendation_strategy: 'NEVER_APPLY'
+
+cluster_template_file: 'cluster_template.j2'
+
+blueprint_name: 'mytestcluster_blueprint'
+blueprint_file: 'blueprint_dynamic.j2'
+blueprint_dynamic:
+  - group: "mytestcluster-master"
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT']
+    services:
+      - ZOOKEEPER_SERVER
+      - NAMENODE
+      - SECONDARY_NAMENODE
+      - RESOURCEMANAGER
+      - APP_TIMELINE_SERVER
+      - HISTORYSERVER
+      - SPARK2_JOBHISTORYSERVER
+      - HIVE_SERVER
+      - HIVE_METASTORE
+      - WEBHCAT_SERVER
+      - MYSQL_SERVER
+      - OOZIE_SERVER
+      - AMBARI_SERVER
+      - INFRA_SOLR
+      - METRICS_COLLECTOR
+      - METRICS_GRAFANA
+      - METRICS_MONITOR
+  - group: "mytestcluster-slave"
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT']
+    services:
+      - DATANODE
+      - NODEMANAGER
+      - METRICS_MONITOR
