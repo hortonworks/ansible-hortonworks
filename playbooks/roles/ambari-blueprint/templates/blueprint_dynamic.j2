@@ -1,5 +1,21 @@
 {
   "configurations" : [
+{% if product.name|lower == 'hdf' %}
+    {
+      "nifi-ambari-config" : {
+        "nifi.node.ssl.port": "9091",
+        "nifi.node.port": "9090",
+        "nifi.security.encrypt.configuration.password": "{{ default_password }}",
+        "nifi.sensitive.props.key": "{{ default_password }}"
+      }
+    },
+    {
+      "nifi-env" : {
+        "nifi_group" : "nifi",
+        "nifi_user" : "nifi"
+      }
+    },
+{% else %}
     {
       "hadoop-env" : {
         "dtnode_heapsize" : "1024m",
@@ -73,6 +89,12 @@
         {% endif -%}
         "fs.trash.interval" : "360"
       }
+    },
+{% endif %}
+    {
+      "zoo.cfg": {
+        "clientPort" : "2181"
+      }
     }
   ],
 
@@ -99,7 +121,7 @@
 
   ],
   "Blueprints" : {
-    "stack_name" : "HDP",
+    "stack_name" : "{{ product.name|upper }}",
     "stack_version" : "{{ product.version | regex_replace('.[0-9]+.[0-9]+[0-9_-]*$','') }}"
   }
 }
