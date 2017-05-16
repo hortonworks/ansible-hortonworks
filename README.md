@@ -68,3 +68,60 @@ Currently, these playbooks are divided into the following parts:
    Run the `apply_blueprint.sh` script to install HDP or HDF based on an Ambari Blueprint.
   
    This uploads the Ambari Blueprint and Cluster Creation Template and launches a cluster create request to Ambari. It can also wait for the cluster to be built
+
+
+## [Features](id:features)
+
+### Infrastructure support
+- [x] Pre-build infrastructure (using an inventory file)
+- [x] OpenStack nodes
+- [ ] OpenStack Block Storage (Cinder)
+- [x] AWS nodes (with root EBS only)
+- [ ] AWS Block Storage (additional EBS)
+- [x] Azure nodes
+- [ ] Azure Block Storage (VHDs)
+- [x] Google Compute Engine nodes (with root Persistent Disks only)
+- [ ] Google Compute Engine Block Storage (additional Persistent Disks)
+
+### OS support
+- [x] CentOS/RHEL 7 support
+- [x] Ubuntu 14 support
+- [x] Amazon AMI 2016.09 support
+- [ ] Amazon AMI 2017.03 support
+- [ ] SuSE support
+
+### Prerequisites
+- [x] Install and start NTP
+- [x] Create /etc/hosts mappings
+- [x] Set nofile and nproc limits
+- [x] Set swappiness
+- [x] Disable SELinux
+- [x] Disable THP
+- [x] Set Ambari repositories
+- [ ] Install OpenJDK and Oracle JDK
+- [ ] Install and prepare MySQL
+- [ ] Install and prepare PostgreSQL
+- [ ] Install and configure local MIT KDC
+- [ ] Partition and mount additional storage
+
+### Cluster build
+- [x] Install Ambari Agent and Server with embedded JDK and databases
+- [ ] Configure Ambari Server with OpenJDK or Oracle JDK
+- [ ] Configure Ambari Server with advanced database options
+- [x] Configure custom Repositories
+- [x] Build HDP clusters
+- [x] Build HDF clusters
+- [x] Build clusters with a specific JSON blueprint (static)
+- [x] Build clusters with a generated JSON blueprint (dynamic based on Jinja2 template and variables)
+- [x] Wait for the cluster to be built
+
+### Dynamic blueprint
+- [x] HA NameNode, ResourceManager, Hive and HBase Master
+- [ ] HA Oozie
+- [ ] Secure clusters with MIT KDC
+- [ ] Secure clusters with Microsoft AD
+- [ ] Ranger
+- [ ] Basic memory settings tuning
+- [ ] Make use of additional storage for HDP workers
+- [ ] Make use of additional storage for master services
+- [ ] Configure additional storage for NiFi
