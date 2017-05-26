@@ -1,4 +1,16 @@
 ---
+- name: Load variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}-{{ ansible_distribution_major_version }}.yml"
+        - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}.yml"
+        - "{{ ansible_os_family|lower }}-{{ ansible_distribution_major_version }}.yml"
+        - "{{ ansible_os_family|lower }}.yml"
+        - defaults.yml
+      paths:
+        - ../vars
+
 - name: Install the ambari-server package (yum)
   yum:
     name: ambari-server
@@ -16,8 +28,18 @@
 
 - meta: flush_handlers
 
+- name: Set the Ambari Server Java setup option (OpenJDK)
+  set_fact:
+    ambari_java_options: "-j {{ openjdk_path }}"
+  when: java == "openjdk"
+
+- name: Set the Ambari Server Java setup option (Oracle JDK)
+  set_fact:
+    ambari_java_options: "-j {{ oraclejdk.base_folder }}/latest"
+  when: java == "oraclejdk"
+
 - name: Run Ambari Server setup
-  shell: /usr/sbin/ambari-server setup -s
+  shell: /usr/sbin/ambari-server setup -s {{ ambari_java_options|default("") }}
   notify: Restart ambari-server
 
 - meta: flush_handlers

@@ -41,6 +41,10 @@
   with_items: "{{ packages|default([]) }}"
   when: ansible_os_family|lower == "debian"
 
+- name: Install Java
+  include: java.yml
+  when: java != "embedded"
+
 - name: Make sure the NTP service is started
   service:
     name: "{{ ntp_service_name }}"

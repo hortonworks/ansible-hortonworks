@@ -195,15 +195,20 @@ source ~/ansible/bin/activate
 
 Modify the file at `~/ansible-hdp/playbooks/group_vars/all` to set the cluster configuration.
 
-| Variable          | Description                                                                                                 |
-| ----------------- | ----------------------------------------------------------------------------------------------------------- |
-| cluster_name      | The name of the cluster.                                                                                |
-| ambari_version    | The Ambari version, in the full, 4-number form, for example: `2.4.2.0`.                                     |
-| product.name      | The product name, `hdp` for HDP and `hdf` for HDF.                                                          |
-| product.version   | The product version, in the full, 4-number form, for example: `2.5.3.0`.                                    |
-| utils_version     | The HDP-UTILS version exactly as displayed on the [repositories page](http://docs.hortonworks.com/HDPDocuments/Ambari-2.4.2.0/bk_ambari-installation/content/hdp_stack_repositories.html). This should be set to `1.1.0.21` for HDP 2.5 or HDF, and to `1.1.0.20` for any HDP less than 2.5.|
-| base_url          | The base URL for the repositories. Change this to the local web server url if using a Local Repository. `/HDP/<OS>/2.x/updates/<latest.version>` (or `/HDF/..`) will be appended to this value to set it accordingly if there are additional URL paths. |
-| mpack_filename    | The exact filename of the mpack to be installed as displayed on the [repositories page](http://docs.hortonworks.com/HDPDocuments/HDF2/HDF-2.1.2/bk_dataflow-release-notes/content/ch_hdf_relnotes.html#repo-location). Example for HDF 2.1.2: `hdf-ambari-mpack-2.1.2.0-10.tar.gz`. |
+| Variable                   | Description                                                                                                 |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| cluster_name               | The name of the cluster.                                                                                    |
+| ambari_version             | The Ambari version, in the full, 4-number form, for example: `2.5.0.3`.                                     |
+| product.name               | The product name, `hdp` for HDP and `hdf` for HDF.                                                          |
+| product.version            | The product version, in the full, 4-number form, for example: `2.6.0.3`.                                    |
+| utils_version              | The HDP-UTILS version exactly as displayed on the [repositories page](http://docs.hortonworks.com/HDPDocuments/Ambari-2.5.0.3/bk_ambari-installation/content/hdp_stack_repositories.html). This should be set to `1.1.0.21` for HDP 2.5 or HDF, and to `1.1.0.20` for any HDP less than 2.5.|
+| base_url                   | The base URL for the repositories. Change this to the local web server url if using a Local Repository. `/HDP/<OS>/2.x/updates/<latest.version>` (or `/HDF/..`) will be appended to this value to set it accordingly if there are additional URL paths. |
+| mpack_filename             | The exact filename of the mpack to be installed as displayed on the [repositories page](http://docs.hortonworks.com/HDPDocuments/HDF2/HDF-2.1.3/bk_release-notes/content/ch_hdf_relnotes.html#repo-location). Example for HDF 2.1.3: `hdf-ambari-mpack-2.1.3.0-6.tar.gz`. |
+| java                       | Can be set to `embedded` (default - downloaded by Ambari), `openjdk` or `oraclejdk`. If `oraclejdk` is selected, then the `.x64.tar.gz` package must be downloaded in advance from [Oracle](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html). Same with the [JCE](http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html) package. These files can be copied to all nodes in advanced or only to the Ansible Controller and Ansible will copy them. |
+| oraclejdk.base_folder      | This indicates the folder where the Java package should be unpacked to. The default of `/usr/java` is also used by the Oracle JDK rpm. |
+| oraclejdk.tarball_location | The location of the tarball file. This can be the location on the remote systems or on the Ansible controller, depending on the `remote_files` variable. |
+| oraclejdk.jce_location     | The location of the JCE package zip file. This can be the location on the remote systems or on the Ansible controller, depending on the `remote_files` variable. |
+| oraclejdk.remote_files     | If this variable is set to `yes` then the tarball and JCE files must already be present on the remote system. If set to `no` then the files will be copied by Ansible (from the Ansible controller to the remote systems). |
 
 
 ## ambari-server config

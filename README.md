@@ -9,6 +9,8 @@ The aim is to first build the nodes in a Cloud environment, prepare them (OS set
 
 If the infrastructure already exists, it can also use a static inventory.
 
+It can use a static blueprint or generate a blueprint based on the components selected.
+
 
 ## [Installation](id:installation)
 
@@ -98,7 +100,7 @@ Currently, these playbooks are divided into the following parts:
 - [x] Disable SELinux
 - [x] Disable THP
 - [x] Set Ambari repositories
-- [ ] Install OpenJDK and Oracle JDK
+- [x] Install OpenJDK and Oracle JDK
 - [ ] Install and prepare MySQL
 - [ ] Install and prepare PostgreSQL
 - [ ] Install and configure local MIT KDC
@@ -106,7 +108,7 @@ Currently, these playbooks are divided into the following parts:
 
 ### Cluster build
 - [x] Install Ambari Agent and Server with embedded JDK and databases
-- [ ] Configure Ambari Server with OpenJDK or Oracle JDK
+- [x] Configure Ambari Server with OpenJDK or Oracle JDK
 - [ ] Configure Ambari Server with advanced database options
 - [x] Configure custom Repositories
 - [x] Build HDP clusters

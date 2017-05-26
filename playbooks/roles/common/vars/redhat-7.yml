@@ -9,6 +9,8 @@ packages:
   - openssl                 # openssl required by Ambari
   - chrony                  # ntp required by Hadoop
 
+openjdk_package: java-1.8.0-openjdk-devel
+
 ntp_service_name: chronyd
 
 update_grub_command: 'grub2-mkconfig -o "$(readlink -n /etc/grub2.cfg)"'

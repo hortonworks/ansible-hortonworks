@@ -1,0 +1,65 @@
+---
+- block:
+    - name: Install OpenJDK (yum)
+      yum:
+        name: "{{ openjdk_package }}"
+        update_cache: yes
+        state: installed
+      when: ansible_os_family|lower == "redhat"
+
+    - name: Install OpenJDK (apt)
+      apt:
+        name: "{{ openjdk_package }}"
+        update_cache: yes
+        state: present
+      when: ansible_os_family|lower == "debian"
+  when: java == "openjdk"
+
+- block:
+    - name: Create the {{ oraclejdk.base_folder }} directory
+      file:
+        path: "{{ oraclejdk.base_folder }}"
+        state: directory
+
+    - name: Extract the Oracle JDK tarball
+      unarchive:
+        src: "{{ oraclejdk.tarball_location }}"
+        dest: "{{ oraclejdk.base_folder }}"
+        owner: root
+        group: root
+        mode: 0755
+        remote_src: "{{ oraclejdk.remote_files }}"
+        list_files: yes
+        keep_newer: yes
+      register: "tarball_content"
+
+    - name: Set the new JDK folder name
+      set_fact:
+        jdk_folder: "{{ tarball_content.files[0] | regex_replace('/(.*)$','') }}"
+
+    - name: Create the {{ oraclejdk.base_folder }}/latest symlink
+      file:
+        src: "{{ oraclejdk.base_folder }}/{{ jdk_folder }}"
+        path: "{{ oraclejdk.base_folder }}/latest"
+        state: link
+        force: yes
+
+    - name: Extract the JCE archive
+      unarchive:
+        src: "{{ oraclejdk.jce_location }}"
+        dest: "{{ oraclejdk.base_folder }}/latest/jre/lib/security"
+        owner: root
+        group: root
+        mode: 0755
+        remote_src: "{{ oraclejdk.remote_files }}"
+
+    - name: Copy the JCE jar files to {{ oraclejdk.base_folder }}/latest/jre/lib/security
+      copy:
+        src: "{{ oraclejdk.base_folder }}/latest/jre/lib/security/UnlimitedJCEPolicyJDK8/{{ item }}"
+        dest: "{{ oraclejdk.base_folder }}/latest/jre/lib/security"
+        force: yes
+        remote_src: yes
+      with_items:
+        - local_policy.jar
+        - US_export_policy.jar
+  when: java == "oraclejdk"
