@@ -1,0 +1,68 @@
+---
+- name: Create the required Ansible groups
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  tasks:
+    - name: Add the nodes to hadoop-cluster and role specific groups
+      include: "clouds/add_nodes_{{ cloud_name }}.yml"
+      with_items: "{{ nodes|default(omit) }}"
+
+- name: Create the required Ansible variables
+  hosts: ambari-server
+  gather_facts: False
+  tasks:
+    - block:
+      - name: Initialize the lists of components
+        set_fact:
+          namenode_groups: []
+          resourcemanager_groups: []
+          journalnode_groups: []
+          zookeeper_groups: []
+          hiveserver_hosts: []
+          oozie_hosts: []
+        no_log: True
+
+      - name: Populate the namenode groups list
+        set_fact:
+          namenode_groups: "{{ namenode_groups }} + [ '{{ item.group }}' ]"
+        when: groups[item.group] is defined and groups[item.group]|length > 0 and 'NAMENODE' in item.services
+        with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+        no_log: True
+
+      - name: Populate the resourcemanager groups list
+        set_fact:
+          resourcemanager_groups: "{{ resourcemanager_groups }} + [ '{{ item.group }}' ]"
+        when: groups[item.group] is defined and groups[item.group]|length > 0 and 'RESOURCEMANAGER' in item.services
+        with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+        no_log: True
+
+      - name: Populate the journalnode groups list
+        set_fact:
+          journalnode_groups: "{{ journalnode_groups }} + [ '{{ item.group }}' ]"
+        when: groups[item.group] is defined and groups[item.group]|length > 0 and 'JOURNALNODE' in item.services
+        with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+        no_log: True
+
+      - name: Populate the zookeeper groups list
+        set_fact:
+          zookeeper_groups: "{{ zookeeper_groups }} + [ '{{ item.group }}' ]"
+        when: groups[item.group] is defined and groups[item.group]|length > 0 and 'ZOOKEEPER_SERVER' in item.services
+        with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+        no_log: True
+
+      - name: Populate the hiveserver hosts list
+        set_fact:
+          hiveserver_hosts: "{{ hiveserver_hosts }} + {{ groups[item.group] }}"
+        when: groups[item.group] is defined and groups[item.group]|length > 0 and ('HIVE_SERVER' in item.services or 'HIVE_METASTORE' in item.services)
+        with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+        no_log: True
+
+      - name: Populate the oozie hosts list
+        set_fact:
+          oozie_hosts: "{{ oozie_hosts }} + {{ groups[item.group] }}"
+        when: groups[item.group] is defined and groups[item.group]|length > 0 and ('OOZIE_SERVER' in item.services)
+        with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+        no_log: True
+
+      when: hostvars[inventory_hostname]['blueprint_file'] == 'blueprint_dynamic.j2'

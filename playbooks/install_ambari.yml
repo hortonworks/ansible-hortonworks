@@ -1,12 +1,5 @@
 ---
-- name: Create Ansible groups
-  hosts: localhost
-  connection: local
-  gather_facts: False
-  tasks:
-    - name: Add the nodes to hadoop-cluster and role specific groups
-      include: "clouds/add_nodes_{{ cloud_name }}.yml"
-      with_items: "{{ nodes|default(omit) }}"
+- include: "set_variables.yml"
 
 - name: Apply the ambari-agent role to the hadoop-cluster group
   hosts: hadoop-cluster
