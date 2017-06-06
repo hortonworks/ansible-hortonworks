@@ -1,15 +1,15 @@
 ---
 cluster_name: 'mytestcluster'
 
-ambari_version: '2.5.0.3'                                 # must be the 4-part full version number
+ambari_version: '2.5.1.0'                                 # must be the 4-part full version number
 
 product:
   name: 'hdp'                                             # can be hdp or hdf
-  version: '2.6.0.3'                                      # must be the 4-part full version number
+  version: '2.6.1.0'                                      # must be the 4-part full version number
 
 utils_version: '1.1.0.21'                                 # set this to 1.1.0.21 for HDP >= 2.5 or HDF, and to 1.1.0.20 for any HDP less than 2.5
 base_url: 'http://public-repo-1.hortonworks.com'          # change this if using a Local Repository
-mpack_filename: 'hdf-ambari-mpack-2.1.3.0-6.tar.gz'       # set this if HDF will be installed
+mpack_filename: 'hdf-ambari-mpack-2.1.4.0-5.tar.gz'      # set this if HDF will be installed
 
 java: 'embedded'                                          # can be set to 'embedded', 'openjdk' or 'oraclejdk'
 oraclejdk:
