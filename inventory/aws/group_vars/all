@@ -7,7 +7,6 @@ cloud_config:
   subnet_name: 'mytestcluster-subnet'
   subnet_cidr: '10.0.10.0/24'
   internet_gateway: true                                           # Only set to false if using local repos
-
   admin_username: ec2-user
   ssh:
     keyname: "Hadoop-key"
@@ -27,9 +26,9 @@ cloud_config:
 nodes:
   - group: "mytestcluster-master"
     count: 1
-    image: ami-d41d58a7                                            # Amazon Linux AMI 2016.09.0 in eu-west-1
+    image: ami-01ccc867                                            # Amazon Linux AMI 2017.03.0 in eu-west-1
     type: r3.xlarge
-    public_ip: true                                                # wait for Ansible 2.2 before setting this to false
+    public_ip: true
     security_groups: default_cluster_access,ambari_access
     root_volume:
       ebs: true                                                    # non-EBS root volumes are not supported at the moment
@@ -38,10 +37,10 @@ nodes:
     ambari_server: true
 
   - group: "mytestcluster-slave"
-    count: 2
-    image: ami-d41d58a7                                            # Amazon Linux AMI 2016.09.0 in eu-west-1
+    count: 3
+    image: ami-01ccc867                                            # Amazon Linux AMI 2017.03.0 in eu-west-1
     type: r3.large
-    public_ip: true                                                # wait for Ansible 2.2 before setting this to false
+    public_ip: true
     security_groups: default_cluster_access
     root_volume:
       ebs: true                                                    # non-EBS root volumes are not supported at the moment
@@ -50,9 +49,9 @@ nodes:
 
   - group: "mytestcluster-edge"
     count: 0
-    image: ami-d41d58a7                                            # Amazon Linux AMI 2016.09.0 in eu-west-1
+    image: ami-01ccc867                                            # Amazon Linux AMI 2017.03.0 in eu-west-1
     type: m3.medium
-    public_ip: true                                                # wait for Ansible 2.2 before setting this to false
+    public_ip: true
     security_groups: default_cluster_access
     root_volume:
       ebs: true                                                    # non-EBS root volumes are not supported at the moment
