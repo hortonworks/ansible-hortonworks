@@ -30,7 +30,7 @@
         "dfs.client.failover.proxy.provider.{{ cluster_name }}" : "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider",
         "dfs.ha.automatic-failover.enabled" : "true",
         "dfs.ha.fencing.methods" : "shell(/bin/true)",
-        "dfs.ha.namenode_groups.{{ cluster_name }}" : "nn1,nn2",
+        "dfs.ha.namenodes.{{ cluster_name }}" : "nn1,nn2",
         "dfs.namenode.http-address.{{ cluster_name }}.nn1" : "%HOSTGROUP::{{ namenode_groups[0] }}%:50070",
         "dfs.namenode.http-address.{{ cluster_name }}.nn2" : "%HOSTGROUP::{{ namenode_groups[1] }}%:50070",
         "dfs.namenode.https-address.{{ cluster_name }}.nn1" : "%HOSTGROUP::{{ namenode_groups[0] }}%:50470",
