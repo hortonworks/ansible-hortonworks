@@ -90,7 +90,7 @@
     status_code: 200,201,202
     return_content: yes
   register: cluster_check_task
-  until: ((cluster_check_task.content|from_json).Requests.request_status == 'COMPLETED' or
+  until: (((cluster_check_task.content|from_json).Requests.request_status == 'COMPLETED' and (cluster_check_task.content|from_json).Requests.completed_task_count|int > 0) or
          (cluster_check_task.content|from_json).Requests.request_status == 'FAILED' or
          (cluster_check_task.content|from_json).Requests.request_status == 'TIMEDOUT' or
          (cluster_check_task.content|from_json).Requests.request_status == 'ABORTED')
