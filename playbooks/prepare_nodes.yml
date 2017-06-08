@@ -7,3 +7,11 @@
   become: yes
   roles:
     - common
+
+- name: Apply the database role to the ambari-server group
+  hosts: ambari-server
+  any_errors_fatal: true
+  become: yes
+  roles:
+    - role: database
+      when: database != "embedded" and not database_options.external_hostname|default('')

@@ -45,7 +45,6 @@ blueprint_dynamic:                                              # properties for
       - OOZIE_SERVER
       - AMBARI_SERVER
       - INFRA_SOLR
-      - MYSQL_SERVER
       - ZEPPELIN_MASTER
       - APP_TIMELINE_SERVER
       - HISTORYSERVER

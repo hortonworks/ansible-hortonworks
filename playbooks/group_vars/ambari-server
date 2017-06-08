@@ -9,6 +9,19 @@ config_recommendation_strategy: 'NEVER_APPLY'
 
 cluster_template_file: 'cluster_template.j2'                    # the cluster creation template file
 
+database: 'embedded'                                            # can be set to 'embedded', 'postgres', 'mysql' or 'mariadb'
+database_options:
+  external_hostname: ''                                         # if this is empty, Ansible will install and prepare the database on the ambari-node
+  ambari_db_name: 'ambari'
+  ambari_db_username: 'ambari'
+  ambari_db_password: 'bigdata'
+  hive_db_name: 'hive'
+  hive_db_username: 'hive'
+  hive_db_password: 'hive'
+  oozie_db_name: 'oozie'
+  oozie_db_username: 'oozie'
+  oozie_db_password: 'oozie'
+
 blueprint_name: 'mytestcluster_blueprint'                       # the name of the blueprint as it will be stored in Ambari
 blueprint_file: 'blueprint_dynamic.j2'                          # the blueprint JSON file - 'blueprint_dynamic.j2' is a Jinja2 template that generates the required JSON
 blueprint_dynamic:                                              # properties for the dynamic blueprint - these are only used by the 'blueprint_dynamic.j2' template to generate the JSON
@@ -25,7 +38,6 @@ blueprint_dynamic:                                              # properties for
       - HIVE_SERVER
       - HIVE_METASTORE
       - WEBHCAT_SERVER
-      - MYSQL_SERVER
       - OOZIE_SERVER
       - AMBARI_SERVER
       - INFRA_SOLR

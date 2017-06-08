@@ -1,5 +1,5 @@
 ---
-openjdk_path: /usr/lib/jvm/java-1.8.0-openjdk.x86_64
+openjdk_path: /usr/lib/jvm/java-1.8.0-openjdk
 
 postgres_packages:
   - postgresql

@@ -9,7 +9,9 @@ The aim is to first build the nodes in a Cloud environment, prepare them (OS set
 
 If the infrastructure already exists, it can also use a static inventory.
 
-It can use a static blueprint or generate a blueprint based on the components selected.
+It can use a static blueprint or generate a blueprint based on the components selected in the Ansible variables file.
+
+For a full list of supported features check [bellow](#features).
 
 
 ## [Installation](id:installation)
@@ -25,7 +27,7 @@ It can use a static blueprint or generate a blueprint based on the components se
 
 - Ansible >= 2.2.1
 
-- Expects CentOS/RHEL 7 or Ubuntu 14 hosts (also supports Amazon Linux AMI)
+- Expects CentOS/RHEL 6/7 or Ubuntu 14 hosts (also supports Amazon Linux AMI)
 
 
 ## [Description](id:description)
@@ -86,10 +88,11 @@ Currently, these playbooks are divided into the following parts:
 - [ ] Google Compute Engine Block Storage (additional Persistent Disks)
 
 ### OS support
+- [x] CentOS/RHEL 6 support
 - [x] CentOS/RHEL 7 support
 - [x] Ubuntu 14 support
-- [x] Amazon AMI 2016.09 support
-- [ ] Amazon AMI 2017.03 support
+- [ ] Ubuntu 16 support
+- [x] Amazon AMI (2016.09 and 2017.03) support
 - [ ] SuSE support
 
 ### Prerequisites
@@ -100,16 +103,16 @@ Currently, these playbooks are divided into the following parts:
 - [x] Disable SELinux
 - [x] Disable THP
 - [x] Set Ambari repositories
-- [x] Install OpenJDK and Oracle JDK
-- [ ] Install and prepare MySQL
-- [ ] Install and prepare PostgreSQL
+- [x] Install OpenJDK or Oracle JDK
+- [x] Install and prepare MySQL
+- [x] Install and prepare PostgreSQL
 - [ ] Install and configure local MIT KDC
 - [ ] Partition and mount additional storage
 
 ### Cluster build
 - [x] Install Ambari Agent and Server with embedded JDK and databases
 - [x] Configure Ambari Server with OpenJDK or Oracle JDK
-- [ ] Configure Ambari Server with advanced database options
+- [x] Configure Ambari Server with advanced database options
 - [x] Configure custom Repositories
 - [x] Build HDP clusters
 - [x] Build HDF clusters
@@ -118,7 +121,10 @@ Currently, these playbooks are divided into the following parts:
 - [x] Wait for the cluster to be built
 
 ### Dynamic blueprint
-- [x] HA NameNode, ResourceManager, Hive and HBase Master
+- [x] HA NameNode
+- [x] HA ResourceManager
+- [x] HA Hive
+- [x] HA HBase Master
 - [ ] HA Oozie
 - [ ] Secure clusters with MIT KDC
 - [ ] Secure clusters with Microsoft AD

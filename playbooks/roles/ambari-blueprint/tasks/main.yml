@@ -1,4 +1,8 @@
 ---
+- name: Load default variables
+  include_vars:
+    file: '../defaults/main.yml'
+
 - name: Fail if HA NameNode prerequisites are not met
   fail:
     msg: "HA NameNode has been requested but there are less than 3 JournalNodes."

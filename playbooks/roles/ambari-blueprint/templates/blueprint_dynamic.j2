@@ -74,6 +74,70 @@
       }
     },
     {
+      "hive-site" : {
+        {% if database != "embedded" -%}
+        {% if database == "mysql" or database == "mariadb" -%}
+        "javax.jdo.option.ConnectionDriverName": "com.mysql.jdbc.Driver",
+        "javax.jdo.option.ConnectionURL": "jdbc:mysql://{{ database_options.external_hostname|default(ansible_nodename,true) }}:{{ mysql_port }}/{{ database_options.hive_db_name }}",
+        {% endif -%}
+        {% if database == "postgres" -%}
+        "javax.jdo.option.ConnectionDriverName": "org.postgresql.Driver",
+        "javax.jdo.option.ConnectionURL": "jdbc:postgresql://{{ database_options.external_hostname|default(ansible_nodename,true) }}:{{ postgres_port }}/{{ database_options.hive_db_name }}",
+        {% endif -%}
+        "javax.jdo.option.ConnectionUserName": "{{ database_options.hive_db_username }}",
+        "javax.jdo.option.ConnectionPassword": "{{ database_options.hive_db_password }}",
+        {% endif -%}
+        "hive.metastore.failure.retries" : "24"
+      }
+    },
+    {
+      "hive-env" : {
+        {% if database != "embedded" -%}
+        {% if database == "mysql" or database == "mariadb" -%}
+        "hive_database": "Existing MySQL / MariaDB Database",
+        "hive_database_type": "mysql",
+        {% endif -%}
+        {% if database == "postgres" -%}
+        "hive_database": "Existing PostgreSQL Database",
+        "hive_database_type": "postgres",
+        {% endif -%}
+        "hive_database_name": "{{ database_options.hive_db_name }}",
+        {% endif -%}
+        "hive_user" : "hive"
+      }
+    },
+    {
+      "oozie-site" : {
+        {% if database != "embedded" -%}
+        {% if database == "mysql" or database == "mariadb" -%}
+        "oozie.service.JPAService.jdbc.driver": "com.mysql.jdbc.Driver",
+        "oozie.service.JPAService.jdbc.url": "jdbc:mysql://{{ database_options.external_hostname|default(ansible_nodename,true) }}:{{ mysql_port }}/{{ database_options.oozie_db_name }}",
+        {% endif -%}
+        {% if database == "postgres" -%}
+        "oozie.service.JPAService.jdbc.driver": "org.postgresql.Driver",
+        "oozie.service.JPAService.jdbc.url": "jdbc:postgresql://{{ database_options.external_hostname|default(ansible_nodename,true) }}:{{ postgres_port }}/{{ database_options.oozie_db_name }}",
+        {% endif -%}
+        "oozie.db.schema.name": "{{ database_options.oozie_db_name }}",
+        "oozie.service.JPAService.jdbc.username": "{{ database_options.oozie_db_username }}",
+        "oozie.service.JPAService.jdbc.password": "{{ database_options.oozie_db_password }}",
+        {% endif -%}
+        "oozie.action.retry.interval" : "30"
+      }
+    },
+    {
+      "oozie-env" : {
+        {% if database != "embedded" -%}
+        {% if database == "mysql" or database == "mariadb" -%}
+        "oozie_database": "Existing MySQL / MariaDB Database",
+        {% endif -%}
+         {% if database == "postgres" -%}
+        "oozie_database": "Existing PostgreSQL Database",
+        {% endif -%}
+        {% endif -%}
+        "oozie_user" : "oozie"
+      }
+    },
+    {
       "hbase-site" : {
         {% if namenode_groups|length > 1 -%}
         "hbase.rootdir": "hdfs://{{ cluster_name }}/apps/hbase/data",
@@ -110,7 +174,7 @@
         {% endfor %}
 
         {% for service in node_group.services -%}
-        { "name" : "{{ service }}" }{% if not loop.last %},{% endif %}
+        { "name" : "{{ service }}" }{% if service == "HIVE_METASTORE" and database == "embedded" %},{ "name" : "MYSQL_SERVER" }{% endif %}{% if not loop.last %},{% endif %}
 
         {% endfor %}
 

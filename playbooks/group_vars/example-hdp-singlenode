@@ -19,7 +19,6 @@ blueprint_dynamic:                                              # properties for
       - NODEMANAGER
       - APP_TIMELINE_SERVER
       - HISTORYSERVER
-      - MYSQL_SERVER
       - HIVE_SERVER
       - HIVE_METASTORE
       - WEBHCAT_SERVER
