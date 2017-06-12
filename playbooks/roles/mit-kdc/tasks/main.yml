@@ -1,0 +1,86 @@
+---
+- name: Load variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}-{{ ansible_distribution_major_version }}.yml"
+        - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}.yml"
+        - "{{ ansible_os_family|lower }}-{{ ansible_distribution_major_version }}.yml"
+        - "{{ ansible_os_family|lower }}.yml"
+        - defaults.yml
+      paths:
+        - ../vars
+
+- name: Install MIT KDC packages (yum)
+  yum:
+    name: "{{ item }}"
+    update_cache: yes
+    state: installed
+  with_items: "{{ kdc_packages }}"
+  when: ansible_os_family|lower == "redhat"
+
+- name: Install MIT KDC packages (apt)
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    state: present
+  with_items: "{{ kdc_packages }}"
+  when: ansible_os_family|lower == "debian"
+
+- name: Upload the temporary krb5.conf
+  template:
+    src: krb5.conf.j2
+    dest: "{{ krb5_config_file }}"
+    mode: 0644
+    force: yes
+
+- name: Create the KDC database for realm {{ security_options.realm | upper }}
+  shell: "{{ kdc_init_command }} -s -W -r {{ security_options.realm | upper }} -P {{ security_options.kdc_master_key }}"
+  args:
+    creates: "{{ kdc_database_file }}"
+  no_log: True
+  notify: Restart krb5
+
+- name: Upload the KDC configuration file
+  template:
+    src: kdc.conf.j2
+    dest: "{{ kdc_config_file }}"
+    mode: 0600
+    force: yes
+  notify: Restart krb5
+
+- meta: flush_handlers
+
+- name: Add the admin principal for realm {{ security_options.realm | upper }}
+  shell: kadmin.local -q "add_principal -pw {{ security_options.admin_password }} {{ security_options.admin_principal }}/admin@{{ security_options.realm | upper }}"
+  no_log: True
+  register: addprinc_result
+
+- name: Fail if the admin principal could not be created
+  fail:
+    msg: The admin principal could not be created. Error is {{ addprinc_result.stderr }}
+  when: addprinc_result|failed or not (addprinc_result.stdout|search("Principal .* created") or addprinc_result.stderr|search("Principal or policy already exists while creating"))
+
+- name: Set the ACL for the admin user
+  lineinfile:
+    dest: "{{ kdc_acl_file }}"
+    line: "*/admin@{{ security_options.realm | upper }}  *"
+    insertbefore: EOF
+    state: present
+    create: yes
+    mode: 0600
+  notify: Restart kadmin
+
+- meta: flush_handlers
+
+- name: Make sure the kdc service is started
+  service:
+    name: "{{ kdc_service_name }}"
+    state: started
+    enabled: yes
+
+- name: Make sure the kadmin service is started
+  service:
+    name: "{{ kadmin_service_name }}"
+    state: started
+    enabled: yes

@@ -1,5 +1,27 @@
 {
   "configurations" : [
+{% if security|lower == "mit-kdc" or security|lower == "active-directory" %}
+    {
+      "kerberos-env": {
+{% if security|lower == "active-directory" %}
+        "ldap_url": "{{ security_options.ldap_url }}",
+        "container_dn": "{{ security_options.container_dn }}",
+{% endif %}
+        "manage_identities": "true",
+        "install_packages": "true",
+        "realm" : "{{ security_options.realm }}",
+        "kdc_type" : "{{ security }}",
+        "kdc_hosts" : "{{ security_options.external_hostname|default(ansible_nodename,true) }}",
+        "admin_server_host" : "{{ security_options.external_hostname|default(ansible_nodename,true) }}"
+      }
+    },
+    {
+      "krb5-conf": {
+          "domains" : ".{{ security_options.realm|lower }},{{ security_options.realm|lower }}",
+          "manage_krb5_conf" : "true"
+      }
+    },
+{% endif %}
 {% if product.name|lower == 'hdf' %}
     {
       "nifi-ambari-config" : {
@@ -172,7 +194,9 @@
         {% for client in node_group.clients -%}
         { "name" : "{{ client }}" },
         {% endfor %}
-
+{% if security|lower == "mit-kdc" or security|lower == "active-directory" -%}
+        { "name" : "KERBEROS_CLIENT" },
+{% endif %}
         {% for service in node_group.services -%}
         { "name" : "{{ service }}" }{% if service == "HIVE_METASTORE" and database == "embedded" %},{ "name" : "MYSQL_SERVER" }{% endif %}{% if not loop.last %},{% endif %}
 
@@ -185,6 +209,11 @@
 
   ],
   "Blueprints" : {
+{% if security|lower == "mit-kdc" or security|lower == "active-directory" %}
+    "security" : {
+         "type" : "KERBEROS"
+    },
+{% endif %}
     "stack_name" : "{{ product.name|upper }}",
     "stack_version" : "{{ product.version | regex_replace('.[0-9]+.[0-9]+[0-9_-]*$','') }}"
   }

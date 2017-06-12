@@ -22,6 +22,18 @@ database_options:
   oozie_db_username: 'oozie'
   oozie_db_password: 'oozie'
 
+
+security: 'none'                                                # can be set to 'none', 'mit-kdc' or 'active-directory'
+security_options:
+  external_hostname: ''                                         # if this is empty, Ansible will install and prepare the MIT KDC on the Ambari node
+  realm: 'EXAMPLE.COM'
+  admin_principal: 'admin'                                      # the Kerberos principal that has the permissions to create new users (don't append the realm)
+  admin_password: 'AsdQwe123'
+  kdc_master_key: 'AsdQwe123'                                   # only used when security is set to 'mit-kdc'
+  ldap_url: 'ldaps://ad.example.com:636'                        # only used when security is set to 'active-directory'
+  container_dn: 'OU=hadoop,DC=example,DC=com'                   # only used when security is set to 'active-directory'
+
+
 blueprint_name: 'mytestcluster_blueprint'                       # the name of the blueprint as it will be stored in Ambari
 blueprint_file: 'blueprint_dynamic.j2'                          # the blueprint JSON file - 'blueprint_dynamic.j2' is a Jinja2 template that generates the required JSON
 blueprint_dynamic:                                              # properties for the dynamic blueprint - these are only used by the 'blueprint_dynamic.j2' template to generate the JSON

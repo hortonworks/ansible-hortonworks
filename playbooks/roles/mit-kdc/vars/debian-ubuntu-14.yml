@@ -1,0 +1,14 @@
+---
+kdc_packages:
+  - krb5-kdc
+  - krb5-admin-server
+  - krb5-user
+kdc_service_name: krb5-kdc
+kadmin_service_name: krb5-admin-server
+
+kdc_init_command: kdb5_util create
+
+krb5_config_file: /etc/krb5.conf
+kdc_config_file: /etc/krb5kdc/kdc.conf
+kdc_acl_file: /etc/krb5kdc/kadm5.acl
+kdc_database_file: /etc/krb5kdc/principal

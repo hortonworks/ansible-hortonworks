@@ -2,6 +2,24 @@
   "blueprint" : "{{ blueprint_name }}",
   "config_recommendation_strategy" : "{{ config_recommendation_strategy }}",
   "default_password" : "{{ default_password }}",
+{% if security|lower == "mit-kdc" or security|lower == "active-directory" %}
+  "credentials" : [
+    {
+      "alias" : "kdc.admin.credential",
+{% if security|lower == "mit-kdc" %}
+      "principal" : "{{ security_options.admin_principal }}/admin@{{ security_options.realm | upper }}",
+{% endif %}
+{% if security|lower == "active-directory" %}
+      "principal" : "{{ security_options.admin_principal }}@{{ security_options.realm | upper }}",
+{% endif %}
+      "key" : "{{ security_options.admin_password }}",
+      "type" : "TEMPORARY"
+    }
+  ],
+  "security" : {
+    "type" : "KERBEROS"
+  },
+{% endif %}
 {#
   The following checks if the inventory being used is static or a dynamic cloud inventory.
   The 'nodes' variable would only exist in a cloud specific inventory.

@@ -16,6 +16,14 @@
     - role: database
       when: database != "embedded" and not database_options.external_hostname|default('')
 
+- name: Apply the mit-kdc role to the ambari-server group
+  hosts: ambari-server
+  any_errors_fatal: true
+  become: yes
+  roles:
+    - role: mit-kdc
+      when: security == "mit-kdc" and not security_options.external_hostname|default('')
+
 - name: Apply the ambari-agent role to the hadoop-cluster group
   hosts: hadoop-cluster
   any_errors_fatal: true

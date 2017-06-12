@@ -77,7 +77,7 @@ Currently, these playbooks are divided into the following parts:
 ## [Features](id:features)
 
 ### Infrastructure support
-- [x] Pre-build infrastructure (using an inventory file)
+- [x] Pre-built infrastructure (using a static inventory file)
 - [x] OpenStack nodes
 - [ ] OpenStack Block Storage (Cinder)
 - [x] AWS nodes (with root EBS only)
@@ -106,7 +106,7 @@ Currently, these playbooks are divided into the following parts:
 - [x] Install OpenJDK or Oracle JDK
 - [x] Install and prepare MySQL
 - [x] Install and prepare PostgreSQL
-- [ ] Install and configure local MIT KDC
+- [x] Install and configure local MIT KDC
 - [ ] Partition and mount additional storage
 
 ### Cluster build
@@ -126,8 +126,8 @@ Currently, these playbooks are divided into the following parts:
 - [x] HA Hive
 - [x] HA HBase Master
 - [ ] HA Oozie
-- [ ] Secure clusters with MIT KDC
-- [ ] Secure clusters with Microsoft AD
+- [x] Secure clusters with MIT KDC (Ambari managed)
+- [x] Secure clusters with Microsoft AD (Ambari managed)
 - [ ] Ranger
 - [ ] Basic memory settings tuning
 - [ ] Make use of additional storage for HDP workers
