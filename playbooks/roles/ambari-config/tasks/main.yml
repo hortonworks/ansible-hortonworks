@@ -20,7 +20,7 @@
 
 - meta: flush_handlers
 
-- name: "Modify the {{ product.name|upper }} base_url repository for {{ product.name|upper }} {{ major_version }}"
+- name: "Modify the {{ product.name|upper }} base_url repository for {{ product.name|upper }} {{ minor_version }}"
   uri:
     url: http://{{ ansible_nodename }}:8080/{{ main_repo_target }}
     method: PUT
@@ -33,7 +33,7 @@
     status_code: 200,201,202
     return_content: no
 
-- name: "Modify the HDP-UTILS base_url repository for {{ product.name|upper }} {{ major_version }}"
+- name: "Modify the HDP-UTILS base_url repository for {{ product.name|upper }} {{ minor_version }}"
   uri:
     url: http://{{ ansible_nodename }}:8080/{{ utils_repo_target }}
     method: PUT
