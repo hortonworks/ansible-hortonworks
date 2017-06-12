@@ -9,6 +9,11 @@ config_recommendation_strategy: 'NEVER_APPLY'
 
 cluster_template_file: 'cluster_template.j2'                    # the cluster creation template file
 
+
+############################
+## database configuration ##
+############################
+
 database: 'embedded'                                            # can be set to 'embedded', 'postgres', 'mysql' or 'mariadb'
 database_options:
   external_hostname: ''                                         # if this is empty, Ansible will install and prepare the database on the ambari-node
@@ -23,6 +28,10 @@ database_options:
   oozie_db_password: 'oozie'
 
 
+############################
+## database configuration ##
+############################
+
 security: 'none'                                                # can be set to 'none', 'mit-kdc' or 'active-directory'
 security_options:
   external_hostname: ''                                         # if this is empty, Ansible will install and prepare the MIT KDC on the Ambari node
@@ -33,6 +42,10 @@ security_options:
   ldap_url: 'ldaps://ad.example.com:636'                        # only used when security is set to 'active-directory'
   container_dn: 'OU=hadoop,DC=example,DC=com'                   # only used when security is set to 'active-directory'
 
+
+#############################
+## blueprint configuration ##
+#############################
 
 blueprint_name: 'mytestcluster_blueprint'                       # the name of the blueprint as it will be stored in Ambari
 blueprint_file: 'blueprint_dynamic.j2'                          # the blueprint JSON file - 'blueprint_dynamic.j2' is a Jinja2 template that generates the required JSON

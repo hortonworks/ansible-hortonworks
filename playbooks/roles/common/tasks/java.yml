@@ -16,19 +16,19 @@
   when: java == "openjdk"
 
 - block:
-    - name: Create the {{ oraclejdk.base_folder }} directory
+    - name: Create the {{ oraclejdk_options.base_folder }} directory
       file:
-        path: "{{ oraclejdk.base_folder }}"
+        path: "{{ oraclejdk_options.base_folder }}"
         state: directory
 
     - name: Extract the Oracle JDK tarball
       unarchive:
-        src: "{{ oraclejdk.tarball_location }}"
-        dest: "{{ oraclejdk.base_folder }}"
+        src: "{{ oraclejdk_options.tarball_location }}"
+        dest: "{{ oraclejdk_options.base_folder }}"
         owner: root
         group: root
         mode: 0755
-        remote_src: "{{ oraclejdk.remote_files }}"
+        remote_src: "{{ oraclejdk_options.remote_files }}"
         list_files: yes
         keep_newer: yes
       register: "tarball_content"
@@ -37,26 +37,26 @@
       set_fact:
         jdk_folder: "{{ tarball_content.files[0] | regex_replace('/(.*)$','') }}"
 
-    - name: Create the {{ oraclejdk.base_folder }}/latest symlink
+    - name: Create the {{ oraclejdk_options.base_folder }}/latest symlink
       file:
-        src: "{{ oraclejdk.base_folder }}/{{ jdk_folder }}"
-        path: "{{ oraclejdk.base_folder }}/latest"
+        src: "{{ oraclejdk_options.base_folder }}/{{ jdk_folder }}"
+        path: "{{ oraclejdk_options.base_folder }}/latest"
         state: link
         force: yes
 
     - name: Extract the JCE archive
       unarchive:
-        src: "{{ oraclejdk.jce_location }}"
-        dest: "{{ oraclejdk.base_folder }}/latest/jre/lib/security"
+        src: "{{ oraclejdk_options.jce_location }}"
+        dest: "{{ oraclejdk_options.base_folder }}/latest/jre/lib/security"
         owner: root
         group: root
         mode: 0755
-        remote_src: "{{ oraclejdk.remote_files }}"
+        remote_src: "{{ oraclejdk_options.remote_files }}"
 
-    - name: Copy the JCE jar files to {{ oraclejdk.base_folder }}/latest/jre/lib/security
+    - name: Copy the JCE jar files to {{ oraclejdk_options.base_folder }}/latest/jre/lib/security
       copy:
-        src: "{{ oraclejdk.base_folder }}/latest/jre/lib/security/UnlimitedJCEPolicyJDK8/{{ item }}"
-        dest: "{{ oraclejdk.base_folder }}/latest/jre/lib/security"
+        src: "{{ oraclejdk_options.base_folder }}/latest/jre/lib/security/UnlimitedJCEPolicyJDK8/{{ item }}"
+        dest: "{{ oraclejdk_options.base_folder }}/latest/jre/lib/security"
         force: yes
         remote_src: yes
       with_items:

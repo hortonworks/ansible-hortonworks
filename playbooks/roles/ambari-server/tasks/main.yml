@@ -112,7 +112,7 @@
 
 - name: Set the Ambari Server Java setup option (Oracle JDK)
   set_fact:
-    ambari_java_options: "-j {{ oraclejdk.base_folder }}/latest"
+    ambari_java_options: "-j {{ oraclejdk_options.base_folder }}/latest"
   when: java == "oraclejdk"
 
 - name: Run Ambari Server setup
