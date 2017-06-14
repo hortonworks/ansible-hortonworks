@@ -20,4 +20,4 @@ mariadb_repo_key: 'http://yum.mariadb.org/RPM-GPG-KEY-MariaDB'
 mariadb_packages:
   - MySQL-python
   - MariaDB-server
-mariadb_service_name: mariadb
+mariadb_service_name: mysql

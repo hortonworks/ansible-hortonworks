@@ -18,6 +18,6 @@ mysql_service_name: mysqld
 mariadb_repo_url: 'http://yum.mariadb.org/10.1/centos6-amd64'
 mariadb_repo_key: 'http://yum.mariadb.org/RPM-GPG-KEY-MariaDB'
 mariadb_packages:
-  - MySQL-python
+  - MySQL-python27
   - MariaDB-server
-mariadb_service_name: mariadb
+mariadb_service_name: mysql
