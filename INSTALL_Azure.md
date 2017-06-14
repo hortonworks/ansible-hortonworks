@@ -210,6 +210,7 @@ Modify the file at `~/ansible-hdp/playbooks/group_vars/all` to set the cluster c
 | .tarball_location          | The location of the tarball file. This can be the location on the remote systems or on the Ansible controller, depending on the `remote_files` variable. |
 | .jce_location              | The location of the JCE package zip file. This can be the location on the remote systems or on the Ansible controller, depending on the `remote_files` variable. |
 | .remote_files              | If this variable is set to `yes` then the tarball and JCE files must already be present on the remote system. If set to `no` then the files will be copied by Ansible (from the Ansible controller to the remote systems). |
+| external_dns               | This controls the type of DNS to be used. If `yes` it will use whatever DNS is currently set up. If `no` it will populate the `/etc/hosts` file with all cluster nodes. |
 
 
 ## ambari-server config file
@@ -241,6 +242,9 @@ Modify the file at `~/ansible-hdp/playbooks/group_vars/ambari-server` to set the
 | .oozie_db_name                 | The name of the database Oozie should use. |
 | .oozie_db_username             | The username that Oozie should use to connect to its database. |
 | .oozie_db_password             | The password for the above user. |
+| .rangeradmin_db_name           | The name of the database Ranger Admin should use. |
+| .rangeradmin_db_username       | The username that Ranger Admin should use to connect to its database. | |
+| .rangeradmin_db_password       | The password for the above user. |
 
 ### security configuration
 
@@ -255,6 +259,14 @@ Modify the file at `~/ansible-hdp/playbooks/group_vars/ambari-server` to set the
 | .kdc_master_key                | The master password for the Kerberos database. Only used when installing a new MIT KDC (when `security` is `mit-kdc` and `external_hostname` is set to `''`. |
 | .ldap_url                      | The URL to the Active Directory LDAPS interface. Only used when `security` is set to `active-directory`. |
 | .container_dn                  | The distinguished name (DN) of the container that will store the service principals. Only used when `security` is set to `active-directory`. |
+
+### ranger configuration
+
+| Variable                       | Description                                                                                                |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| ranger_options                 | These options are only relevant if `RANGER_ADMIN` is a component of the dynamic Blueprint stack.           |
+| .ranger_admin_password         | The password for the Ranger admin users (both admin and amb_ranger_admin).                                 |
+| .enable_plugins                | If set to `yes` the plugins for all of the available services will be enabled. With `no` Ranger would be installed but not functional. |
 
 ### blueprint configuration
 

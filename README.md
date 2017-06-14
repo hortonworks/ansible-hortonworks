@@ -113,6 +113,7 @@ Currently, these playbooks are divided into the following parts:
 - [x] Install Ambari Agent and Server with embedded JDK and databases
 - [x] Configure Ambari Server with OpenJDK or Oracle JDK
 - [x] Configure Ambari Server with advanced database options
+- [ ] Configure Ambari Server with SSL
 - [x] Configure custom Repositories
 - [x] Build HDP clusters
 - [x] Build HDF clusters
@@ -128,7 +129,12 @@ Currently, these playbooks are divided into the following parts:
 - [ ] HA Oozie
 - [x] Secure clusters with MIT KDC (Ambari managed)
 - [x] Secure clusters with Microsoft AD (Ambari managed)
-- [ ] Ranger
+- [x] Install Ranger and enable plugins
+- [ ] Ranger AD integration
+- [ ] Hadoop SSL
+- [ ] Hadoop AD integration
+- [ ] NiFi SSL
+- [ ] NiFi AD integration
 - [ ] Basic memory settings tuning
 - [ ] Make use of additional storage for HDP workers
 - [ ] Make use of additional storage for master services
