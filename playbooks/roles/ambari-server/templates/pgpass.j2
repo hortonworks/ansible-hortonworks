@@ -1,1 +1,1 @@
-{{ database_options.external_hostname|default(ansible_nodename,true) }}:{{ postgres_port }}:{{ database_options.ambari_db_name }}:{{ database_options.ambari_db_username }}:{{ database_options.ambari_db_password }}
+{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ postgres_port }}:{{ database_options.ambari_db_name }}:{{ database_options.ambari_db_username }}:{{ database_options.ambari_db_password }}

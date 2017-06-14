@@ -3,6 +3,6 @@ default_realm = {{ security_options.realm | upper }}
 
 [realms]
     {{ security_options.realm | upper }} = {
-        kdc = {{ ansible_nodename }}
-        admin_server = {{ ansible_nodename }}
+        kdc = {{ ansible_fqdn }}
+        admin_server = {{ ansible_fqdn }}
     }

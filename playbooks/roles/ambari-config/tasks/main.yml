@@ -22,7 +22,7 @@
 
 - name: "Modify the {{ product.name|upper }} base_url repository for {{ product.name|upper }} {{ minor_version }}"
   uri:
-    url: http://{{ ansible_nodename }}:8080/{{ main_repo_target }}
+    url: http://{{ ansible_fqdn }}:8080/{{ main_repo_target }}
     method: PUT
     force_basic_auth: yes
     user: "{{ ambari_admin_user }}"
@@ -35,7 +35,7 @@
 
 - name: "Modify the HDP-UTILS base_url repository for {{ product.name|upper }} {{ minor_version }}"
   uri:
-    url: http://{{ ansible_nodename }}:8080/{{ utils_repo_target }}
+    url: http://{{ ansible_fqdn }}:8080/{{ utils_repo_target }}
     method: PUT
     force_basic_auth: yes
     user: "{{ ambari_admin_user }}"

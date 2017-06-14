@@ -33,7 +33,7 @@
       "hosts" : [
         {% for node in groups[node_group.group]|sort -%}
 
-        { "fqdn" : "{{ hostvars[node]['ansible_nodename'] | lower }}" }{% if not loop.last %},{% endif %}
+        { "fqdn" : "{{ hostvars[node]['ansible_fqdn'] | lower }}" }{% if not loop.last %},{% endif %}
 
         {% endfor %}
 
@@ -52,7 +52,7 @@
       "hosts" : [
         {% for node in groups[node_group]|sort -%}
 
-        { "fqdn" : "{{ hostvars[node]['ansible_nodename'] | lower }}" }{% if not loop.last %},{% endif %}
+        { "fqdn" : "{{ hostvars[node]['ansible_fqdn'] | lower }}" }{% if not loop.last %},{% endif %}
 
         {% endfor %}
 

@@ -255,7 +255,7 @@
     - name: Create the ambari database user (mysql)
       mysql_user:
         name: "{{ database_options.ambari_db_username }}"
-        host: "{{ hostvars[inventory_hostname]['ansible_nodename'] }}"
+        host: "{{ hostvars[inventory_hostname]['ansible_fqdn'] }}"
         priv: "{{ database_options.ambari_db_name }}.*:ALL"
         password: "{{ database_options.ambari_db_password }}"
         state: present
@@ -269,7 +269,7 @@
     - name: Create the hive database user (mysql)
       mysql_user:
         name: "{{ database_options.hive_db_username }}"
-        host: "{{ hostvars[item]['ansible_nodename'] }}"
+        host: "{{ hostvars[item]['ansible_fqdn'] }}"
         priv: "{{ database_options.hive_db_name }}.*:ALL"
         password: "{{ database_options.hive_db_password }}"
         state: present
@@ -285,7 +285,7 @@
     - name: Create the oozie database user (mysql)
       mysql_user:
         name: "{{ database_options.oozie_db_username }}"
-        host: "{{ hostvars[item]['ansible_nodename'] }}"
+        host: "{{ hostvars[item]['ansible_fqdn'] }}"
         priv: "{{ database_options.oozie_db_name }}.*:ALL"
         password: "{{ database_options.oozie_db_password }}"
         state: present
@@ -301,7 +301,7 @@
     - name: Create the ranger admin database user (mysql)
       mysql_user:
         name: "{{ database_options.rangeradmin_db_username }}"
-        host: "{{ hostvars[item]['ansible_nodename'] }}"
+        host: "{{ hostvars[item]['ansible_fqdn'] }}"
         priv: "{{ database_options.rangeradmin_db_name }}.*:ALL"
         password: "{{ database_options.rangeradmin_db_password }}"
         state: present

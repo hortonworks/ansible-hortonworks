@@ -59,6 +59,7 @@
     state: present
   with_items:
     - "{{ groups['hadoop-cluster']|sort(reverse=True) }}"
+  when: not external_dns
 
 - name: Set nofile and nproc limits
   blockinfile:

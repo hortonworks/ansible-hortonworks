@@ -58,13 +58,13 @@
       when: database == "postgres"
 
     - name: Check if the postgres schema was already uploaded
-      shell: "PGPASSFILE=/tmp/.pgpass-ambari psql -h {{ database_options.external_hostname|default(ansible_nodename,true) }} -U {{ database_options.ambari_db_username }} -p {{ postgres_port }} -w -d {{ database_options.ambari_db_name }} -c 'select user_id from ambari.users limit 0;'"
+      shell: "PGPASSFILE=/tmp/.pgpass-ambari psql -h {{ database_options.external_hostname|default(ansible_fqdn,true) }} -U {{ database_options.ambari_db_username }} -p {{ postgres_port }} -w -d {{ database_options.ambari_db_name }} -c 'select user_id from ambari.users limit 0;'"
       register: check_results
       ignore_errors: true
       when: database == "postgres"
 
     - name: Load the Ambari Server postgres schema
-      shell: "PGPASSFILE=/tmp/.pgpass-ambari psql -h {{ database_options.external_hostname|default(ansible_nodename,true) }} -U {{ database_options.ambari_db_username }} -p {{ postgres_port }} -w -d {{ database_options.ambari_db_name }} < /var/lib/ambari-server/resources/Ambari-DDL-Postgres-CREATE.sql"
+      shell: "PGPASSFILE=/tmp/.pgpass-ambari psql -h {{ database_options.external_hostname|default(ansible_fqdn,true) }} -U {{ database_options.ambari_db_username }} -p {{ postgres_port }} -w -d {{ database_options.ambari_db_name }} < /var/lib/ambari-server/resources/Ambari-DDL-Postgres-CREATE.sql"
       when: database == "postgres" and check_results|failed
 
     - name: Delete the .pgpass file
@@ -76,7 +76,7 @@
     - name: Load the Ambari Server mysql schema
       mysql_db:
         name: "{{ database_options.ambari_db_name }}"
-        login_host: "{{ database_options.external_hostname|default(ansible_nodename,true) }}"
+        login_host: "{{ database_options.external_hostname|default(ansible_fqdn,true) }}"
         login_port: "{{ mysql_port }}"
         login_user: "{{ database_options.ambari_db_username }}"
         login_password: "{{ database_options.ambari_db_password }}"
@@ -98,7 +98,7 @@
     - name: Set the Ambari Server database setup options
       set_fact:
         ambari_database_options: "--database={{ database | regex_replace('mariadb', 'mysql') }} \
-                                  --databasehost={{ database_options.external_hostname|default(ansible_nodename,true) }} \
+                                  --databasehost={{ database_options.external_hostname|default(ansible_fqdn,true) }} \
                                   --databaseport={{ hostvars[inventory_hostname][database | regex_replace('mariadb', 'mysql') + '_port'] }} \
                                   --databasename={{ database_options.ambari_db_name }} \
                                   --databaseusername={{ database_options.ambari_db_username }} \
@@ -123,7 +123,7 @@
 
 - name: Make sure all of the Ambari Agents have registered
   uri:
-    url: http://{{ ansible_nodename }}:8080/api/v1/hosts/{{ hostvars[item]['ansible_nodename']|lower }}
+    url: http://{{ ansible_fqdn }}:8080/api/v1/hosts/{{ hostvars[item]['ansible_fqdn']|lower }}
     method: GET
     force_basic_auth: yes
     user: admin

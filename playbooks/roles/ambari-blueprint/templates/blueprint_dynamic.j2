@@ -11,8 +11,8 @@
         "install_packages": "true",
         "realm" : "{{ security_options.realm }}",
         "kdc_type" : "{{ security }}",
-        "kdc_hosts" : "{{ security_options.external_hostname|default(ansible_nodename,true) }}",
-        "admin_server_host" : "{{ security_options.external_hostname|default(ansible_nodename,true) }}"
+        "kdc_hosts" : "{{ security_options.external_hostname|default(ansible_fqdn,true) }}",
+        "admin_server_host" : "{{ security_options.external_hostname|default(ansible_fqdn,true) }}"
       }
     },
     {
@@ -27,7 +27,7 @@
       "admin-properties" : {
         "DB_FLAVOR" : "{{ database|regex_replace('mariadb', 'mysql')|upper }}",
         "SQL_CONNECTOR_JAR" : "{{ hostvars[inventory_hostname][database + '_jdbc_location'] }}",
-        "db_host" : "{{ database_options.external_hostname|default(ansible_nodemane,true) }}",
+        "db_host" : "{{ database_options.external_hostname|default(ansible_fqdn,true) }}",
         "db_name" : "{{ database_options.rangeradmin_db_name }}",
         "db_user" : "{{ database_options.rangeradmin_db_username }}",
         "db_password" : "{{ database_options.rangeradmin_db_password }}",
@@ -39,14 +39,14 @@
         "ranger.externalurl" : "http://%HOSTGROUP::{{ rangeradmin_groups[0] }}%:6080",
         {% if database == "mysql" or database == "mariadb" -%}
         "ranger.jpa.jdbc.driver": "com.mysql.jdbc.Driver",
-        "ranger.jpa.jdbc.url": "jdbc:mysql://{{ database_options.external_hostname|default(ansible_nodename,true) }}:{{ mysql_port }}/{{ database_options.rangeradmin_db_name }}",
+        "ranger.jpa.jdbc.url": "jdbc:mysql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ mysql_port }}/{{ database_options.rangeradmin_db_name }}",
         {% endif -%}
         {% if database == "postgres" -%}
         "ranger.jpa.jdbc.driver": "org.postgresql.Driver",
-        "ranger.jpa.jdbc.url": "jdbc:postgresql://{{ database_options.external_hostname|default(ansible_nodename,true) }}:{{ postgres_port }}/{{ database_options.rangeradmin_db_name }}",
+        "ranger.jpa.jdbc.url": "jdbc:postgresql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ postgres_port }}/{{ database_options.rangeradmin_db_name }}",
         {% endif -%}
         "ranger.audit.source.type" : "solr",
-        "ranger.audit.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_nodename'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
+        "ranger.audit.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_fqdn'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
       }
     },
 {% if ranger_options.enable_plugins|default(no) %}
@@ -58,7 +58,7 @@
     },
     {
       "ranger-hdfs-security" : {
-        "ranger.plugin.hdfs.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_nodename'] }}:6080",
+        "ranger.plugin.hdfs.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_fqdn'] }}:6080",
         "ranger.plugin.hdfs.policy.pollIntervalMs" : "30000"
       }
     },
@@ -66,9 +66,9 @@
       "ranger-hdfs-audit" : {
         "xasecure.audit.destination.db" : "false",
         "xasecure.audit.destination.hdfs" : "true",
-        "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ cluster_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_nodename'] }}:8020{% endif %}/ranger/audit",
+        "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ cluster_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_fqdn'] }}:8020{% endif %}/ranger/audit",
         "xasecure.audit.destination.solr" : "true",
-        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_nodename'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
+        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_fqdn'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
       }
     },
     {
@@ -78,7 +78,7 @@
     },
     {
       "ranger-hive-security" : {
-        "ranger.plugin.hive.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_nodename'] }}:6080",
+        "ranger.plugin.hive.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_fqdn'] }}:6080",
         "ranger.plugin.hive.policy.pollIntervalMs" : "30000"
       }
     },
@@ -86,9 +86,9 @@
       "ranger-hive-audit" : {
         "xasecure.audit.destination.db" : "false",
         "xasecure.audit.destination.hdfs" : "true",
-        "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ cluster_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_nodename'] }}:8020{% endif %}/ranger/audit",
+        "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ cluster_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_fqdn'] }}:8020{% endif %}/ranger/audit",
         "xasecure.audit.destination.solr" : "true",
-        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_nodename'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
+        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_fqdn'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
       }
     },
     {
@@ -98,7 +98,7 @@
     },
     {
       "ranger-yarn-security" : {
-        "ranger.plugin.yarn.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_nodename'] }}:6080",
+        "ranger.plugin.yarn.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_fqdn'] }}:6080",
         "ranger.plugin.yarn.policy.pollIntervalMs" : "30000"
       }
     },
@@ -106,9 +106,9 @@
       "ranger-yarn-audit" : {
         "xasecure.audit.destination.db" : "false",
         "xasecure.audit.destination.hdfs" : "true",
-        "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ cluster_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_nodename'] }}:8020{% endif %}/ranger/audit",
+        "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ cluster_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_fqdn'] }}:8020{% endif %}/ranger/audit",
         "xasecure.audit.destination.solr" : "true",
-        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_nodename'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
+        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_fqdn'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
       }
     },
     {
@@ -118,7 +118,7 @@
     },
     {
       "ranger-hbase-security" : {
-        "ranger.plugin.hbase.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_nodename'] }}:6080",
+        "ranger.plugin.hbase.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_fqdn'] }}:6080",
         "ranger.plugin.hbase.policy.pollIntervalMs" : "30000"
       }
     },
@@ -126,9 +126,9 @@
       "ranger-hbase-audit" : {
         "xasecure.audit.destination.db" : "false",
         "xasecure.audit.destination.hdfs" : "true",
-        "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ cluster_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_nodename'] }}:8020{% endif %}/ranger/audit",
+        "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ cluster_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_fqdn'] }}:8020{% endif %}/ranger/audit",
         "xasecure.audit.destination.solr" : "true",
-        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_nodename'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
+        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_fqdn'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
       }
     },
 {% endif %}
@@ -140,14 +140,14 @@
     },
     {
       "ranger-nifi-security" : {
-        "ranger.plugin.nifi.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_nodename'] }}:6080",
+        "ranger.plugin.nifi.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_fqdn'] }}:6080",
         "ranger.plugin.nifi.policy.pollIntervalMs" : "30000"
       }
     },
     {
       "ranger-nifi-audit" : {
         "xasecure.audit.destination.solr" : "true",
-        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_nodename'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
+        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_fqdn'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
       }
     },
 {% endif %}
@@ -159,7 +159,7 @@
     },
     {
       "ranger-storm-security" : {
-        "ranger.plugin.storm.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_nodename'] }}:6080",
+        "ranger.plugin.storm.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_fqdn'] }}:6080",
         "ranger.plugin.storm.policy.pollIntervalMs" : "30000"
       }
     },
@@ -168,12 +168,12 @@
         "xasecure.audit.destination.db" : "false",
 {% if product.name|lower == 'hdp' %}
         "xasecure.audit.destination.hdfs" : "true",
-        "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ cluster_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_nodename'] }}:8020{% endif %}/ranger/audit",
+        "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ cluster_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_fqdn'] }}:8020{% endif %}/ranger/audit",
 {% else %}
         "xasecure.audit.destination.hdfs" : "false",
 {% endif %}
         "xasecure.audit.destination.solr" : "true",
-        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_nodename'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
+        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_fqdn'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
       }
     },
 {% endif %}
@@ -184,7 +184,7 @@
     },
     {
       "ranger-kafka-security" : {
-        "ranger.plugin.kafka.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_nodename'] }}:6080",
+        "ranger.plugin.kafka.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_fqdn'] }}:6080",
         "ranger.plugin.kafka.policy.pollIntervalMs" : "30000"
       }
     },
@@ -193,12 +193,12 @@
         "xasecure.audit.destination.db" : "false",
 {% if product.name|lower == 'hdp' %}
         "xasecure.audit.destination.hdfs" : "true",
-        "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ cluster_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_nodename'] }}:8020{% endif %}/ranger/audit",
+        "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ cluster_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_fqdn'] }}:8020{% endif %}/ranger/audit",
 {% else %}
         "xasecure.audit.destination.hdfs" : "false",
 {% endif %}
         "xasecure.audit.destination.solr" : "true",
-        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_nodename'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
+        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_fqdn'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
       }
     },
 {% endif %}
@@ -320,11 +320,11 @@
         {% if database != "embedded" -%}
         {% if database == "mysql" or database == "mariadb" -%}
         "javax.jdo.option.ConnectionDriverName": "com.mysql.jdbc.Driver",
-        "javax.jdo.option.ConnectionURL": "jdbc:mysql://{{ database_options.external_hostname|default(ansible_nodename,true) }}:{{ mysql_port }}/{{ database_options.hive_db_name }}",
+        "javax.jdo.option.ConnectionURL": "jdbc:mysql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ mysql_port }}/{{ database_options.hive_db_name }}",
         {% endif -%}
         {% if database == "postgres" -%}
         "javax.jdo.option.ConnectionDriverName": "org.postgresql.Driver",
-        "javax.jdo.option.ConnectionURL": "jdbc:postgresql://{{ database_options.external_hostname|default(ansible_nodename,true) }}:{{ postgres_port }}/{{ database_options.hive_db_name }}",
+        "javax.jdo.option.ConnectionURL": "jdbc:postgresql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ postgres_port }}/{{ database_options.hive_db_name }}",
         {% endif -%}
         "javax.jdo.option.ConnectionUserName": "{{ database_options.hive_db_username }}",
         "javax.jdo.option.ConnectionPassword": "{{ database_options.hive_db_password }}",
@@ -369,11 +369,11 @@
         {% if database != "embedded" -%}
         {% if database == "mysql" or database == "mariadb" -%}
         "oozie.service.JPAService.jdbc.driver": "com.mysql.jdbc.Driver",
-        "oozie.service.JPAService.jdbc.url": "jdbc:mysql://{{ database_options.external_hostname|default(ansible_nodename,true) }}:{{ mysql_port }}/{{ database_options.oozie_db_name }}",
+        "oozie.service.JPAService.jdbc.url": "jdbc:mysql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ mysql_port }}/{{ database_options.oozie_db_name }}",
         {% endif -%}
         {% if database == "postgres" -%}
         "oozie.service.JPAService.jdbc.driver": "org.postgresql.Driver",
-        "oozie.service.JPAService.jdbc.url": "jdbc:postgresql://{{ database_options.external_hostname|default(ansible_nodename,true) }}:{{ postgres_port }}/{{ database_options.oozie_db_name }}",
+        "oozie.service.JPAService.jdbc.url": "jdbc:postgresql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ postgres_port }}/{{ database_options.oozie_db_name }}",
         {% endif -%}
         "oozie.db.schema.name": "{{ database_options.oozie_db_name }}",
         "oozie.service.JPAService.jdbc.username": "{{ database_options.oozie_db_username }}",

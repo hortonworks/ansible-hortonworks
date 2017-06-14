@@ -39,7 +39,7 @@
 
 - name: Delete any existing blueprint called {{ blueprint_name }}
   uri:
-    url: "http://{{ ansible_nodename }}:8080/api/v1/blueprints/{{ blueprint_name }}"
+    url: "http://{{ ansible_fqdn }}:8080/api/v1/blueprints/{{ blueprint_name }}"
     method: DELETE
     force_basic_auth: yes
     user: "{{ ambari_admin_user }}"
@@ -55,7 +55,7 @@
 
 - name: Upload the blueprint to the Ambari server
   uri:
-    url: "http://{{ ansible_nodename }}:8080/api/v1/blueprints/{{ blueprint_name }}"
+    url: "http://{{ ansible_fqdn }}:8080/api/v1/blueprints/{{ blueprint_name }}"
     method: POST
     force_basic_auth: yes
     user: "{{ ambari_admin_user }}"
@@ -68,7 +68,7 @@
 
 - name: Check if a cluster {{ cluster_name }} already exists
   uri:
-    url: "http://{{ ansible_nodename }}:8080/api/v1/clusters/{{ cluster_name }}"
+    url: "http://{{ ansible_fqdn }}:8080/api/v1/clusters/{{ cluster_name }}"
     method: GET
     force_basic_auth: yes
     user: "{{ ambari_admin_user }}"
@@ -89,7 +89,7 @@
 
 - name: Launch the create cluster request
   uri:
-    url: http://{{ ansible_nodename }}:8080/api/v1/clusters/{{ cluster_name }}
+    url: http://{{ ansible_fqdn }}:8080/api/v1/clusters/{{ cluster_name }}
     method: POST
     force_basic_auth: yes
     user: "{{ ambari_admin_user }}"
