@@ -1,0 +1,67 @@
+###########
+#
+# These variables would be used by the 'blueprint_dynamic.j2' Jinja2 template to generate the blueprint JSON.
+# This blueprint will build an HDP cluster with 3 master services nodes and 1 or more slave nodes.
+# One of the master services nodes is running Ambari and other utility services - here called the management node.
+# The other two master services are running the main HA Hadoop services.
+# It will also install Ranger (both Admin and UserSync) on the management node.
+#
+###########
+
+blueprint_name: 'mytestcluster_blueprint'                       # the name of the blueprint as it will be stored in Ambari
+blueprint_file: 'blueprint_dynamic.j2'                          # the blueprint JSON file - 'blueprint_dynamic.j2' is a Jinja2 template that generates the required JSON
+blueprint_dynamic:                                              # properties for the dynamic blueprint - these are only used by the 'blueprint_dynamic.j2' template to generate the JSON
+  - group: "mytestcluster-masternode1"
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT']
+    services:
+      - ZOOKEEPER_SERVER
+      - NAMENODE
+      - ZKFC
+      - JOURNALNODE
+      - RESOURCEMANAGER
+      - HBASE_MASTER
+      - HIVE_SERVER
+      - HIVE_METASTORE
+      - WEBHCAT_SERVER
+      - HST_AGENT
+      - METRICS_MONITOR
+  - group: "mytestcluster-masternode2"
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT']
+    services:
+      - ZOOKEEPER_SERVER
+      - NAMENODE
+      - ZKFC
+      - JOURNALNODE
+      - RESOURCEMANAGER
+      - HBASE_MASTER
+      - HIVE_SERVER
+      - HIVE_METASTORE
+      - HST_AGENT
+      - METRICS_MONITOR
+  - group: "mytestcluster-management"
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT']
+    services:
+      - ZOOKEEPER_SERVER
+      - JOURNALNODE
+      - OOZIE_SERVER
+      - AMBARI_SERVER
+      - INFRA_SOLR
+      - ZEPPELIN_MASTER
+      - APP_TIMELINE_SERVER
+      - HISTORYSERVER
+      - SPARK2_JOBHISTORYSERVER
+      - RANGER_ADMIN
+      - RANGER_USERSYNC
+      - HST_SERVER
+      - HST_AGENT
+      - METRICS_COLLECTOR
+      - METRICS_GRAFANA
+      - METRICS_MONITOR
+  - group: "mytestcluster-slave"
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT']
+    services:
+      - DATANODE
+      - NODEMANAGER
+      - HBASE_REGIONSERVER
+      - HST_AGENT
+      - METRICS_MONITOR

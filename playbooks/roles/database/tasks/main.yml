@@ -85,6 +85,7 @@
         ambari_db_password_md5: "md5{{ (database_options.ambari_db_password~database_options.ambari_db_username) | hash('md5') }}"
         hive_db_password_md5: "md5{{ (database_options.hive_db_password~database_options.hive_db_username) | hash('md5') }}"
         oozie_db_password_md5: "md5{{ (database_options.oozie_db_password~database_options.oozie_db_username) | hash('md5') }}"
+        rangeradmin_db_password_md5: "md5{{ (database_options.rangeradmin_db_password~database_options.rangeradmin_db_username) | hash('md5') }}"
 
     - name: Create the ambari database user (postgres)
       shell: su - postgres -c "psql -c \"CREATE ROLE {{ database_options.ambari_db_username }} ENCRYPTED PASSWORD '{{ ambari_db_password_md5 }}' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN;\""
@@ -207,6 +208,42 @@
       with_items: "{{ oozie_hosts }}"
       when: oozie_hosts|length > 0
 
+    - name: Create the ranger admin database user (postgres)
+      shell: su - postgres -c "psql -c \"CREATE ROLE {{ database_options.rangeradmin_db_username }} ENCRYPTED PASSWORD '{{ rangeradmin_db_password_md5 }}' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN;\""
+      args:
+        warn: false
+      register: createuser_results
+      ignore_errors: true
+      when: rangeradmin_hosts|length > 0
+
+    - name: Fail if the user could not be created (postgres)
+      fail:
+        msg: The user could not be created. Error is {{ createuser_results.stderr }}!
+      when: rangeradmin_hosts|length > 0 and createuser_results|failed and not createuser_results.stderr|search("role .* already exists")
+
+    - name: Create the ranger admin database (postgres)
+      shell: su - postgres -c "createdb -O {{ database_options.rangeradmin_db_username }} {{ database_options.rangeradmin_db_name }}"
+      args:
+        warn: false
+      register: createdb_results
+      ignore_errors: true
+      when: rangeradmin_hosts|length > 0
+
+    - name: Fail if the database could not be created (postgres)
+      fail:
+        msg: The database could not be created. Error is {{ createdb_results.stderr }}!
+      when: rangeradmin_hosts|length > 0 and createdb_results|failed and not createdb_results.stderr|search("database .* already exists")
+
+    - name: Configure access for the ranger admin database user (postgres)
+      lineinfile:
+        dest: "{{ postgres_hba_file }}"
+        line: "host ranger ranger {{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 md5"
+        insertbefore: EOF
+        state: present
+      notify: Restart postgres
+      with_items: "{{ rangeradmin_hosts }}"
+      when: rangeradmin_hosts|length > 0
+
   when: database == "postgres"
 
 - block:
@@ -254,5 +291,21 @@
         state: present
       with_items: "{{ oozie_hosts }}"
       when: oozie_hosts|length > 0
+
+    - name: Create the ranger admin database (mysql)
+      mysql_db:
+        name: "{{ database_options.rangeradmin_db_name }}"
+        state: present
+      when: rangeradmin_hosts|length > 0
+
+    - name: Create the ranger admin database user (mysql)
+      mysql_user:
+        name: "{{ database_options.rangeradmin_db_username }}"
+        host: "{{ hostvars[item]['ansible_nodename'] }}"
+        priv: "{{ database_options.rangeradmin_db_name }}.*:ALL"
+        password: "{{ database_options.rangeradmin_db_password }}"
+        state: present
+      with_items: "{{ rangeradmin_hosts }}"
+      when: rangeradmin_hosts|length > 0
 
   when: database == "mysql" or database == "mariadb"

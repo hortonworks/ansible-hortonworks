@@ -16,7 +16,7 @@ cluster_template_file: 'cluster_template.j2'                    # the cluster cr
 
 database: 'embedded'                                            # can be set to 'embedded', 'postgres', 'mysql' or 'mariadb'
 database_options:
-  external_hostname: ''                                         # if this is empty, Ansible will install and prepare the database on the ambari-node
+  external_hostname: ''                                         # if this is empty, Ansible will install and prepare the databases on the ambari-node
   ambari_db_name: 'ambari'
   ambari_db_username: 'ambari'
   ambari_db_password: 'bigdata'
@@ -26,10 +26,13 @@ database_options:
   oozie_db_name: 'oozie'
   oozie_db_username: 'oozie'
   oozie_db_password: 'oozie'
+  rangeradmin_db_name: 'ranger'
+  rangeradmin_db_username: 'ranger'
+  rangeradmin_db_password: 'ranger'
 
 
 ############################
-## database configuration ##
+## security configuration ##
 ############################
 
 security: 'none'                                                # can be set to 'none', 'mit-kdc' or 'active-directory'
@@ -41,6 +44,15 @@ security_options:
   kdc_master_key: 'AsdQwe123'                                   # only used when security is set to 'mit-kdc'
   ldap_url: 'ldaps://ad.example.com:636'                        # only used when security is set to 'active-directory'
   container_dn: 'OU=hadoop,DC=example,DC=com'                   # only used when security is set to 'active-directory'
+
+
+##########################
+## ranger configuration ##
+##########################
+
+ranger_options:                                                 # only used if RANGER_ADMIN is part of the blueprint stack
+  ranger_admin_password: 'admin'                                # the password for the Ranger admin users (both admin and amb_ranger_admin)
+  enable_plugins: yes                                           # set to 'yes' if the plugins should be enabled for all of the installed services
 
 
 #############################

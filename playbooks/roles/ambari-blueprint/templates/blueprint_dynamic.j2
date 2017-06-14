@@ -22,6 +22,219 @@
       }
     },
 {% endif %}
+{% if rangeradmin_hosts|length > 0 %}
+    {
+      "admin-properties" : {
+        "DB_FLAVOR" : "{{ database|regex_replace('mariadb', 'mysql')|upper }}",
+        "SQL_CONNECTOR_JAR" : "{{ hostvars[inventory_hostname][database + '_jdbc_location'] }}",
+        "db_host" : "{{ database_options.external_hostname|default(ansible_nodemane,true) }}",
+        "db_name" : "{{ database_options.rangeradmin_db_name }}",
+        "db_user" : "{{ database_options.rangeradmin_db_username }}",
+        "db_password" : "{{ database_options.rangeradmin_db_password }}",
+        "policymgr_external_url" : "http://%HOSTGROUP::{{ rangeradmin_groups[0] }}%:6080"
+      }
+    },
+    {
+      "ranger-admin-site" : {
+        "ranger.externalurl" : "http://%HOSTGROUP::{{ rangeradmin_groups[0] }}%:6080",
+        {% if database == "mysql" or database == "mariadb" -%}
+        "ranger.jpa.jdbc.driver": "com.mysql.jdbc.Driver",
+        "ranger.jpa.jdbc.url": "jdbc:mysql://{{ database_options.external_hostname|default(ansible_nodename,true) }}:{{ mysql_port }}/{{ database_options.rangeradmin_db_name }}",
+        {% endif -%}
+        {% if database == "postgres" -%}
+        "ranger.jpa.jdbc.driver": "org.postgresql.Driver",
+        "ranger.jpa.jdbc.url": "jdbc:postgresql://{{ database_options.external_hostname|default(ansible_nodename,true) }}:{{ postgres_port }}/{{ database_options.rangeradmin_db_name }}",
+        {% endif -%}
+        "ranger.audit.source.type" : "solr",
+        "ranger.audit.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_nodename'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
+      }
+    },
+{% if ranger_options.enable_plugins|default(no) %}
+{% if product.name|lower == 'hdp' %}
+    {
+      "ranger-hdfs-plugin-properties" : {
+        "ranger-hdfs-plugin-enabled" : "Yes"
+      }
+    },
+    {
+      "ranger-hdfs-security" : {
+        "ranger.plugin.hdfs.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_nodename'] }}:6080",
+        "ranger.plugin.hdfs.policy.pollIntervalMs" : "30000"
+      }
+    },
+    {
+      "ranger-hdfs-audit" : {
+        "xasecure.audit.destination.db" : "false",
+        "xasecure.audit.destination.hdfs" : "true",
+        "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ cluster_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_nodename'] }}:8020{% endif %}/ranger/audit",
+        "xasecure.audit.destination.solr" : "true",
+        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_nodename'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
+      }
+    },
+    {
+      "ranger-hive-plugin-properties" : {
+        "ranger-hive-plugin-enabled" : "Yes"
+      }
+    },
+    {
+      "ranger-hive-security" : {
+        "ranger.plugin.hive.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_nodename'] }}:6080",
+        "ranger.plugin.hive.policy.pollIntervalMs" : "30000"
+      }
+    },
+    {
+      "ranger-hive-audit" : {
+        "xasecure.audit.destination.db" : "false",
+        "xasecure.audit.destination.hdfs" : "true",
+        "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ cluster_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_nodename'] }}:8020{% endif %}/ranger/audit",
+        "xasecure.audit.destination.solr" : "true",
+        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_nodename'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
+      }
+    },
+    {
+      "ranger-yarn-plugin-properties" : {
+        "ranger-yarn-plugin-enabled" : "Yes"
+      }
+    },
+    {
+      "ranger-yarn-security" : {
+        "ranger.plugin.yarn.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_nodename'] }}:6080",
+        "ranger.plugin.yarn.policy.pollIntervalMs" : "30000"
+      }
+    },
+    {
+      "ranger-yarn-audit" : {
+        "xasecure.audit.destination.db" : "false",
+        "xasecure.audit.destination.hdfs" : "true",
+        "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ cluster_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_nodename'] }}:8020{% endif %}/ranger/audit",
+        "xasecure.audit.destination.solr" : "true",
+        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_nodename'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
+      }
+    },
+    {
+      "ranger-hbase-plugin-properties" : {
+        "ranger-hbase-plugin-enabled" : "Yes"
+      }
+    },
+    {
+      "ranger-hbase-security" : {
+        "ranger.plugin.hbase.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_nodename'] }}:6080",
+        "ranger.plugin.hbase.policy.pollIntervalMs" : "30000"
+      }
+    },
+    {
+      "ranger-hbase-audit" : {
+        "xasecure.audit.destination.db" : "false",
+        "xasecure.audit.destination.hdfs" : "true",
+        "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ cluster_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_nodename'] }}:8020{% endif %}/ranger/audit",
+        "xasecure.audit.destination.solr" : "true",
+        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_nodename'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
+      }
+    },
+{% endif %}
+{% if product.name|lower == 'hdf' %}
+    {
+      "ranger-nifi-plugin-properties" : {
+        "ranger-nifi-plugin-enabled" : "Yes"
+      }
+    },
+    {
+      "ranger-nifi-security" : {
+        "ranger.plugin.nifi.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_nodename'] }}:6080",
+        "ranger.plugin.nifi.policy.pollIntervalMs" : "30000"
+      }
+    },
+    {
+      "ranger-nifi-audit" : {
+        "xasecure.audit.destination.solr" : "true",
+        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_nodename'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
+      }
+    },
+{% endif %}
+{% if security|lower == "mit-kdc" or security|lower == "active-directory" -%}
+    {
+      "ranger-storm-plugin-properties" : {
+        "ranger-storm-plugin-enabled" : "Yes"
+      }
+    },
+    {
+      "ranger-storm-security" : {
+        "ranger.plugin.storm.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_nodename'] }}:6080",
+        "ranger.plugin.storm.policy.pollIntervalMs" : "30000"
+      }
+    },
+    {
+      "ranger-storm-audit" : {
+        "xasecure.audit.destination.db" : "false",
+{% if product.name|lower == 'hdp' %}
+        "xasecure.audit.destination.hdfs" : "true",
+        "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ cluster_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_nodename'] }}:8020{% endif %}/ranger/audit",
+{% else %}
+        "xasecure.audit.destination.hdfs" : "false",
+{% endif %}
+        "xasecure.audit.destination.solr" : "true",
+        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_nodename'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
+      }
+    },
+{% endif %}
+    {
+      "ranger-kafka-plugin-properties" : {
+        "ranger-kafka-plugin-enabled" : "Yes"
+      }
+    },
+    {
+      "ranger-kafka-security" : {
+        "ranger.plugin.kafka.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_nodename'] }}:6080",
+        "ranger.plugin.kafka.policy.pollIntervalMs" : "30000"
+      }
+    },
+    {
+      "ranger-kafka-audit" : {
+        "xasecure.audit.destination.db" : "false",
+{% if product.name|lower == 'hdp' %}
+        "xasecure.audit.destination.hdfs" : "true",
+        "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ cluster_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_nodename'] }}:8020{% endif %}/ranger/audit",
+{% else %}
+        "xasecure.audit.destination.hdfs" : "false",
+{% endif %}
+        "xasecure.audit.destination.solr" : "true",
+        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_nodename'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
+      }
+    },
+{% endif %}
+    {
+      "ranger-env" : {
+{% if ranger_options.enable_plugins|default(no) %}
+{% if product.name|lower == 'hdp' %}
+        "ranger-hdfs-plugin-enabled" : "Yes",
+        "ranger-hive-plugin-enabled" : "Yes",
+        "ranger-yarn-plugin-enabled" : "Yes",
+        "ranger-hbase-plugin-enabled" : "Yes",
+{% endif %}
+{% if product.name|lower == 'hdf' %}
+        "ranger-nifi-plugin-enabled" : "Yes",
+{% endif %}
+{% if security|lower == "mit-kdc" or security|lower == "active-directory" -%}
+        "ranger-storm-plugin-enabled" : "Yes",
+{% endif %}
+        "ranger-kafka-plugin-enabled" : "Yes",
+{% endif %}
+        "admin_username" : "admin",
+        "admin_password" : "{{ ranger_options.ranger_admin_password }}",
+        "ranger_admin_username" : "amb_ranger_admin",
+        "ranger_admin_password" : "{{ ranger_options.ranger_admin_password }}",
+        "xasecure.audit.destination.db" : "false",
+{% if product.name|lower == 'hdp' %}
+        "xasecure.audit.destination.hdfs" : "true",
+{% else %}
+        "xasecure.audit.destination.hdfs" : "false",
+{% endif %}
+        "xasecure.audit.destination.solr" : "true",
+        "is_solrCloud_enabled": "true",
+        "create_db_dbuser": "false"
+      }
+    },
+{% endif %}
 {% if product.name|lower == 'hdf' %}
     {
       "nifi-ambari-config" : {
@@ -62,6 +275,9 @@
         "dfs.namenode.shared.edits.dir" : "qjournal://{% for jn in journalnode_groups %}%HOSTGROUP::{{ jn }}%:8485{% if not loop.last %};{% endif %}{% endfor %}/{{ cluster_name }}",
         "dfs.nameservices" : "{{ cluster_name }}",
         {% endif -%}
+{% if rangeradmin_hosts|length > 0 and ranger_options.enable_plugins|default(no) %}
+        "dfs.namenode.inode.attributes.provider.class" : "org.apache.ranger.authorization.hadoop.RangerHdfsAuthorizer",
+{% endif %}
         "dfs.datanode.data.dir" : "/hadoop/hdfs/data",
         "dfs.datanode.failed.volumes.tolerated" : "0",
         "dfs.replication" : "3"
@@ -92,6 +308,10 @@
         "yarn.resourcemanager.webapp.https.address.rm2": "%HOSTGROUP::{{ resourcemanager_groups[1] }}%:8090",
         "yarn.resourcemanager.zk-address": "{% for zk in zookeeper_groups %}%HOSTGROUP::{{ zk }}%:2181{% if not loop.last %},{% endif %}{% endfor %}",
         {% endif -%}
+{% if rangeradmin_hosts|length > 0 and ranger_options.enable_plugins|default(no) %}
+        "yarn.acl.enable" : "true",
+        "yarn.authorization-provider": "org.apache.ranger.authorization.yarn.authorizer.RangerYarnAuthorizer",
+{% endif %}
         "yarn.client.nodemanager-connect.retry-interval-ms" : "10000"
       }
     },
@@ -109,7 +329,20 @@
         "javax.jdo.option.ConnectionUserName": "{{ database_options.hive_db_username }}",
         "javax.jdo.option.ConnectionPassword": "{{ database_options.hive_db_password }}",
         {% endif -%}
+{% if rangeradmin_hosts|length > 0 and ranger_options.enable_plugins|default(no) %}
+        "hive.security.authorization.enabled" : "true",
+{% endif %}
         "hive.metastore.failure.retries" : "24"
+      }
+    },
+    {
+      "hiveserver2-site" : {
+{% if rangeradmin_hosts|length > 0 and ranger_options.enable_plugins|default(no) %}
+        "hive.security.authorization.enabled" : "true",
+        "hive.security.authorization.manager" : "org.apache.ranger.authorization.hive.authorizer.RangerHiveAuthorizerFactory",
+        "hive.conf.restricted.list" : "hive.security.authenticator.manager,hive.security.authorization.manager,hive.security.metastore.authorization.manager,hive.security.metastore.authenticator.manager,hive.users.in.admin.role,hive.server2.xsrf.filter.enabled,hive.security.authorization.enabled",
+{% endif %}
+        "hive.metastore.metrics.enabled" : "true"
       }
     },
     {
@@ -125,6 +358,9 @@
         {% endif -%}
         "hive_database_name": "{{ database_options.hive_db_name }}",
         {% endif -%}
+{% if rangeradmin_hosts|length > 0 and ranger_options.enable_plugins|default(no) %}
+        "hive_security_authorization" : "Ranger",
+{% endif %}
         "hive_user" : "hive"
       }
     },
@@ -164,6 +400,12 @@
         {% if namenode_groups|length > 1 -%}
         "hbase.rootdir": "hdfs://{{ cluster_name }}/apps/hbase/data",
         {% endif -%}
+{% if rangeradmin_hosts|length > 0 and ranger_options.enable_plugins|default(no) %}
+        "hbase.security.authorization" : "true",
+        "hbase.coprocessor.master.classes" : "org.apache.ranger.authorization.hbase.RangerAuthorizationCoprocessor",
+        "hbase.coprocessor.region.classes" : "org.apache.hadoop.hbase.security.access.SecureBulkLoadEndpoint,org.apache.ranger.authorization.hbase.RangerAuthorizationCoprocessor",
+        "hbase.coprocessor.regionserver.classes" : "org.apache.ranger.authorization.hbase.RangerAuthorizationCoprocessor",
+{% endif %}
         "hbase.client.retries.number" : "35"
       }
     },
@@ -177,6 +419,22 @@
       }
     },
 {% endif %}
+    {
+      "storm-site": {
+{% if rangeradmin_hosts|length > 0 and ranger_options.enable_plugins|default(no) and (security|lower == "mit-kdc" or security|lower == "active-directory") %}
+        "nimbus.authorizer" : "org.apache.ranger.authorization.storm.authorizer.RangerStormAuthorizer",
+{% endif %}
+        "storm.zookeeper.retry.intervalceiling.millis" : "30000"
+      }
+    },
+    {
+      "kafka-broker": {
+{% if rangeradmin_hosts|length > 0 and ranger_options.enable_plugins|default(no) %}
+        "authorizer.class.name" : "org.apache.ranger.authorization.kafka.authorizer.RangerKafkaAuthorizer",
+{% endif %}
+        "zookeeper.session.timeout.ms" : "30000"
+      }
+    },
     {
       "zoo.cfg": {
         "clientPort" : "2181"
@@ -197,6 +455,7 @@
 {% if security|lower == "mit-kdc" or security|lower == "active-directory" -%}
         { "name" : "KERBEROS_CLIENT" },
 {% endif %}
+
         {% for service in node_group.services -%}
         { "name" : "{{ service }}" }{% if service == "HIVE_METASTORE" and database == "embedded" %},{ "name" : "MYSQL_SERVER" }{% endif %}{% if not loop.last %},{% endif %}
 

@@ -1,0 +1,6 @@
+---
+postgres_jdbc_location: /usr/share/java/postgresql-jdbc.jar
+
+mysql_jdbc_location: /usr/share/java/mysql-connector-java.jar
+
+mariadb_jdbc_location: /usr/share/java/mysql-connector-java.jar

@@ -3,10 +3,27 @@
   include_vars:
     file: '../defaults/main.yml'
 
+- name: Load variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}-{{ ansible_distribution_major_version }}.yml"
+        - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}.yml"
+        - "{{ ansible_os_family|lower }}-{{ ansible_distribution_major_version }}.yml"
+        - "{{ ansible_os_family|lower }}.yml"
+        - defaults.yml
+      paths:
+        - ../vars
+
 - name: Fail if HA NameNode prerequisites are not met
   fail:
     msg: "HA NameNode has been requested but there are less than 3 JournalNodes."
   when: product.name|lower == 'hdp' and blueprint_file == 'blueprint_dynamic.j2' and namenode_groups|length > 1 and journalnode_groups|length < 3
+
+- name: Fail if Ranger prerequisites are not met
+  fail:
+    msg: "Ranger has been requested to be installed but the database option is embedded."
+  when: rangeradmin_hosts|length > 0 and database == 'embedded'
 
 - name: Upload the blueprint and the cluster creation template
   template:
