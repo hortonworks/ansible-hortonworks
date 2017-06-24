@@ -7,14 +7,11 @@
     - ../../inventory/aws/group_vars/all
   tasks:
     - name: Create the VPC
-      ec2_vpc:
+      ec2_vpc_net:
         region: "{{ cloud_config.region }}"
         cidr_block: "{{ cloud_config.vpc_cidr }}"
-        internet_gateway: "{{ cloud_config.internet_gateway }}"
-        resource_tags:
-          Name: "{{ cloud_config.vpc_name }}"
+        name: "{{ cloud_config.vpc_name }}"
         state: present
-        wait: yes
       register: cluster_vpc
 
     - name: Create the Subnet
@@ -28,16 +25,24 @@
         state: present
       register: cluster_subnet
 
-    - name: Add the Default Route if Internet Gateway is present
+    - name: Add an Internet Gateway to the VPC
+      ec2_vpc_igw:
+        region: "{{ cloud_config.region }}"
+        vpc_id: "{{ cluster_vpc.vpc.id }}"
+        state: present
+      when: "{{ cloud_config.internet_gateway }}"
+      register: cluster_igw
+
+    - name: Set up the public subnet route table for the Internet Gateway
       ec2_vpc_route_table:
         region: "{{ cloud_config.region }}"
         vpc_id: "{{ cluster_vpc.vpc.id }}"
         subnets: "{{ cluster_subnet.subnet.id }}"
         routes:
           - dest: 0.0.0.0/0
-            gateway_id: "{{ cluster_vpc.igw_id }}"
+            gateway_id: "{{ cluster_igw.gateway_id }}"
         state: present
-      when: "{{ cloud_config.internet_gateway }}"
+      when: "{{ cluster_igw.gateway_id is defined }}"
 
     - name: Create Security Groups
       ec2_group:

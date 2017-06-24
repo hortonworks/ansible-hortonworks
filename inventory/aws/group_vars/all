@@ -6,7 +6,7 @@ cloud_config:
   vpc_cidr: '10.0.0.0/16'
   subnet_name: 'mytestcluster-subnet'
   subnet_cidr: '10.0.10.0/24'
-  internet_gateway: true                                           # Only set to false if using local repos
+  internet_gateway: true                                           # Only set to false if using local repos (node will be without Internet access)
   admin_username: ec2-user
   ssh:
     keyname: "Hadoop-key"
@@ -26,7 +26,7 @@ cloud_config:
 nodes:
   - group: "mytestcluster-master"
     count: 1
-    image: ami-01ccc867                                            # Amazon Linux AMI 2017.03.0 in eu-west-1
+    image: ami-7d50491b                                            # Amazon Linux AMI 2017.03.1 in eu-west-1
     type: r3.xlarge
     public_ip: true
     security_groups: default_cluster_access,ambari_access
@@ -38,7 +38,7 @@ nodes:
 
   - group: "mytestcluster-slave"
     count: 3
-    image: ami-01ccc867                                            # Amazon Linux AMI 2017.03.0 in eu-west-1
+    image: ami-7d50491b                                            # Amazon Linux AMI 2017.03.1 in eu-west-1
     type: r3.large
     public_ip: true
     security_groups: default_cluster_access
@@ -49,7 +49,7 @@ nodes:
 
   - group: "mytestcluster-edge"
     count: 0
-    image: ami-01ccc867                                            # Amazon Linux AMI 2017.03.0 in eu-west-1
+    image: ami-7d50491b                                            # Amazon Linux AMI 2017.03.1 in eu-west-1
     type: m3.medium
     public_ip: true
     security_groups: default_cluster_access
