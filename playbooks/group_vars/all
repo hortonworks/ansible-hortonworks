@@ -19,4 +19,4 @@ oraclejdk_options:                                        # only used when java 
   jce_location: '/tmp/jce_policy-8.zip'                   # the location of the JCE package on the remote system or on the Ansible controller
   remote_files: no                                        # set to yes to indicate the files are already on the remote systems, otherwise they will be copied by Ansible from the Ansible controller
 
-external_dns: yes                                         # set to yes to use the existing DNS (when no, it will update the /etc/hosts file)
+external_dns: yes                                         # set to yes to use the existing DNS (when no, it will update the /etc/hosts file - must be set to 'no' when using Azure)

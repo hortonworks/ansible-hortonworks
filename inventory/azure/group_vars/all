@@ -1,6 +1,6 @@
 ---
 cloud_config:
-  name_suffix: ''
+  name_suffix: ''                                  # Set this to a domain name (like '.example.com') when using the Azure internal DNS otherwise the cluster won't use FQDN nodes
   location: 'West Europe'
   admin_username: azure-user
   ssh:

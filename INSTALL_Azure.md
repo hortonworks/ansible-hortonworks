@@ -138,7 +138,7 @@ This section contains variables that are cluster specific and are used by all no
 
 | Variable        | Description                                                                                                |
 | --------------- | ---------------------------------------------------------------------------------------------------------- |
-| name_suffix     | A suffix that will be appended to the name of all nodes. Usually it's a domain, but can be anything or even the empty string `''`. |
+| name_suffix     | A suffix that will be appended to the name of all nodes. Usually it's a domain, but can be anything or even the empty string `''`. It's recommended to set this to a domain name when using the Azure internal DNS otherwise the cluster won't use FQDN nodes. |
 | location        | The Azure Region as described [here](https://azure.microsoft.com/en-gb/regions/).                          |
 | admin_username  | The Linux user with sudo permissions. Can be customized in Azure as it's used when building the nodes.     |
 | ssh.privatekey  | Local path to the SSH private key that will be used to login into the nodes. This can be the key generated as part of the Build Setup, step 4. |
@@ -210,7 +210,7 @@ Modify the file at `~/ansible-hdp/playbooks/group_vars/all` to set the cluster c
 | .tarball_location          | The location of the tarball file. This can be the location on the remote systems or on the Ansible controller, depending on the `remote_files` variable. |
 | .jce_location              | The location of the JCE package zip file. This can be the location on the remote systems or on the Ansible controller, depending on the `remote_files` variable. |
 | .remote_files              | If this variable is set to `yes` then the tarball and JCE files must already be present on the remote system. If set to `no` then the files will be copied by Ansible (from the Ansible controller to the remote systems). |
-| external_dns               | This controls the type of DNS to be used. If `yes` it will use whatever DNS is currently set up. If `no` it will populate the `/etc/hosts` file with all cluster nodes. |
+| external_dns               | This controls the type of DNS to be used. If `yes` it will use whatever DNS is currently set up (it must support reverse lookups). If `no` it will populate the `/etc/hosts` file with all cluster nodes. This must be set to `no` (unless a local DNS is used) because the Azure internal DNS doesn't provide reverse lookups. More about the Azure internal DNS can be found in the [documentation](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/azure-dns#name-resolution-that-azure-provides). |
 
 
 ## ambari-server config file
