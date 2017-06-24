@@ -30,7 +30,7 @@
         region: "{{ cloud_config.region }}"
         vpc_id: "{{ cluster_vpc.vpc.id }}"
         state: present
-      when: "{{ cloud_config.internet_gateway }}"
+      when: cloud_config.internet_gateway
       register: cluster_igw
 
     - name: Set up the public subnet route table for the Internet Gateway
@@ -42,7 +42,7 @@
           - dest: 0.0.0.0/0
             gateway_id: "{{ cluster_igw.gateway_id }}"
         state: present
-      when: "{{ cluster_igw.gateway_id is defined }}"
+      when: cluster_igw.gateway_id is defined
 
     - name: Create Security Groups
       ec2_group:

@@ -48,7 +48,7 @@
       register: current_public_nics
       until: current_public_nics.finished
       retries: 120
-  when: "{{ outer_loop.public_ip|default(false)|bool }}"
+  when: outer_loop.public_ip|default(false)|bool
 
 - block:
     - name: Create NICs (with private IP only)
@@ -75,7 +75,7 @@
       register: current_private_nics
       until: current_private_nics.finished
       retries: 120
-  when: "not {{ outer_loop.public_ip|default(false)|bool }}"
+  when: outer_loop.public_ip|default(false)|bool
 
 - name: Create {{ outer_loop.group }} nodes
   azure_rm_virtualmachine:

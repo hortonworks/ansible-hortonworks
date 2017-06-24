@@ -30,4 +30,4 @@ openstack)
 esac
 
 echo -e $message
-ansible-playbook playbooks/clouds/build_$cloud_to_use.yml --connection=local
+ansible-playbook -i inventory/localhost playbooks/clouds/build_$cloud_to_use.yml --connection=local

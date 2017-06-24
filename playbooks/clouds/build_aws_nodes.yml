@@ -30,7 +30,7 @@
     wait: yes
     wait_timeout: 600
   register: current_ec2
-  when: "{{ outer_loop.root_volume.ebs }}"
+  when: outer_loop.root_volume.ebs
 
 - name: Wait for SSH to start
   wait_for:
