@@ -11,21 +11,12 @@
       paths:
         - ../vars
 
-- name: Install MIT KDC packages (yum)
-  yum:
-    name: "{{ item }}"
-    update_cache: yes
-    state: installed
-  with_items: "{{ kdc_packages }}"
-  when: ansible_os_family|lower == "redhat"
-
-- name: Install MIT KDC packages (apt)
-  apt:
+- name: Install MIT KDC packages
+  package:
     name: "{{ item }}"
     update_cache: yes
     state: present
   with_items: "{{ kdc_packages }}"
-  when: ansible_os_family|lower == "debian"
 
 - name: Upload the temporary krb5.conf
   template:

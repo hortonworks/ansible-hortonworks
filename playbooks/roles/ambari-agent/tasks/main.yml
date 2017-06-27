@@ -1,18 +1,10 @@
 ---
-- name: Install the ambari-agent package (yum)
-  yum:
+- name: Install the ambari-agent package
+  package:
     name: ambari-agent
     update_cache: yes
     state: latest
   notify: Reload systemd
-  when: ansible_os_family|lower == "redhat"
-
-- name: Install the ambari-agent package (apt)
-  apt:
-    name: ambari-agent
-    update_cache: yes
-    state: latest
-  when: ansible_os_family|lower == "debian"
 
 - name: Configure the Ambari agent
   lineinfile:

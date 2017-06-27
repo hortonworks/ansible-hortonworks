@@ -15,39 +15,22 @@
       paths:
         - ../vars
 
-- name: Install the ambari-server package (yum)
-  yum:
+- name: Install the ambari-server package
+  package:
     name: ambari-server
     update_cache: yes
     state: latest
   notify: Reload systemd
-  when: ansible_os_family|lower == "redhat"
-
-- name: Install the ambari-server package (apt)
-  apt:
-    name: ambari-server
-    update_cache: yes
-    state: latest
-  when: ansible_os_family|lower == "debian"
 
 - meta: flush_handlers
 
 - block:
-    - name: Install {{ database }} database packages (yum)
-      yum:
-        name: "{{ item }}"
-        update_cache: yes
-        state: installed
-      with_items: "{{ hostvars[inventory_hostname][database + '_packages'] }}"
-      when: ansible_os_family|lower == "redhat"
-
-    - name: Install {{ database }} database packages (apt)
-      apt:
+    - name: Install {{ database }} required packages
+      package:
         name: "{{ item }}"
         update_cache: yes
         state: present
       with_items: "{{ hostvars[inventory_hostname][database + '_packages'] }}"
-      when: ansible_os_family|lower == "debian"
 
     - name: Create a .pgpass file
       template:

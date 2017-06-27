@@ -1,18 +1,9 @@
 ---
-- block:
-    - name: Install OpenJDK (yum)
-      yum:
-        name: "{{ openjdk_package }}"
-        update_cache: yes
-        state: installed
-      when: ansible_os_family|lower == "redhat"
-
-    - name: Install OpenJDK (apt)
-      apt:
-        name: "{{ openjdk_package }}"
-        update_cache: yes
-        state: present
-      when: ansible_os_family|lower == "debian"
+- name: Install OpenJDK
+  package:
+    name: "{{ openjdk_package }}"
+    update_cache: yes
+    state: present
   when: java == "openjdk"
 
 - block:

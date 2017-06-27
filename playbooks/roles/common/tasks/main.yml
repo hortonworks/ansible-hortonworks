@@ -25,21 +25,12 @@
     state: installed
   when: ansible_os_family|lower == "redhat" and epel_result|failed
 
-- name: Install required packages (yum)
-  yum:
-    name: "{{ item }}"
-    update_cache: yes
-    state: installed
-  with_items: "{{ packages|default([]) }}"
-  when: ansible_os_family|lower == "redhat"
-
-- name: Install required packages (apt)
-  apt:
+- name: Install required packages
+  package:
     name: "{{ item }}"
     update_cache: yes
     state: present
   with_items: "{{ packages|default([]) }}"
-  when: ansible_os_family|lower == "debian"
 
 - name: Install Java
   include: java.yml
