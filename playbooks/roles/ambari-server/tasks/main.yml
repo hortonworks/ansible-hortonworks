@@ -102,6 +102,13 @@
   shell: /usr/sbin/ambari-server setup -s {{ ambari_java_options|default("") }} {{ ambari_database_options|default("") }}
   notify: Restart ambari-server
 
+- name: Increase the Ambari Server startup timeout
+  lineinfile:
+    dest: /etc/ambari-server/conf/ambari.properties
+    state: present
+    line: 'server.startup.web.timeout=120'
+  notify: Restart ambari-server
+
 - meta: flush_handlers
 
 - name: Make sure all of the Ambari Agents have registered
