@@ -6,3 +6,7 @@ default_realm = {{ security_options.realm | upper }}
         kdc = {{ ansible_fqdn }}
         admin_server = {{ ansible_fqdn }}
     }
+[logging]
+    kdc = FILE:/var/log/krb5/krb5kdc.log
+    admin_server = FILE:/var/log/krb5/kadmind.log
+    default = SYSLOG:NOTICE:DAEMON
