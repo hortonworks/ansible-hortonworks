@@ -1,6 +1,6 @@
 [libdefaults]
-default_realm = {{ security_options.realm | upper }}
-
+    default_realm = {{ security_options.realm | upper }}
+    default_ccache_name = /tmp/krb5cc_%{uid}
 [realms]
     {{ security_options.realm | upper }} = {
         kdc = {{ ansible_fqdn }}

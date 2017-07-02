@@ -11,6 +11,11 @@
       paths:
         - ../vars
 
+- name: Fail if trying to install MariaDB on unsupported OS
+  fail:
+    msg: "MariaDB is not available or supported on SLES 11 and Debian/Ubuntu"
+  when: database == "mariadb" and ((ansible_os_family|lower == "suse" and ansible_distribution_major_version|int == 11) or ansible_os_family|lower == "debian")
+
 - block:
     - name: Upload mysql repository file (yum)
       template:
@@ -18,6 +23,13 @@
         dest: /etc/yum.repos.d/mysql-community.repo
         mode: 0644
       when: ansible_os_family|lower == "redhat"
+
+    - name: Upload mysql repository file (zypper)
+      template:
+        src: mysql-community-suse.repo.j2
+        dest: /etc/zypp/repos.d/mysql-community.repo
+        mode: 0644
+      when: ansible_os_family|lower == "suse"
 
     - name: Upload mysql repository file (apt)
       template:
@@ -33,12 +45,21 @@
       when: ansible_os_family|lower == "debian"
   when: database == "mysql"
 
-- name: Upload mariadb repository file (yum)
-  template:
-    src: mariadb.repo.j2
-    dest: /etc/yum.repos.d/mariadb.repo
-    mode: 0644
-  when: database == "mariadb" and ansible_os_family|lower == "redhat"
+- block:
+    - name: Upload mariadb repository file (yum)
+      template:
+        src: mariadb.repo.j2
+        dest: /etc/yum.repos.d/mariadb.repo
+        mode: 0644
+      when: ansible_os_family|lower == "redhat"
+
+    - name: Upload mariadb repository file (zypper)
+      template:
+        src: mariadb-suse.repo.j2
+        dest: /etc/zypp/repos.d/mariadb.repo
+        mode: 0644
+      when: ansible_os_family|lower == "suse"
+  when: database == "mariadb"
 
 - name: Install {{ database }} database packages
   package:
@@ -68,7 +89,12 @@
   service:
     name: "{{ hostvars[inventory_hostname][database + '_service_name'] }}"
     state: started
+
+- name: Make sure the {{ database }} service is enabled
+  service:
+    name: "{{ hostvars[inventory_hostname][database + '_service_name'] }}"
     enabled: yes
+  ignore_errors: true
 
 - block:
     - name: Generate MD5 passwords

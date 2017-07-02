@@ -111,6 +111,17 @@
 
 - meta: flush_handlers
 
+- name: Make sure the ambari-server service is started
+  service:
+    name: ambari-server
+    state: started
+
+- name: Make sure the ambari-server service is enabled
+  service:
+    name: ambari-server
+    enabled: yes
+  ignore_errors: true
+
 - name: Make sure all of the Ambari Agents have registered
   uri:
     url: http://{{ ansible_fqdn }}:8080/api/v1/hosts/{{ hostvars[item]['ansible_fqdn']|lower }}

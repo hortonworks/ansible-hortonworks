@@ -1,0 +1,16 @@
+---
+postgres_packages:
+  - postgresql94-server
+postgres_service_name: postgresql
+postgres_initdb_command: systemctl start postgresql
+postgres_unix_socket: /var/run/postgresql
+postgres_config_file: /var/lib/pgsql/data/postgresql.conf
+postgres_hba_file: /var/lib/pgsql/data/pg_hba.conf
+
+mysql_repo_url: 'http://repo.mysql.com/yum/mysql-5.6-community/sles/12/$basearch/'
+mysql_repo_key: 'http://repo.mysql.com/RPM-GPG-KEY-mysql'
+mysql_packages:
+  - mysql-community-client
+  - mysql-community-server
+  - python-mysql
+mysql_service_name: mysql

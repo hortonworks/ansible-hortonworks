@@ -27,7 +27,7 @@ For a full list of supported features check [bellow](#features).
 
 - Ansible >= 2.2.1
 
-- Expects CentOS/RHEL 6/7 or Ubuntu 14 hosts (also supports Amazon Linux AMI)
+- Expects CentOS/RHEL, Ubuntu, Amazon Linux or SLES hosts
 
 
 ## [Description](id:description)
@@ -93,7 +93,8 @@ Currently, these playbooks are divided into the following parts:
 - [x] Ubuntu 14 support
 - [ ] Ubuntu 16 support
 - [x] Amazon AMI (2016.09 and 2017.03) support
-- [ ] SuSE support
+- [x] SUSE Linux Enterprise Server 11 support
+- [x] SUSE Linux Enterprise Server 12 support
 
 ### Prerequisites
 - [x] Install and start NTP

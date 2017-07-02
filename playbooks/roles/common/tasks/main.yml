@@ -40,7 +40,12 @@
   service:
     name: "{{ ntp_service_name }}"
     state: started
+
+- name: Make sure the NTP service is enabled
+  service:
+    name: "{{ ntp_service_name }}"
     enabled: yes
+  ignore_errors: true
 
 - name: Add mappings to /etc/hosts
   lineinfile:
@@ -51,6 +56,12 @@
   with_items:
     - "{{ groups['hadoop-cluster']|sort(reverse=True) }}"
   when: not external_dns
+
+- name: Make sure /etc/security/limits.d exists
+  file:
+    path: /etc/security/limits.d
+    mode: 0755
+    state: directory
 
 - name: Set nofile and nproc limits
   blockinfile:
@@ -87,7 +98,8 @@
     dest: /etc/default/grub
     state: present
     line: 'GRUB_CMDLINE_LINUX=$GRUB_CMDLINE_LINUX" transparent_hugepage=never"'
-  when: (ansible_os_family|lower == "redhat" or ansible_os_family|lower == "debian") and (ansible_distribution_major_version|int >= 7)
+  when: (ansible_os_family|lower == "redhat" and ansible_distribution_major_version|int == 7) or (ansible_os_family|lower == "debian" and ansible_distribution_major_version|int >= 7) or (ansible_os_family|lower == "suse" and ansible_distribution_major_version|int == 12)
+
   notify: Generate the Grub config file
 
 - meta: flush_handlers
@@ -107,3 +119,25 @@
     keyserver: "{{ ambari_repo_keyserver }}"
     id: "{{ ambari_repo_key }}"
   when: ansible_os_family|lower == "debian"
+
+- block:
+    - name: Upload HDP-UTILS repository file (SLES 12)
+      template:
+        src: hdp-utils-suse.repo.j2
+        dest: /etc/zypp/repos.d/HDP-UTILS.repo
+        mode: 0644
+
+    - name: Make sure libsnappy1 is absent (bug in SLES 12 HDP-UTILS repo)
+      zypper:
+        name: libsnappy1
+        state: absent
+
+    - name: Install snappy from HDP-UTILS repo (bug in SLES 12 HDP-UTILS repo)
+      zypper:
+        name: "{{ item }}"
+        state: present
+        oldpackage: yes
+      with_items:
+        - "snappy-1.0.5-1"
+        - "snappy-devel-1.0.5-1"
+  when: ansible_os_family|lower == "suse" and ansible_distribution_major_version|int == 12

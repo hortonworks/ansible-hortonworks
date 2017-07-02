@@ -1,7 +1,6 @@
 ---
 postgres_packages:
-  - python-psycopg2
-  - postgresql-9.3
+  - postgresql
 postgres_service_name: postgresql
 postgres_initdb_command: service postgresql initdb
 postgres_unix_socket: /var/run/postgresql
@@ -12,6 +11,6 @@ mysql_repo_url: 'http://repo.mysql.com/apt/ubuntu/'
 mysql_repo_key: '5072E1F5'
 mysql_repo_keyserver: 'pgp.mit.edu'
 mysql_packages:
-  - python-mysqldb
   - mysql-community-server
+  - python-mysqldb
 mysql_service_name: mysql

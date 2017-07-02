@@ -1,4 +1,9 @@
 ---
+- name: Fail if trying to install OpenJDK on SLES 11
+  fail:
+    msg: "OpenJDK is not available or supported on SLES 11."
+  when: java == "openjdk" and ansible_os_family|lower == "suse" and ansible_distribution_major_version|int == 11
+
 - name: Install OpenJDK
   package:
     name: "{{ openjdk_package }}"

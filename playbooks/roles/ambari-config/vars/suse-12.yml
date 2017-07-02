@@ -1,0 +1,9 @@
+---
+minor_version: "{{ product.version | regex_replace('.[0-9]+.[0-9]+[0-9_-]*$','') }}"
+major_version: "{{ minor_version.split('.').0 }}"
+
+main_repo_url: "{{ base_url }}/{{ product.name|upper }}/sles12/{{ major_version }}.x/updates/{{ product.version }}"
+main_repo_target: "api/v1/stacks/{{ product.name|upper }}/versions/{{ minor_version }}/operating_systems/suse{{ ansible_distribution_major_version }}/repositories/{{ product.name|upper }}-{{ minor_version }}"
+
+utils_repo_url: "{{ base_url }}/HDP-UTILS-{{ utils_version }}/repos/sles12"
+utils_repo_target: "api/v1/stacks/{{ product.name|upper }}/versions/{{ minor_version }}/operating_systems/suse{{ ansible_distribution_major_version }}/repositories/HDP-UTILS-{{ utils_version }}"

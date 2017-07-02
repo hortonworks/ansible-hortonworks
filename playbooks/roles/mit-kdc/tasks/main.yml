@@ -26,10 +26,9 @@
     force: yes
 
 - name: Create the KDC database for realm {{ security_options.realm | upper }}
-  shell: "{{ kdc_init_command }} -s -W -r {{ security_options.realm | upper }} -P {{ security_options.kdc_master_key }}"
+  shell: "{{ kdc_init_command }} -r {{ security_options.realm | upper }} -P {{ security_options.kdc_master_key }}"
   args:
     creates: "{{ kdc_database_file }}"
-  no_log: True
   notify: Restart krb5
 
 - name: Upload the KDC configuration file
@@ -43,8 +42,7 @@
 - meta: flush_handlers
 
 - name: Add the admin principal for realm {{ security_options.realm | upper }}
-  shell: kadmin.local -q "add_principal -pw {{ security_options.admin_password }} {{ security_options.admin_principal }}/admin@{{ security_options.realm | upper }}"
-  no_log: True
+  shell: "{{ kadmin_command }} -q \"add_principal -pw {{ security_options.admin_password }} {{ security_options.admin_principal }}/admin@{{ security_options.realm | upper }}\""
   register: addprinc_result
 
 - name: Fail if the admin principal could not be created
@@ -68,10 +66,20 @@
   service:
     name: "{{ kdc_service_name }}"
     state: started
+
+- name: Make sure the kdc service is enabled
+  service:
+    name: "{{ kdc_service_name }}"
     enabled: yes
+  ignore_errors: true
 
 - name: Make sure the kadmin service is started
   service:
     name: "{{ kadmin_service_name }}"
     state: started
+
+- name: Make sure the kadmin service is enabled
+  service:
+    name: "{{ kadmin_service_name }}"
     enabled: yes
+  ignore_errors: true

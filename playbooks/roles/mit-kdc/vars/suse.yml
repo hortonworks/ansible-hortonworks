@@ -1,0 +1,14 @@
+---
+kdc_packages:
+  - krb5-server
+  - krb5-client
+kdc_service_name: krb5kdc
+kadmin_service_name: kadmind
+
+kdc_init_command: /usr/lib/mit/sbin/kdb5_util create -s
+kadmin_command: /usr/lib/mit/sbin/kadmin.local
+
+krb5_config_file: /etc/krb5.conf
+kdc_config_file: /var/lib/kerberos/krb5kdc/kdc.conf
+kdc_acl_file: /var/lib/kerberos/krb5kdc/kadm5.acl
+kdc_database_file: /var/lib/kerberos/krb5kdc/principal

@@ -1,6 +1,5 @@
 ---
 postgres_packages:
-  - python-psycopg2
   - postgresql-server
 postgres_service_name: postgresql
 postgres_initdb_command: service postgresql initdb
@@ -11,13 +10,13 @@ postgres_hba_file: /var/lib/pgsql/data/pg_hba.conf
 mysql_repo_url: 'http://repo.mysql.com/yum/mysql-5.6-community/el/6/$basearch/'
 mysql_repo_key: 'http://repo.mysql.com/RPM-GPG-KEY-mysql'
 mysql_packages:
-  - MySQL-python
   - mysql-community-server
+  - MySQL-python
 mysql_service_name: mysqld
 
 mariadb_repo_url: 'http://yum.mariadb.org/10.1/centos6-amd64'
 mariadb_repo_key: 'http://yum.mariadb.org/RPM-GPG-KEY-MariaDB'
 mariadb_packages:
-  - MySQL-python
   - MariaDB-server
+  - MySQL-python
 mariadb_service_name: mysql

@@ -20,4 +20,9 @@
   service:
     name: ambari-agent
     state: started
+
+- name: Make sure the ambari-agent service is enabled
+  service:
+    name: ambari-agent
     enabled: yes
+  ignore_errors: true

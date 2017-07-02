@@ -6,7 +6,8 @@ kdc_packages:
 kdc_service_name: krb5-kdc
 kadmin_service_name: krb5-admin-server
 
-kdc_init_command: kdb5_util create
+kdc_init_command: kdb5_util create -s -W
+kadmin_command: kadmin.local
 
 krb5_config_file: /etc/krb5.conf
 kdc_config_file: /etc/krb5kdc/kdc.conf
