@@ -13,6 +13,8 @@ openjdk_package: openjdk-7-jdk
 
 ntp_service_name: ntp
 
+firewall_service_name: ufw
+
 update_grub_command: "/usr/sbin/update-grub"
 
 ambari_repo_url: "http://public-repo-1.hortonworks.com/ambari/{{ ansible_distribution|lower }}{{ ansible_distribution_major_version }}/2.x/updates/{{ ambari_version }}/ambari.list"

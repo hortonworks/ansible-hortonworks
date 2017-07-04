@@ -211,6 +211,7 @@ Modify the file at `~/ansible-hdp/playbooks/group_vars/all` to set the cluster c
 | .jce_location              | The location of the JCE package zip file. This can be the location on the remote systems or on the Ansible controller, depending on the `remote_files` variable. |
 | .remote_files              | If this variable is set to `yes` then the tarball and JCE files must already be present on the remote system. If set to `no` then the files will be copied by Ansible (from the Ansible controller to the remote systems). |
 | external_dns               | This controls the type of DNS to be used. If `yes` it will use whatever DNS is currently set up (it must support reverse lookups). If `no` it will populate the `/etc/hosts` file with all cluster nodes. This must be set to `no` (unless a local DNS is used) because the Azure internal DNS doesn't provide reverse lookups. More about the Azure internal DNS can be found in the [documentation](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/azure-dns#name-resolution-that-azure-provides). |
+| disable_firewall           | This variable controls the local firewall service (iptables, firewalld, ufw). Sometimes, a local firewall service might run and block inter-node cluster communication. In these circumstances the local firewall service should be disabled as traffic rules should be provided by an external firewall such as Security Groups. Set to `yes` to disable the existing local firewall service if it blocks the inter-node cluster communication. |
 
 
 ## ambari-server config file

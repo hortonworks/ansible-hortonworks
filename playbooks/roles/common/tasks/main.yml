@@ -83,6 +83,19 @@
     reload: yes
     ignoreerrors: yes
 
+- name: Stop the {{ firewall_service_name }} firewall service
+  service:
+    name: "{{ firewall_service_name }}"
+    state: stopped
+  when: disable_firewall
+
+- name: Disable the {{ firewall_service_name }} firewall service
+  service:
+    name: "{{ firewall_service_name }}"
+    enabled: no
+  ignore_errors: true
+  when: disable_firewall
+
 - name: Disable selinux
   selinux:
     state: disabled

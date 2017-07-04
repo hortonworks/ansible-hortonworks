@@ -13,6 +13,8 @@ openjdk_package: java-1.8.0-openjdk-devel
 
 ntp_service_name: chronyd
 
+firewall_service_name: firewalld
+
 update_grub_command: 'grub2-mkconfig -o "$(readlink -n /etc/grub2.cfg)"'
 
 epel_url: "http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"

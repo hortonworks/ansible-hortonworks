@@ -14,6 +14,8 @@ openjdk_package: java-1_8_0-openjdk-devel
 
 ntp_service_name: ntpd
 
+firewall_service_name: SuSEfirewall2
+
 update_grub_command: 'grub2-mkconfig -o /boot/grub2/grub.cfg'
 
 ambari_repo_url: "http://public-repo-1.hortonworks.com/ambari/sles{{ ansible_distribution_major_version }}/2.x/updates/{{ ambari_version }}/ambari.repo"
