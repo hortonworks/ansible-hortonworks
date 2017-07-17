@@ -135,6 +135,19 @@ The following variables can be set for each host:
 | ansible_ssh_private_key_file  | (Optional) Local path to the SSH private key that will be used to login into the host. Either this or `ansible_ssh_pass` should be configured. |
 | ambari_server                 | Set it to `true` for the host that should also run the Ambari Server.                                       |
 
+# Test the inventory
+
+List the inventory:
+
+```
+ansible -i inventory/static all --list-hosts
+```
+
+Confirm access to hosts in the inventory:
+
+```
+ansible -i inventory/static all -m setup
+```
 
 # Set the cluster variables
 
