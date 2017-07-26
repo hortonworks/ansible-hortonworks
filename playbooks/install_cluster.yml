@@ -1,53 +1,8 @@
 ---
-- include: "set_variables.yml"
+- include: "prepare_nodes.yml"
 
-- name: Apply the common role to the hadoop-cluster group
-  hosts: hadoop-cluster
-  any_errors_fatal: true
-  become: yes
-  roles:
-    - common
+- include: "install_ambari.yml"
 
-- name: Apply the database role to the ambari-server group
-  hosts: ambari-server
-  any_errors_fatal: true
-  become: yes
-  roles:
-    - role: database
-      when: database != "embedded" and not database_options.external_hostname|default('')
+- include: "configure_ambari.yml"
 
-- name: Apply the mit-kdc role to the ambari-server group
-  hosts: ambari-server
-  any_errors_fatal: true
-  become: yes
-  roles:
-    - role: mit-kdc
-      when: security == "mit-kdc" and not security_options.external_hostname|default('')
-
-- name: Apply the ambari-agent role to the hadoop-cluster group
-  hosts: hadoop-cluster
-  any_errors_fatal: true
-  become: yes
-  roles:
-    - ambari-agent
-
-- name: Apply the ambari-server role to the ambari-server group
-  hosts: ambari-server
-  any_errors_fatal: true
-  become: yes
-  roles:
-    - ambari-server
-
-- name: Apply the ambari-config role to the ambari-server group
-  hosts: ambari-server
-  any_errors_fatal: true
-  become: yes
-  roles:
-    - ambari-config
-
-- name: Apply the ambari-blueprint role to the ambari-server group
-  hosts: ambari-server
-  any_errors_fatal: true
-  become: yes
-  roles:
-    - ambari-blueprint
+- include: "apply_blueprint.yml"
