@@ -16,6 +16,14 @@
     - role: database
       when: database != "embedded" and not database_options.external_hostname|default('')
 
+- name: Apply the krb5-client role to the hadoop-cluster groupp
+  hosts: hadoop-cluster
+  any_errors_fatal: true
+  become: yes
+  roles:
+    - role: krb5-client
+      when: hostvars[groups['ambari-server']|sort|list|first]['security'] == "mit-kdc"
+
 - name: Apply the mit-kdc role to the ambari-server group
   hosts: ambari-server
   any_errors_fatal: true

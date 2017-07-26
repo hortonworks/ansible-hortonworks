@@ -1,0 +1,13 @@
+{% set security_options = hostvars[groups['ambari-server']|sort|list|first]['security_options'] %}
+[libdefaults]
+    default_realm = {{ security_options.realm | upper }}
+    default_ccache_name = /tmp/krb5cc_%{uid}
+[realms]
+    {{ security_options.realm | upper }} = {
+        kdc = {{ security_options.external_hostname|default(hostvars[groups['ambari-server']|sort|list|first]['ansible_fqdn'],true) }}
+        admin_server = {{ security_options.external_hostname|default(hostvars[groups['ambari-server']|sort|list|first]['ansible_fqdn'],true) }}
+    }
+[logging]
+    default = FILE:/var/log/krb5kdc.log
+    admin_server = FILE:/var/log/kadmind.log
+    kdc = FILE:/var/log/krb5kdc.log

@@ -9,7 +9,6 @@ kadmin_service_name: kadmin
 kdc_init_command: kdb5_util create -s -W
 kadmin_command: kadmin.local
 
-krb5_config_file: /etc/krb5.conf
 kdc_config_file: /var/kerberos/krb5kdc/kdc.conf
 kdc_acl_file: /var/kerberos/krb5kdc/kadm5.acl
 kdc_database_file: /var/kerberos/krb5kdc/principal
