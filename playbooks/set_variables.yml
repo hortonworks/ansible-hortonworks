@@ -24,6 +24,7 @@
           oozie_hosts: []
           rangeradmin_groups: []
           rangeradmin_hosts: []
+          hdf_hosts: []
         no_log: True
 
       - name: Populate the namenode groups list
@@ -86,6 +87,13 @@
         set_fact:
           rangeradmin_hosts: "{{ rangeradmin_hosts }} + {{ groups[item.group] }}"
         when: groups[item.group] is defined and groups[item.group]|length > 0 and ('RANGER_ADMIN' in item.services)
+        with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+        no_log: True
+
+      - name: Populate the hdf hosts list
+        set_fact:
+          hdf_hosts: "{{ hdf_hosts }} + {{ groups[item.group] }}"
+        when: groups[item.group] is defined and groups[item.group]|length > 0 and ('NIFI_MASTER' in item.services)
         with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
         no_log: True
 

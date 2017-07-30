@@ -50,7 +50,7 @@
       }
     },
 {% if ranger_options.enable_plugins|default(no) %}
-{% if product.name|lower == 'hdp' %}
+{% if namenode_groups|length > 0 %}
     {
       "ranger-hdfs-plugin-properties" : {
         "ranger-hdfs-plugin-enabled" : "Yes"
@@ -132,7 +132,7 @@
       }
     },
 {% endif %}
-{% if product.name|lower == 'hdf' %}
+{% if hdf_hosts|length > 0 %}
     {
       "ranger-nifi-plugin-properties" : {
         "ranger-nifi-plugin-enabled" : "Yes"
@@ -146,6 +146,12 @@
     },
     {
       "ranger-nifi-audit" : {
+{% if namenode_groups|length > 0 %}
+        "xasecure.audit.destination.hdfs" : "true",
+        "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ cluster_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_fqdn'] }}:8020{% endif %}/ranger/audit",
+{% else %}
+        "xasecure.audit.destination.hdfs" : "false",
+{% endif %}
         "xasecure.audit.destination.solr" : "true",
         "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_fqdn'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
       }
@@ -166,7 +172,7 @@
     {
       "ranger-storm-audit" : {
         "xasecure.audit.destination.db" : "false",
-{% if product.name|lower == 'hdp' %}
+{% if namenode_groups|length > 0 %}
         "xasecure.audit.destination.hdfs" : "true",
         "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ cluster_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_fqdn'] }}:8020{% endif %}/ranger/audit",
 {% else %}
@@ -191,7 +197,7 @@
     {
       "ranger-kafka-audit" : {
         "xasecure.audit.destination.db" : "false",
-{% if product.name|lower == 'hdp' %}
+{% if namenode_groups|length > 0 %}
         "xasecure.audit.destination.hdfs" : "true",
         "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ cluster_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_fqdn'] }}:8020{% endif %}/ranger/audit",
 {% else %}
@@ -205,13 +211,13 @@
     {
       "ranger-env" : {
 {% if ranger_options.enable_plugins|default(no) %}
-{% if product.name|lower == 'hdp' %}
+{% if namenode_groups|length > 0 %}
         "ranger-hdfs-plugin-enabled" : "Yes",
         "ranger-hive-plugin-enabled" : "Yes",
         "ranger-yarn-plugin-enabled" : "Yes",
         "ranger-hbase-plugin-enabled" : "Yes",
 {% endif %}
-{% if product.name|lower == 'hdf' %}
+{% if hdf_hosts|length > 0 %}
         "ranger-nifi-plugin-enabled" : "Yes",
 {% endif %}
 {% if security|lower == "mit-kdc" or security|lower == "active-directory" -%}
@@ -224,7 +230,7 @@
         "ranger_admin_username" : "amb_ranger_admin",
         "ranger_admin_password" : "{{ ranger_options.ranger_admin_password }}",
         "xasecure.audit.destination.db" : "false",
-{% if product.name|lower == 'hdp' %}
+{% if namenode_groups|length > 0 %}
         "xasecure.audit.destination.hdfs" : "true",
 {% else %}
         "xasecure.audit.destination.hdfs" : "false",
@@ -235,7 +241,7 @@
       }
     },
 {% endif %}
-{% if product.name|lower == 'hdf' %}
+{% if hdf_hosts|length > 0 %}
     {
       "nifi-ambari-config" : {
         "nifi.node.ssl.port": "9091",
@@ -250,7 +256,8 @@
         "nifi_user" : "nifi"
       }
     },
-{% else %}
+{% endif %}
+{% if namenode_groups|length > 0 %}
     {
       "hadoop-env" : {
         "dtnode_heapsize" : "1024m",
@@ -470,10 +477,10 @@
   "Blueprints" : {
 {% if security|lower == "mit-kdc" or security|lower == "active-directory" %}
     "security" : {
-         "type" : "KERBEROS"
+      "type" : "KERBEROS"
     },
 {% endif %}
-    "stack_name" : "{{ product.name|upper }}",
-    "stack_version" : "{{ product.version | regex_replace('.[0-9]+.[0-9]+[0-9_-]*$','') }}"
+    "stack_name" : "{% if namenode_groups|length > 0 %}HDP{% else %}HDF{% endif %}",
+    "stack_version" : "{% if namenode_groups|length > 0 %}{{ hdp_version | regex_replace('.[0-9]+.[0-9]+[0-9_-]*$','') }}{% else %}{{ hdf_version | regex_replace('.[0-9]+.[0-9]+[0-9_-]*$','') }}{% endif %}"
   }
 }

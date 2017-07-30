@@ -118,6 +118,7 @@ Currently, these playbooks are divided into the following parts:
 - [x] Configure custom Repositories
 - [x] Build HDP clusters
 - [x] Build HDF clusters
+- [x] Build HDP clusters with HDF nodes
 - [x] Build clusters with a specific JSON blueprint (static)
 - [x] Build clusters with a generated JSON blueprint (dynamic based on Jinja2 template and variables)
 - [x] Wait for the cluster to be built

@@ -1,9 +1,12 @@
 ---
-minor_version: "{{ product.version | regex_replace('.[0-9]+.[0-9]+[0-9_-]*$','') }}"
-major_version: "{{ minor_version.split('.').0 }}"
+hdp_minor_version: "{{ hdp_version | regex_replace('.[0-9]+.[0-9]+[0-9_-]*$','') }}"
+hdp_major_version: "{{ hdp_minor_version.split('.').0 }}"
+hdf_minor_version: "{{ hdf_version | regex_replace('.[0-9]+.[0-9]+[0-9_-]*$','') }}"
+hdf_major_version: "{{ hdf_minor_version.split('.').0 }}"
 
-main_repo_url: "{{ base_url }}/{{ product.name|upper }}/centos{{ ansible_distribution_major_version }}/{{ major_version }}.x/updates/{{ product.version }}"
-main_repo_target: "api/v1/stacks/{{ product.name|upper }}/versions/{{ minor_version }}/operating_systems/redhat{{ ansible_distribution_major_version }}/repositories/{{ product.name|upper }}-{{ minor_version }}"
+hdp_main_repo_url: "{{ base_url }}/HDP/centos{{ ansible_distribution_major_version }}/{{ hdp_major_version }}.x/updates/{{ hdp_version }}"
+hdf_main_repo_url: "{{ base_url }}/HDF/centos{{ ansible_distribution_major_version }}/{{ hdf_major_version }}.x/updates/{{ hdf_version }}"
+main_os_target: "operating_systems/redhat{{ ansible_distribution_major_version }}"
 
 utils_repo_url: "{{ base_url }}/HDP-UTILS-{{ utils_version }}/repos/centos{{ ansible_distribution_major_version }}"
-utils_repo_target: "api/v1/stacks/{{ product.name|upper }}/versions/{{ minor_version }}/operating_systems/redhat{{ ansible_distribution_major_version }}/repositories/HDP-UTILS-{{ utils_version }}"
+utils_os_target: "operating_systems/redhat{{ ansible_distribution_major_version }}/repositories/HDP-UTILS-{{ utils_version }}"
