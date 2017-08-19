@@ -37,6 +37,17 @@
         body_format: raw
         status_code: 200,201,202
         return_content: no
+
+    - name: ​Enable User Home Directory Creation
+      lineinfile:
+        dest: /etc/ambari-server/conf/ambari.properties
+        state: present
+        line: "{{ item }}"
+      notify: Restart ambari-server
+      with_items:
+        - "ambari.post.user.creation.hook.enabled=true"
+        - "ambari.post.user.creation.hook=/var/lib/ambari-server/resources/scripts/post-user-creation-hook.sh"
+    - meta: flush_handlers
   when: namenode_groups|length > 0
 
 - block:
