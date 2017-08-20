@@ -317,3 +317,4 @@ This script will apply all the required playbooks in one run, but you can also a
 - Install Ambari: `install_ambari.sh`
 - Configure Ambari: `configure_ambari.sh`
 - Apply Blueprint: `apply_blueprint.sh`
+- Post Install: `post_install.sh`

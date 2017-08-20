@@ -73,6 +73,10 @@ Currently, these playbooks are divided into the following parts:
   
    This uploads the Ambari Blueprint and Cluster Creation Template and launches a cluster create request to Ambari. It can also wait for the cluster to be built
 
+6. Post Install
+
+   Run the `post_install.sh` script to execute any actions after the cluster is built.
+
 
 ## [Features](id:features)
 
