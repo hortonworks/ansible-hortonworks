@@ -386,6 +386,9 @@
         "oozie.service.JPAService.jdbc.username": "{{ database_options.oozie_db_username }}",
         "oozie.service.JPAService.jdbc.password": "{{ database_options.oozie_db_password }}",
         {% endif -%}
+{% if (security|lower == "mit-kdc" or security|lower == "active-directory") and security_options.http_authentication|default(no) %}
+        "oozie.authentication.cookie.domain" : "{{ security_options.realm|lower }}",
+{% endif %}
         "oozie.action.retry.interval" : "30"
       }
     },
@@ -422,6 +425,15 @@
         "fs.defaultFS" : "hdfs://{{ cluster_name }}",
         "ha.zookeeper.quorum" : "{% for zk in zookeeper_groups %}%HOSTGROUP::{{ zk }}%:2181{% if not loop.last %},{% endif %}{% endfor %}",
         {% endif -%}
+{% if (security|lower == "mit-kdc" or security|lower == "active-directory") and security_options.http_authentication|default(no) %}
+        "hadoop.http.authentication.simple.anonymous.allowed" : "false",
+        "hadoop.http.authentication.signature.secret.file" : "/etc/security/http_secret",
+        "hadoop.http.authentication.type" : "kerberos",
+        "hadoop.http.authentication.kerberos.keytab" : "/etc/security/keytabs/spnego.service.keytab",
+        "hadoop.http.authentication.kerberos.principal" : "HTTP/_HOST@{{ security_options.realm }}",
+        "hadoop.http.filter.initializers" : "org.apache.hadoop.security.AuthenticationFilterInitializer",
+        "hadoop.http.authentication.cookie.domain" : "{{ security_options.realm|lower }}",
+{% endif %}
         "fs.trash.interval" : "360"
       }
     },

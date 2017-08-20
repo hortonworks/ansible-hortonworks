@@ -154,3 +154,34 @@
         - "snappy-1.0.5-1"
         - "snappy-devel-1.0.5-1"
   when: ansible_os_family|lower == "suse" and ansible_distribution_major_version|int == 12
+
+- block:
+    - name: Attempt to fetch the http secret key
+      fetch:
+        src: /etc/security/http_secret
+        dest: /tmp/hadoop_http_secret
+        flat: yes
+      delegate_to: "{{ groups['ambari-server']|sort|list|first }}"
+      run_once: true
+      register: fetch_results
+
+    - name: Create the http secret key
+      local_action: shell dd if=/dev/urandom of=/tmp/hadoop_http_secret bs=1024 count=1
+      run_once: true
+      become: false
+      args:
+        creates: /tmp/hadoop_http_secret
+      when: not fetch_results.changed
+
+    - name: Copy the http secret key to all nodes
+      copy:
+        src: /tmp/hadoop_http_secret
+        dest: /etc/security/http_secret
+        force: yes
+        mode: 0444
+
+    - name: Delete the http secret key
+      local_action: file path="/tmp/hadoop_http_secret" state="absent"
+      run_once: true
+      become: false
+  when: hostvars[groups['ambari-server']|sort|list|first]['security'] != "none" and hostvars[groups['ambari-server']|sort|list|first]['security_options']['http_authentication']|default(false)
