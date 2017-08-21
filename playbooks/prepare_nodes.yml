@@ -22,7 +22,7 @@
   become: yes
   roles:
     - role: krb5-client
-      when: hostvars[groups['ambari-server']|sort|list|first]['security'] == "mit-kdc"
+      when: security == "mit-kdc"
 
 - name: Apply the mit-kdc role to the ambari-server group
   hosts: ambari-server

@@ -1,4 +1,3 @@
-{% set security_options = hostvars[groups['ambari-server']|sort|list|first]['security_options'] %}
 [libdefaults]
     default_realm = {{ security_options.realm | upper }}
     default_ccache_name = /tmp/krb5cc_%{uid}

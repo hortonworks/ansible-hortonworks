@@ -184,4 +184,4 @@
       local_action: file path="/tmp/hadoop_http_secret" state="absent"
       run_once: true
       become: false
-  when: hostvars[groups['ambari-server']|sort|list|first]['security'] != "none" and hostvars[groups['ambari-server']|sort|list|first]['security_options']['http_authentication']|default(false)
+  when: security != "none" and security_options.http_authentication|default(false)

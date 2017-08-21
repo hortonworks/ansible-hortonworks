@@ -18,3 +18,18 @@ oraclejdk_options:                                        # only used when java 
 
 external_dns: yes                                         # set to yes to use the existing DNS (when no, it will update the /etc/hosts file - must be set to 'no' when using Azure)
 disable_firewall: no                                      # set to yes to disable the existing local firewall service (iptables, firewalld, ufw)
+
+############################
+## security configuration ##
+############################
+
+security: 'none'                                          # can be set to 'none', 'mit-kdc' or 'active-directory'
+security_options:
+  external_hostname: ''                                   # if this is empty, Ansible will install and prepare the MIT KDC on the Ambari node
+  realm: 'EXAMPLE.COM'
+  admin_principal: 'admin'                                # the Kerberos principal that has the permissions to create new users (don't append the realm)
+  admin_password: 'AsdQwe123'
+  kdc_master_key: 'AsdQwe123'                             # only used when security is set to 'mit-kdc'
+  ldap_url: 'ldaps://ad.example.com:636'                  # only used when security is set to 'active-directory'
+  container_dn: 'OU=hadoop,DC=example,DC=com'             # only used when security is set to 'active-directory'
+  http_authentication: no                                 # set to yes to enable HTTP authentication (SPNEGO)
