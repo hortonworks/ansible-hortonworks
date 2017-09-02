@@ -5,7 +5,7 @@
 #
 ###########
 
-blueprint_name: 'mytestcluster_blueprint'                       # the name of the blueprint as it will be stored in Ambari
+blueprint_name: '{{ cluster_name }}_blueprint'                  # the name of the blueprint as it will be stored in Ambari
 blueprint_file: 'blueprint_dynamic.j2'                          # the blueprint JSON file - 'blueprint_dynamic.j2' is a Jinja2 template that generates the required JSON
 blueprint_dynamic:                                              # properties for the dynamic blueprint - these are only used by the 'blueprint_dynamic.j2' template to generate the JSON
   - role: "hdf-singlenode"

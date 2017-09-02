@@ -11,10 +11,10 @@ cloud_config:
     name: teststorage000111111
     type: Standard_LRS
   network:
-    name: mytestcluster-network
+    name: "{{ cluster_name }}-network"
     address: "10.10.0.0/16"
   subnet:
-    name: "mytestcluster-subnet"
+    name: "{{ cluster_name }}-subnet"
     address: "10.10.0.0/24"
   security_groups:
     - name: ssh_access

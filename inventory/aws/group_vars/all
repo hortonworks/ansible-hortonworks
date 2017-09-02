@@ -2,26 +2,26 @@
 cloud_config:
   region: 'eu-west-1'
   zone: 'eu-west-1a'
-  vpc_name: "mytestcluster-vpc"
+  vpc_name: "{{ cluster_name }}-vpc"
   vpc_cidr: '10.0.0.0/16'
-  subnet_name: 'mytestcluster-subnet'
+  subnet_name: '{{ cluster_name }}-subnet'
   subnet_cidr: '10.0.10.0/24'
   internet_gateway: true                                           # Only set to false if using local repos (node will be without Internet access)
   admin_username: ec2-user
   ssh:
-    keyname: "Hadoop-key"
+    keyname: "{{ cluster_name }}-key"
     publickey: '~/.ssh/id_rsa.pub'
     privatekey: '~/.ssh/id_rsa'
   security_groups:
     - name: ambari_access
       rules:
         - {"proto":"tcp", "from_port":"8080", "to_port":"8080", "cidr_ip":"0.0.0.0/0"}
-      description: "Ambari access - mytestcluster"
+      description: "Ambari access - {{ cluster_name }}"
     - name: default_cluster_access
       rules:
         - {"proto":"tcp", "from_port":"22", "to_port":"22", "cidr_ip":"0.0.0.0/0"}
         - {"proto":"all", "group_name":"default_cluster_access"}
-      description: "SSH and inter-nodes access - mytestcluster"
+      description: "SSH and inter-nodes access - {{ cluster_name }}"
 
 nodes:
   - role: "hdp-master"
