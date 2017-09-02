@@ -11,7 +11,7 @@
 blueprint_name: 'mytestcluster_blueprint'                       # the name of the blueprint as it will be stored in Ambari
 blueprint_file: 'blueprint_dynamic.j2'                          # the blueprint JSON file - 'blueprint_dynamic.j2' is a Jinja2 template that generates the required JSON
 blueprint_dynamic:                                              # properties for the dynamic blueprint - these are only used by the 'blueprint_dynamic.j2' template to generate the JSON
-  - group: "mytestcluster-masternode1"
+  - role: "hdp-masternode-01"
     clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT']
     services:
       - ZOOKEEPER_SERVER
@@ -25,7 +25,7 @@ blueprint_dynamic:                                              # properties for
       - WEBHCAT_SERVER
       - HST_AGENT
       - METRICS_MONITOR
-  - group: "mytestcluster-masternode2"
+  - role: "hdp-masternode-02"
     clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT']
     services:
       - ZOOKEEPER_SERVER
@@ -38,7 +38,7 @@ blueprint_dynamic:                                              # properties for
       - HIVE_METASTORE
       - HST_AGENT
       - METRICS_MONITOR
-  - group: "mytestcluster-management"
+  - role: "hdp-management"
     clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT']
     services:
       - ZOOKEEPER_SERVER
@@ -57,7 +57,7 @@ blueprint_dynamic:                                              # properties for
       - METRICS_COLLECTOR
       - METRICS_GRAFANA
       - METRICS_MONITOR
-  - group: "mytestcluster-slave"
+  - role: "hdp-worker"
     clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT']
     services:
       - DATANODE

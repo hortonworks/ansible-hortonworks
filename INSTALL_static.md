@@ -123,9 +123,11 @@ cd && git clone git@github.com:hortonworks/ansible-hdp.git
 
 Modify the file at `~/ansible-hdp/inventory/static` to set the static inventory.
 
-The static inventory puts the hosts in different groups as described in the [Ansible Documentation](http://docs.ansible.com/ansible/intro_inventory.html#hosts-and-groups).
+The static inventory puts the nodes in different groups as described in the [Ansible Documentation](http://docs.ansible.com/ansible/intro_inventory.html#hosts-and-groups).
 
-The following variables can be set for each host:
+Each group defines a specific node role, for example master, slave, edge.
+
+The following variables can be set for each node:
 
 | Variable                      | Description                                                                                                 |
 | ----------------------------- | ----------------------------------------------------------------------------------------------------------- |
@@ -171,7 +173,7 @@ Modify the file at `~/ansible-hdp/playbooks/group_vars/all` to set the cluster c
 | .jce_location              | The location of the JCE package zip file. This can be the location on the remote systems or on the Ansible controller, depending on the `remote_files` variable. |
 | .remote_files              | If this variable is set to `yes` then the tarball and JCE files must already be present on the remote system. If set to `no` then the files will be copied by Ansible (from the Ansible controller to the remote systems). |
 | external_dns               | This controls the type of DNS to be used. If `yes` it will use whatever DNS is currently set up. If `no` it will populate the `/etc/hosts` file with all cluster nodes. |
-| disable_firewall           | This variable controls the local firewall service (iptables, firewalld, ufw). Sometimes, a local firewall service might run and block inter-node cluster communication. In these circumstances the local firewall service should be disabled as traffic rules should be provided by an external firewall such as Security Groups. Set to `yes` to disable the existing local firewall service if it blocks the inter-node cluster communication. |
+| disable_firewall           | This variable controls the local firewall service (iptables, firewalld, ufw). Sometimes, a local firewall service might run and block inter-node cluster communication. In these circumstances the local firewall service should be disabled as traffic rules should be provided by an external firewall such as a Cisco ASA. Set to `yes` to disable the existing local firewall service if it blocks the inter-node cluster communication. |
 
 ### security configuration
 
@@ -200,7 +202,7 @@ Modify the file at `~/ansible-hdp/playbooks/group_vars/ambari-server` to set the
 | wait / wait_timeout            | Set this to `true` if you want the playbook to wait for the cluster to be successfully built after applying the blueprint. The timeout setting controls for how long (in seconds) should it wait for the cluster build. |
 | default_password               | A default password for all required passwords which are not specified in the blueprint.                                                                               |
 | config_recommendation_strategy | Configuration field which specifies the strategy of applying configuration recommendations to a cluster as explained in the [documentation](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-ClusterCreationTemplateStructure). |
-| cluster_template_file          | The path to the cluster creation template file that will be used to build the cluster. It can be an absolute path or relative to the `ambari-blueprint/templates`  folder. The default should be sufficient for cloud builds as it uses the `cloud_config` variables and [Jinja2 Template](http://jinja.pocoo.org/docs/dev/templates/) to generate the file. |
+| cluster_template_file          | The path to the cluster creation template file that will be used to build the cluster. It can be an absolute path or relative to the `ambari-blueprint/templates` folder. The default should be sufficient as it uses [Jinja2 Template](http://jinja.pocoo.org/docs/dev/templates/) to generate the file. |
 
 ### database configuration
 
@@ -235,8 +237,8 @@ Modify the file at `~/ansible-hdp/playbooks/group_vars/ambari-server` to set the
 | Variable                       | Description                                                                                                |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
 | blueprint_name                 | The name of the blueprint as it will be stored in Ambari.                                                  |
-| blueprint_file                 | The path to the blueprint file that will be uploaded to Ambari. It can be an absolute path or relative to the `roles/ambari-blueprint/templates`  folder. The blueprint file can also contain [Jinja2 Template](http://jinja.pocoo.org/docs/dev/templates/) variables. |
-| blueprint_dynamic              | Settings for the dynamic blueprint template - only used if `blueprint_file` is set to `blueprint_dynamic.j2`. The group names must match the groups from the inventory setting file `~/ansible-hdp/inventory/static/group_vars/all`. The chosen components are split into two lists: clients and services. The chosen Component layout must respect Ambari Blueprint restrictions - for example if a single `NAMENODE` is configured, there must also be a `SECONDARY_NAMENODE` component. |
+| blueprint_file                 | The path to the blueprint file that will be uploaded to Ambari. It can be an absolute path or relative to the `roles/ambari-blueprint/templates` folder. The blueprint file can also contain [Jinja2 Template](http://jinja.pocoo.org/docs/dev/templates/) variables. |
+| blueprint_dynamic              | Settings for the dynamic blueprint template - only used if `blueprint_file` is set to `blueprint_dynamic.j2`. The role names must match the groups from the inventory setting file `~/ansible-hdp/inventory/static/group_vars/all`. The chosen components are split into two lists: clients and services. The chosen Component layout must respect Ambari Blueprint restrictions - for example if a single `NAMENODE` is configured, there must also be a `SECONDARY_NAMENODE` component. |
 
 
 # Install the cluster

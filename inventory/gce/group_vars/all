@@ -19,11 +19,9 @@ firewall_rules:
   - name: "{{ cloud_config.network.name }}-ambari-access"
     allowed: 'tcp:8080,8443'
     src_range: '0.0.0.0/0'
-    target_groups:
-      - "mytestcluster-master"
 
 nodes:
-  - group: "mytestcluster-master"
+  - role: "hdp-master"
     count: 1
     image: centos-7
     type: n1-highmem-2
@@ -33,8 +31,8 @@ nodes:
       size: 15
     ambari_server: true
 
-  - group: "mytestcluster-slave"
-    count: 0
+  - role: "hdp-slave"
+    count: 2
     image: centos-7
     type: n1-standard-1
     public_ip: true
@@ -42,7 +40,7 @@ nodes:
       type: pd-ssd
       size: 15
 
-  - group: "mytestcluster-edge"
+  - role: "hdp-edge"
     count: 0
     image: centos-7
     type: n1-standard-1

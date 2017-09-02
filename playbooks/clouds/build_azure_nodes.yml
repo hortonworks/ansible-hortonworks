@@ -6,7 +6,7 @@
       azure_rm_publicipaddress:
         resource_group: "{{ cloud_config.resource_group }}"
         allocation_method: Static
-        name: "IP-{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
+        name: "IP-{{ cluster_name }}-{{ outer_loop.role }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
       loop_control:
         loop_var: local_loop
       with_sequence: count="{{ outer_loop.count }}" format=-%02x
@@ -24,11 +24,11 @@
       until: current_public_ips.finished
       retries: 120
 
-    - name: Create NICs (with public IP)
+    - name: Create NIC(s) (with public IP)
       azure_rm_networkinterface:
         resource_group: "{{ cloud_config.resource_group }}"
-        name: "NIC-{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
-        public_ip_address_name: "IP-{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
+        name: "NIC-{{ cluster_name }}-{{ outer_loop.role }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
+        public_ip_address_name: "IP-{{ cluster_name }}-{{ outer_loop.role }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
         virtual_network_name: "{{ cloud_config.network.name }}"
         subnet_name: "{{ cloud_config.subnet.name }}"
         security_group_name: "{{ outer_loop.security_group }}"
@@ -39,7 +39,7 @@
       poll: 0
       register: current_public_nics_async
 
-    - name: Wait for NICs to be built
+    - name: Wait for NIC(s) to be built
       async_status:
         jid: "{{ local_loop.ansible_job_id }}"
       loop_control:
@@ -51,10 +51,10 @@
   when: outer_loop.public_ip|default(false)|bool
 
 - block:
-    - name: Create NICs (with private IP only)
+    - name: Create NIC(s) (with private IP only)
       azure_rm_networkinterface:
         resource_group: "{{ cloud_config.resource_group }}"
-        name: "NIC-{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
+        name: "NIC-{{ cluster_name }}-{{ outer_loop.role }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
         public_ip: false
         virtual_network_name: "{{ cloud_config.network.name }}"
         subnet_name: "{{ cloud_config.subnet.name }}"
@@ -66,7 +66,7 @@
       poll: 0
       register: current_private_nics_async
 
-    - name: Wait for NICs to be built
+    - name: Wait for NIC(s) to be built
       async_status:
         jid: "{{ local_loop.ansible_job_id }}"
       loop_control:
@@ -77,18 +77,18 @@
       retries: 120
   when: outer_loop.public_ip|default(false)|bool
 
-- name: Create {{ outer_loop.group }} nodes
+- name: Create {{ outer_loop.role }} node(s)
   azure_rm_virtualmachine:
     resource_group: "{{ cloud_config.resource_group }}"
     storage_account_name: "{{ cloud_config.storage_account.name }}"
-    name: "{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}{{ cloud_config.name_suffix|default('') }}"
+    name: "{{ cluster_name }}-{{ outer_loop.role }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}{{ cloud_config.name_suffix|default('') }}"
     image:
       offer:  "{{ outer_loop.image.offer }}"
       publisher: "{{ outer_loop.image.publisher }}"
       sku: "{{ outer_loop.image.sku }}"
       version: "{{ outer_loop.image.version }}"
     vm_size: "{{ outer_loop.flavor }}"
-    network_interface_names: "NIC-{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
+    network_interface_names: "NIC-{{ cluster_name }}-{{ outer_loop.role }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
     ssh_password_enabled: false
     admin_username: "{{ cloud_config.admin_username }}"
     ssh_public_keys:
@@ -96,7 +96,9 @@
         key_data: "{{ lookup('file', cloud_config.ssh.publickey) }}"
     state: present
     tags:
-      group: "{{ outer_loop.group }}"
+      Cluster: "{{ cluster_name }}"
+      Role: "{{ outer_loop.role }}"
+      Group: "{{ cluster_name }}-{{ outer_loop.role }}"
   loop_control:
     loop_var: local_loop
   with_sequence: count="{{ outer_loop.count }}" format=-%02x
@@ -104,7 +106,7 @@
   poll: 0
   register: current_nodes_async
 
-- name: Wait for {{ outer_loop.group }} nodes to be built
+- name: Wait for {{ outer_loop.role }} node(s) to be built
   async_status:
     jid: "{{ local_loop.ansible_job_id }}"
   loop_control:

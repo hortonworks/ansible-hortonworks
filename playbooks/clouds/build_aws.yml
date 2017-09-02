@@ -4,6 +4,7 @@
   connection: local
   gather_facts: False
   vars_files:
+    - ../group_vars/all
     - ../../inventory/aws/group_vars/all
   tasks:
     - name: Create the VPC

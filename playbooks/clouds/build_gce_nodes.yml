@@ -1,10 +1,10 @@
 ---
 - set_fact: outer_loop="{{ item }}"
 
-- name: Create {{ outer_loop.group }} root disks
+- name: Create {{ outer_loop.role }} root disk(s)
   gce_pd:
     zone: "{{ cloud_config.zone }}"
-    name: "{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
+    name: "{{ cluster_name }}-{{ outer_loop.role }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
     image: "{{ outer_loop.image }}"
     disk_type: "{{ outer_loop.root_disk.type }}"
     size_gb: "{{ outer_loop.root_disk.size }}"
@@ -17,7 +17,7 @@
   poll: 0
   register: current_disks_async
 
-- name: Wait for {{ outer_loop.group }} root disks to be created
+- name: Wait for {{ outer_loop.role }} root disk(s) to be created
   async_status:
     jid: "{{ local_loop.ansible_job_id }}"
   loop_control:
@@ -27,17 +27,20 @@
   until: current_disks.finished
   retries: 120
 
-- name: Create {{ outer_loop.group }} nodes
+- name: Create {{ outer_loop.role }} node(s)
   gce:
     zone: "{{ cloud_config.zone }}"
-    name: "{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}{{ cloud_config.name_suffix|default('') }}"
+    name: "{{ cluster_name }}-{{ outer_loop.role }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}{{ cloud_config.name_suffix|default('') }}"
     image: "{{ outer_loop.image }}"
     machine_type: "{{ outer_loop.type }}"
     network: "{{ cloud_config.network.name }}"
     external_ip: "{{ (outer_loop.public_ip|default(false)|bool == true) | ternary('ephemeral','none') }}"
     disks:
-      - "{{ outer_loop.group }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
-    tags: "{{ outer_loop.group }}"
+      - "{{ cluster_name }}-{{ outer_loop.role }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
+    tags:
+      - "cluster-{{ cluster_name }}"
+      - "role-{{ outer_loop.role }}"
+      - "group-{{ cluster_name }}-{{ outer_loop.role }}"
     state: present
   loop_control:
     loop_var: local_loop
@@ -46,7 +49,7 @@
   poll: 0
   register: current_nodes_async
 
-- name: Wait for {{ outer_loop.group }} nodes to be built
+- name: Wait for {{ outer_loop.role }} node(s) to be built
   async_status:
     jid: "{{ local_loop.ansible_job_id }}"
   loop_control:

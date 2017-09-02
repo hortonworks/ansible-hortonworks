@@ -29,9 +29,9 @@
     {% for node_group in nodes if node_group.count > 0 -%}
 
     {
-      "name" : "{{ node_group.group }}",
+      "name" : "{{ node_group.role }}",
       "hosts" : [
-        {% for node in groups[node_group.group]|sort -%}
+        {% for node in groups[node_group.role]|sort -%}
 
         { "fqdn" : "{{ hostvars[node]['ansible_fqdn'] | lower }}" }{% if not loop.last %},{% endif %}
 

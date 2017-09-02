@@ -147,22 +147,22 @@ This section contains variables that are cluster specific and are used by all no
 
 This section contains variables that are node specific.
 
-Nodes are separated by groups, for example master, slave, edge.
+Nodes are separated by groups, each group defining a specific node role, for example master, slave, edge.
 
-There can be any number of groups.
+There can be any number of roles so other roles can be added to correspond with the required architecture.
 
-And groups can have any names and any number of nodes but they should correspond with the host groups in the Ambari Blueprint.
+And roles can have any names and any number of nodes but they should correspond with the host groups in the Ambari Blueprint.
 
 | Variable        | Description                                                               |
 | --------------- | ------------------------------------------------------------------------- |
-| group           | The name of the group. Must be unique in the AWS VPC. Usually it contains the cluster name. Other groups can be added to correspond with the required architecture. |
-| count           | The number of nodes to be built in this group. |
+| role            | The name of the role. This will be appended to the cluster name in order to form a unique group in the AWS VPC. Other roles can be added to correspond with the required architecture. |
+| count           | The number of nodes to be built with this role. |
 | image           | The AMI ID of the OS image to be used. More details [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html). The easiest way to find out the ID is by using the EC2 console and clicking on the `Launch Instance` button. |
 | type            | The instance-type / size of the node. A list of all the instance-types can be found [here](https://aws.amazon.com/ec2/instance-types/) and the pricing [here](https://aws.amazon.com/ec2/pricing/). |
 | public_ip       | If the VM should have a Public IP assigned to it. Required if the build node does not have access to the private IP range of the cluster nodes. |
 | security_groups | The security groups that should be applied to the node. The nodes should have at least the default security group that allows traffic in the same group. |
 | root_volume     | The vast majority of AMIs require an EBS root volume. The default size of this root volume is small, irrespective of the instance-type, so use this variable to set the size of the root volume to the desired value. More details about root devices [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/RootDeviceStorage.html) and about types of EBS Volumes [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html). |
-| ambari_server   | Set it to `true` if the group also runs an Ambari Server. The number of nodes in this group should be 1. If there are more than 1 node, ambari-server will be installed on all of them, but only the first one (in alphabetical order) will be used by the Ambari Agents. |
+| ambari_server   | Set it to `true` if the role also defines an Ambari Server. The number of nodes with this role should be 1. If there are more than 1 node, ambari-server will be installed on all of them, but only the first one (in alphabetical order) will be used by the Ambari Agents. |
 
 
 # Build the Cloud environment
@@ -234,7 +234,7 @@ Modify the file at `~/ansible-hdp/playbooks/group_vars/ambari-server` to set the
 | wait / wait_timeout            | Set this to `true` if you want the playbook to wait for the cluster to be successfully built after applying the blueprint. The timeout setting controls for how long (in seconds) should it wait for the cluster build. |
 | default_password               | A default password for all required passwords which are not specified in the blueprint.                                                                               |
 | config_recommendation_strategy | Configuration field which specifies the strategy of applying configuration recommendations to a cluster as explained in the [documentation](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-ClusterCreationTemplateStructure). |
-| cluster_template_file          | The path to the cluster creation template file that will be used to build the cluster. It can be an absolute path or relative to the `ambari-blueprint/templates`  folder. The default should be sufficient for cloud builds as it uses the `cloud_config` variables and [Jinja2 Template](http://jinja.pocoo.org/docs/dev/templates/) to generate the file. |
+| cluster_template_file          | The path to the cluster creation template file that will be used to build the cluster. It can be an absolute path or relative to the `ambari-blueprint/templates` folder. The default should be sufficient for cloud builds as it uses the `cloud_config` variables and [Jinja2 Template](http://jinja.pocoo.org/docs/dev/templates/) to generate the file. |
 
 ### database configuration
 
@@ -269,8 +269,8 @@ Modify the file at `~/ansible-hdp/playbooks/group_vars/ambari-server` to set the
 | Variable                       | Description                                                                                                |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
 | blueprint_name                 | The name of the blueprint as it will be stored in Ambari.                                                  |
-| blueprint_file                 | The path to the blueprint file that will be uploaded to Ambari. It can be an absolute path or relative to the `roles/ambari-blueprint/templates`  folder. The blueprint file can also contain [Jinja2 Template](http://jinja.pocoo.org/docs/dev/templates/) variables. |
-| blueprint_dynamic              | Settings for the dynamic blueprint template - only used if `blueprint_file` is set to `blueprint_dynamic.j2`. The group names must match the groups from the inventory setting file `~/ansible-hdp/inventory/aws/group_vars/all`. The chosen components are split into two lists: clients and services. The chosen Component layout must respect Ambari Blueprint restrictions - for example if a single `NAMENODE` is configured, there must also be a `SECONDARY_NAMENODE` component. |
+| blueprint_file                 | The path to the blueprint file that will be uploaded to Ambari. It can be an absolute path or relative to the `roles/ambari-blueprint/templates` folder. The blueprint file can also contain [Jinja2 Template](http://jinja.pocoo.org/docs/dev/templates/) variables. |
+| blueprint_dynamic              | Settings for the dynamic blueprint template - only used if `blueprint_file` is set to `blueprint_dynamic.j2`. The role names must match the roles from the inventory setting file `~/ansible-hdp/inventory/aws/group_vars/all`. The chosen components are split into two lists: clients and services. The chosen Component layout must respect Ambari Blueprint restrictions - for example if a single `NAMENODE` is configured, there must also be a `SECONDARY_NAMENODE` component. |
 
 
 # Install the cluster

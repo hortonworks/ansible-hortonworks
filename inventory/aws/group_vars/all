@@ -24,7 +24,7 @@ cloud_config:
       description: "SSH and inter-nodes access - mytestcluster"
 
 nodes:
-  - group: "mytestcluster-master"
+  - role: "hdp-master"
     count: 1
     image: ami-7d50491b                                            # Amazon Linux AMI 2017.03.1 in eu-west-1
     type: r3.xlarge
@@ -36,7 +36,7 @@ nodes:
       size: 15
     ambari_server: true
 
-  - group: "mytestcluster-slave"
+  - role: "hdp-slave"
     count: 3
     image: ami-7d50491b                                            # Amazon Linux AMI 2017.03.1 in eu-west-1
     type: r3.large
@@ -47,7 +47,7 @@ nodes:
       type: gp2
       size: 15
 
-  - group: "mytestcluster-edge"
+  - role: "hdp-edge"
     count: 0
     image: ami-7d50491b                                            # Amazon Linux AMI 2017.03.1 in eu-west-1
     type: m3.medium

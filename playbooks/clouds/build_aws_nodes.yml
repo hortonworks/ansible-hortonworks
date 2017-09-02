@@ -7,7 +7,7 @@
     ami_id: "{{ outer_loop.image }}"
   register: current_ami
 
-- name: Create {{ outer_loop.group }} nodes (EBS root volume)
+- name: Create {{ outer_loop.role }} node(s) (EBS root volume)
   ec2:
     region: "{{ cloud_config.region }}"
     zone: "{{ cloud_config.zone }}"
@@ -24,9 +24,11 @@
         volume_size: "{{ outer_loop.root_volume.size }}"
         delete_on_termination: true
     count_tag:
-      group: "{{ outer_loop.group }}"
+      role: "{{ outer_loop.role }}"
     instance_tags:
-      group: "{{ outer_loop.group }}"
+      Cluster: "{{ cluster_name }}"
+      Role: "{{ outer_loop.role }}"
+      Group: "{{ cluster_name }}-{{ outer_loop.role }}"
     wait: yes
     wait_timeout: 600
   register: current_ec2

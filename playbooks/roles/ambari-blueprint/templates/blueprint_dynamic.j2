@@ -462,10 +462,10 @@
   ],
 
   "host_groups" : [
-    {% for node_group in blueprint_dynamic if groups[node_group.group] is defined and groups[node_group.group]|length > 0 -%}
+    {% for node_group in blueprint_dynamic if groups[node_group.role] is defined and groups[node_group.role]|length > 0 -%}
 
     {
-      "name" : "{{ node_group.group }}",
+      "name" : "{{ node_group.role }}",
       "configurations" : [ ],
       "components" : [
         {% for client in node_group.clients -%}
@@ -481,7 +481,7 @@
         {% endfor %}
 
       ]
-    }{% if not loop.last and groups[node_group.group]|length > 0 %},{% endif %}
+    }{% if not loop.last and groups[node_group.role]|length > 0 %},{% endif %}
 
     {% endfor %}
 

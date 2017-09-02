@@ -21,7 +21,7 @@ cloud_config:
       port: 22
 
 nodes:
-  - group: "mytestcluster-master"
+  - role: "hdp-master"
     count: 1
     image:
       offer: CentOS
@@ -33,7 +33,7 @@ nodes:
     security_group: ssh_access
     ambari_server: true
 
-  - group: "mytestcluster-slave"
+  - role: "hdp-slave"
     count: 2
     image:
       offer: CentOS
@@ -44,7 +44,7 @@ nodes:
     public_ip: true
     security_group: ssh_access
 
-  - group: "mytestcluster-edge"
+  - role: "hdp-edge"
     count: 0
     image:
       offer: CentOS
