@@ -24,7 +24,7 @@
         volume_size: "{{ outer_loop.root_volume.size }}"
         delete_on_termination: true
     count_tag:
-      role: "{{ outer_loop.role }}"
+      Group: "{{ cluster_name }}-{{ outer_loop.role }}"
     instance_tags:
       Cluster: "{{ cluster_name }}"
       Role: "{{ outer_loop.role }}"
