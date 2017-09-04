@@ -23,6 +23,30 @@
         volume_type: "{{ outer_loop.root_volume.type }}"
         volume_size: "{{ outer_loop.root_volume.size }}"
         delete_on_termination: true
+      - { device_name: /dev/xvdb, ephemeral: ephemeral0 }
+      - { device_name: /dev/xvdc, ephemeral: ephemeral1 }
+      - { device_name: /dev/xvdd, ephemeral: ephemeral2 }
+      - { device_name: /dev/xvde, ephemeral: ephemeral3 }
+      - { device_name: /dev/xvdf, ephemeral: ephemeral4 }
+      - { device_name: /dev/xvdg, ephemeral: ephemeral5 }
+      - { device_name: /dev/xvdh, ephemeral: ephemeral6 }
+      - { device_name: /dev/xvdi, ephemeral: ephemeral7 }
+      - { device_name: /dev/xvdj, ephemeral: ephemeral8 }
+      - { device_name: /dev/xvdk, ephemeral: ephemeral9 }
+      - { device_name: /dev/xvdl, ephemeral: ephemeral10 }
+      - { device_name: /dev/xvdm, ephemeral: ephemeral11 }
+      - { device_name: /dev/xvdn, ephemeral: ephemeral12 }
+      - { device_name: /dev/xvdo, ephemeral: ephemeral13 }
+      - { device_name: /dev/xvdp, ephemeral: ephemeral14 }
+      - { device_name: /dev/xvdq, ephemeral: ephemeral15 }
+      - { device_name: /dev/xvdr, ephemeral: ephemeral16 }
+      - { device_name: /dev/xvds, ephemeral: ephemeral17 }
+      - { device_name: /dev/xvdt, ephemeral: ephemeral18 }
+      - { device_name: /dev/xvdu, ephemeral: ephemeral19 }
+      - { device_name: /dev/xvdv, ephemeral: ephemeral20 }
+      - { device_name: /dev/xvdw, ephemeral: ephemeral21 }
+      - { device_name: /dev/xvdx, ephemeral: ephemeral22 }
+      - { device_name: /dev/xvdy, ephemeral: ephemeral23 }
     count_tag:
       Group: "{{ cluster_name }}-{{ outer_loop.role }}"
     instance_tags:
