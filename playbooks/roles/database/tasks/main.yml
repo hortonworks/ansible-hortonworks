@@ -148,7 +148,7 @@
     - name: Configure access for the ambari user (postgres)
       lineinfile:
         dest: "{{ postgres_hba_file }}"
-        line: "host ambari ambari {{ hostvars[inventory_hostname]['ansible_'~hostvars[inventory_hostname].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 md5"
+        line: "host {{ database_options.ambari_db_name }} {{ database_options.ambari_db_username }} {{ hostvars[inventory_hostname]['ansible_'~hostvars[inventory_hostname].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 md5"
         insertbefore: EOF
         state: present
       notify: Restart postgres
@@ -182,7 +182,7 @@
     - name: Configure access for the hive user (postgres)
       lineinfile:
         dest: "{{ postgres_hba_file }}"
-        line: "host hive hive {{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 md5"
+        line: "host {{ database_options.hive_db_name }} {{ database_options.hive_db_username }} {{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 md5"
         insertbefore: EOF
         state: present
       notify: Restart postgres
@@ -218,7 +218,7 @@
     - name: Configure access for the oozie user (postgres)
       lineinfile:
         dest: "{{ postgres_hba_file }}"
-        line: "host oozie oozie {{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 md5"
+        line: "host {{ database_options.oozie_db_name }} {{ database_options.oozie_db_username }} {{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 md5"
         insertbefore: EOF
         state: present
       notify: Restart postgres
@@ -254,7 +254,7 @@
     - name: Configure access for the ranger admin database user (postgres)
       lineinfile:
         dest: "{{ postgres_hba_file }}"
-        line: "host ranger ranger {{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 md5"
+        line: "host {{ database_options.rangeradmin_db_name }} {{ database_options.rangeradmin_db_username }} {{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 md5"
         insertbefore: EOF
         state: present
       notify: Restart postgres
