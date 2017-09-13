@@ -25,6 +25,16 @@
     msg: "Ranger has been requested to be installed but the database option is embedded."
   when: rangeradmin_hosts|length > 0 and database == 'embedded'
 
+- name: Fail if Streamline prerequisites are not met
+  fail:
+    msg: "Streamline has been requested to be installed but the database option is embedded."
+  when: streamline_hosts|length > 0 and database == 'embedded'
+
+- name: Fail if Registry prerequisites are not met
+  fail:
+    msg: "Registry has been requested to be installed but the database option is embedded."
+  when: streamline_hosts|length > 0 and database == 'embedded'
+
 - name: Upload the blueprint and the cluster creation template
   template:
     src: "{{ item.src }}"

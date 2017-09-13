@@ -103,6 +103,8 @@
         hive_db_password_md5: "md5{{ (database_options.hive_db_password~database_options.hive_db_username) | hash('md5') }}"
         oozie_db_password_md5: "md5{{ (database_options.oozie_db_password~database_options.oozie_db_username) | hash('md5') }}"
         rangeradmin_db_password_md5: "md5{{ (database_options.rangeradmin_db_password~database_options.rangeradmin_db_username) | hash('md5') }}"
+        registry_db_password_md5: "md5{{ (database_options.registry_db_password~database_options.registry_db_username) | hash('md5') }}"
+        streamline_db_password_md5: "md5{{ (database_options.streamline_db_password~database_options.streamline_db_username) | hash('md5') }}"
 
     - name: Create the ambari database user (postgres)
       shell: su - postgres -c "psql -c \"CREATE ROLE {{ database_options.ambari_db_username }} ENCRYPTED PASSWORD '{{ ambari_db_password_md5 }}' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN;\""
@@ -261,6 +263,78 @@
       with_items: "{{ rangeradmin_hosts }}"
       when: rangeradmin_hosts|length > 0
 
+    - name: Create the registry database user (postgres)
+      shell: su - postgres -c "psql -c \"CREATE ROLE {{ database_options.registry_db_username }} ENCRYPTED PASSWORD '{{ registry_db_password_md5 }}' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN;\""
+      args:
+        warn: false
+      register: createuser_results
+      ignore_errors: true
+      when: registry_hosts|length > 0
+
+    - name: Fail if the user could not be created (postgres)
+      fail:
+        msg: The user could not be created. Error is {{ createuser_results.stderr }}!
+      when: registry_hosts|length > 0 and createuser_results|failed and not createuser_results.stderr|search("role .* already exists")
+
+    - name: Create the registry database (postgres)
+      shell: su - postgres -c "createdb -O {{ database_options.registry_db_username }} {{ database_options.registry_db_name }}"
+      args:
+        warn: false
+      register: createdb_results
+      ignore_errors: true
+      when: registry_hosts|length > 0
+
+    - name: Fail if the database could not be created (postgres)
+      fail:
+        msg: The database could not be created. Error is {{ createdb_results.stderr }}!
+      when: registry_hosts|length > 0 and createdb_results|failed and not createdb_results.stderr|search("database .* already exists")
+
+    - name: Configure access for the registry database user (postgres)
+      lineinfile:
+        dest: "{{ postgres_hba_file }}"
+        line: "host {{ database_options.registry_db_name }} {{ database_options.registry_db_username }} {{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 md5"
+        insertbefore: EOF
+        state: present
+      notify: Restart postgres
+      with_items: "{{ registry_hosts }}"
+      when: registry_hosts|length > 0
+
+    - name: Create the streamline database user (postgres)
+      shell: su - postgres -c "psql -c \"CREATE ROLE {{ database_options.streamline_db_username }} ENCRYPTED PASSWORD '{{ streamline_db_password_md5 }}' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN;\""
+      args:
+        warn: false
+      register: createuser_results
+      ignore_errors: true
+      when: streamline_hosts|length > 0
+
+    - name: Fail if the user could not be created (postgres)
+      fail:
+        msg: The user could not be created. Error is {{ createuser_results.stderr }}!
+      when: streamline_hosts|length > 0 and createuser_results|failed and not createuser_results.stderr|search("role .* already exists")
+
+    - name: Create the streamline database (postgres)
+      shell: su - postgres -c "createdb -O {{ database_options.streamline_db_username }} {{ database_options.streamline_db_name }}"
+      args:
+        warn: false
+      register: createdb_results
+      ignore_errors: true
+      when: streamline_hosts|length > 0
+
+    - name: Fail if the database could not be created (postgres)
+      fail:
+        msg: The database could not be created. Error is {{ createdb_results.stderr }}!
+      when: streamline_hosts|length > 0 and createdb_results|failed and not createdb_results.stderr|search("database .* already exists")
+
+    - name: Configure access for the streamline database user (postgres)
+      lineinfile:
+        dest: "{{ postgres_hba_file }}"
+        line: "host {{ database_options.streamline_db_name }} {{ database_options.streamline_db_username }} {{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 md5"
+        insertbefore: EOF
+        state: present
+      notify: Restart postgres
+      with_items: "{{ streamline_hosts }}"
+      when: streamline_hosts|length > 0
+
   when: database == "postgres"
 
 - block:
@@ -363,4 +437,55 @@
       with_items: "{{ rangeradmin_hosts }}"
       when: rangeradmin_hosts|length > 0
 
+    - name: Create the registry database (mysql)
+      mysql_db:
+        name: "{{ database_options.registry_db_name }}"
+        state: present
+      when: registry_hosts|length > 0
+
+    - name: Create the registry database user and host based access (mysql)
+      mysql_user:
+        name: "{{ database_options.registry_db_username }}"
+        host: "{{ hostvars[item]['ansible_fqdn'] }}"
+        priv: "{{ database_options.registry_db_name }}.*:ALL"
+        password: "{{ database_options.registry_db_password }}"
+        state: present
+      with_items: "{{ registry_hosts }}"
+      when: registry_hosts|length > 0
+
+    - name: Create the registry database user and IP based access (mysql)
+      mysql_user:
+        name: "{{ database_options.registry_db_username }}"
+        host: "{{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}"
+        priv: "{{ database_options.registry_db_name }}.*:ALL"
+        password: "{{ database_options.registry_db_password }}"
+        state: present
+      with_items: "{{ registry_hosts }}"
+      when: registry_hosts|length > 0
+
+    - name: Create the streamline database (mysql)
+      mysql_db:
+        name: "{{ database_options.streamline_db_name }}"
+        state: present
+      when: streamline_hosts|length > 0
+
+    - name: Create the streamline database user and host based access (mysql)
+      mysql_user:
+        name: "{{ database_options.streamline_db_username }}"
+        host: "{{ hostvars[item]['ansible_fqdn'] }}"
+        priv: "{{ database_options.streamline_db_name }}.*:ALL"
+        password: "{{ database_options.streamline_db_password }}"
+        state: present
+      with_items: "{{ streamline_hosts }}"
+      when: streamline_hosts|length > 0
+
+    - name: Create the streamline database user and IP based access (mysql)
+      mysql_user:
+        name: "{{ database_options.streamline_db_username }}"
+        host: "{{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}"
+        priv: "{{ database_options.streamline_db_name }}.*:ALL"
+        password: "{{ database_options.streamline_db_password }}"
+        state: present
+      with_items: "{{ streamline_hosts }}"
+      when: streamline_hosts|length > 0
   when: database == "mysql" or database == "mariadb"

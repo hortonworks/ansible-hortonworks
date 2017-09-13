@@ -24,6 +24,8 @@
           oozie_hosts: []
           rangeradmin_groups: []
           rangeradmin_hosts: []
+          streamline_hosts: []
+          registry_hosts: []
           hdf_hosts: []
         no_log: True
 
@@ -90,10 +92,24 @@
         with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
         no_log: True
 
+      - name: Populate the streamline hosts list
+        set_fact:
+          streamline_hosts: "{{ streamline_hosts }} + {{ groups[item.role] }}"
+        when: groups[item.role] is defined and groups[item.role]|length > 0 and ('STREAMLINE_SERVER' in item.services)
+        with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+        no_log: True
+
+      - name: Populate the registry hosts list
+        set_fact:
+          registry_hosts: "{{ registry_hosts }} + {{ groups[item.role] }}"
+        when: groups[item.role] is defined and groups[item.role]|length > 0 and ('REGISTRY_SERVER' in item.services)
+        with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+        no_log: True
+
       - name: Populate the hdf hosts list
         set_fact:
           hdf_hosts: "{{ hdf_hosts }} + {{ groups[item.role] }}"
-        when: groups[item.role] is defined and groups[item.role]|length > 0 and ('NIFI_MASTER' in item.services)
+        when: groups[item.role] is defined and groups[item.role]|length > 0 and ('NIFI_MASTER' in item.services or 'STREAMLINE_SERVER' in item.services or 'REGISTRY_SERVER' in item.services)
         with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
         no_log: True
 

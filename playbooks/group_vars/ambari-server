@@ -29,7 +29,12 @@ database_options:
   rangeradmin_db_name: 'ranger'
   rangeradmin_db_username: 'ranger'
   rangeradmin_db_password: 'ranger'
-
+  registry_db_name: 'registry'
+  registry_db_username: 'registry'
+  registry_db_password: 'registry'
+  streamline_db_name: 'streamline'
+  streamline_db_username: 'streamline'
+  streamline_db_password: 'streamline'
 
 ##########################
 ## ranger configuration ##

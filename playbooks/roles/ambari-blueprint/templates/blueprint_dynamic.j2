@@ -256,6 +256,46 @@
         "nifi_user" : "nifi"
       }
     },
+    {
+      "streamline-common" : {
+        {% if database == "mysql" or database == "mariadb" -%}
+        "database_name" : "{{ database_options.streamline_db_name }}",
+        "streamline.storage.type": "mysql",
+        "streamline.storage.connector.user": "{{ database_options.streamline_db_username }}",
+        "streamline.storage.connector.password": "{{ database_options.streamline_db_password }}",
+        "streamline.storage.connector.connectURI": "jdbc:mysql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ mysql_port }}/{{ database_options.streamline_db_name }}",
+        {% endif -%}
+        {% if database == "postgres" -%}
+        "database_name" : "{{ database_options.streamline_db_name }}",
+        "streamline.storage.type": "postgresql",
+        "streamline.storage.connector.user": "{{ database_options.streamline_db_username }}",
+        "streamline.storage.connector.password": "{{ database_options.streamline_db_password }}",
+        "streamline.storage.connector.connectURI": "jdbc:postgresql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ postgres_port }}/{{ database_options.streamline_db_name }}",
+        {% endif -%}
+        "jar.storage.type" : "local",
+        "streamline.storage.query.timeout" : "30"
+      }
+    },
+    {
+      "registry-common" : {
+        {% if database == "mysql" or database == "mariadb" -%}
+        "database_name" : "{{ database_options.registry_db_name }}",
+        "registry.storage.type": "mysql",
+        "registry.storage.connector.user": "{{ database_options.registry_db_username }}",
+        "registry.storage.connector.password": "{{ database_options.registry_db_password }}",
+        "registry.storage.connector.connectURI": "jdbc:mysql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ mysql_port }}/{{ database_options.registry_db_name }}",
+        {% endif -%}
+        {% if database == "postgres" -%}
+        "database_name" : "{{ database_options.registry_db_name }}",
+        "registry.storage.type": "postgresql",
+        "registry.storage.connector.user": "{{ database_options.registry_db_username }}",
+        "registry.storage.connector.password": "{{ database_options.registry_db_password }}",
+        "registry.storage.connector.connectURI": "jdbc:postgresql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ postgres_port }}/{{ database_options.registry_db_name }}",
+        {% endif -%}
+        "jar.storage.type" : "local",
+        "registry.storage.query.timeout" : "30"
+      }
+    },
 {% endif %}
 {% if namenode_groups|length > 0 %}
     {
