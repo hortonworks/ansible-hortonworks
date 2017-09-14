@@ -12,5 +12,4 @@ aws|azure|gce|openstack)
   ;;
 esac
 
-ansible-playbook -i inventory/localhost "playbooks/clouds/build_${cloud_to_use}.yml" --connection=local
-
+ansible-playbook --connection=local "playbooks/clouds/build_${cloud_to_use}.yml"
