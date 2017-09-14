@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "${BASH_SOURCE%/*}/set_cloud.sh"
+source $(dirname "${BASH_SOURCE[0]}")/set_cloud.sh
 
 case $cloud_to_use in
 aws|azure|gce|openstack)
