@@ -1,4 +1,4 @@
-ansible-hdp
+ansible-hortonworks
 -----------
 
 These Ansible playbooks will build a Hortonworks cluster (either Hortonworks Data Platform or Hortonworks DataFlow) using Ambari Blueprints.

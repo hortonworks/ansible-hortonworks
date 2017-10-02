@@ -1,4 +1,4 @@
-ansible-hdp installation guide
+ansible-hortonworks installation guide
 ------------------------------
 
 * These Ansible playbooks will deploy a Hortonworks cluster (either Hortonworks Data Platform or Hortonworks DataFlow) using Ambari Blueprints and a static inventory.
@@ -104,24 +104,24 @@ It can even be one of the cluster nodes.
 
 # Clone the repository
 
-Upload the ansible-hdp repository to the build node / workstation, preferable under the home folder.
+Upload the ansible-hortonworks repository to the build node / workstation, preferable under the home folder.
 
 If the build node / workstation can directly download the repository, run the following:
 
 ```
-cd && git clone https://github.com/hortonworks/ansible-hdp.git
+cd && git clone https://github.com/hortonworks/ansible-hortonworks.git
 ```
 
 If your GitHub SSH key is installed, you can use the SSH link:
 
 ```
-cd && git clone git@github.com:hortonworks/ansible-hdp.git
+cd && git clone git@github.com:hortonworks/ansible-hortonworks.git
 ```
 
 
 # Set the static inventory
 
-Modify the file at `~/ansible-hdp/inventory/static` to set the static inventory.
+Modify the file at `~/ansible-hortonworks/inventory/static` to set the static inventory.
 
 The static inventory puts the nodes in different groups as described in the [Ansible Documentation](http://docs.ansible.com/ansible/intro_inventory.html#hosts-and-groups).
 
@@ -155,7 +155,7 @@ ansible -i inventory/static all -m setup
 
 ## cluster config file
 
-Modify the file at `~/ansible-hdp/playbooks/group_vars/all` to set the cluster configuration.
+Modify the file at `~/ansible-hortonworks/playbooks/group_vars/all` to set the cluster configuration.
 
 | Variable                   | Description                                                                                                 |
 | -------------------------- | ----------------------------------------------------------------------------------------------------------- |
@@ -193,7 +193,7 @@ Modify the file at `~/ansible-hdp/playbooks/group_vars/all` to set the cluster c
 
 ## ambari-server config file
 
-Modify the file at `~/ansible-hdp/playbooks/group_vars/ambari-server` to set the Ambari Server specific configuration.
+Modify the file at `~/ansible-hortonworks/playbooks/group_vars/ambari-server` to set the Ambari Server specific configuration.
 
 | Variable                       | Description                                                                                                |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
@@ -238,7 +238,7 @@ Modify the file at `~/ansible-hdp/playbooks/group_vars/ambari-server` to set the
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
 | blueprint_name                 | The name of the blueprint as it will be stored in Ambari.                                                  |
 | blueprint_file                 | The path to the blueprint file that will be uploaded to Ambari. It can be an absolute path or relative to the `roles/ambari-blueprint/templates` folder. The blueprint file can also contain [Jinja2 Template](http://jinja.pocoo.org/docs/dev/templates/) variables. |
-| blueprint_dynamic              | Settings for the dynamic blueprint template - only used if `blueprint_file` is set to `blueprint_dynamic.j2`. The role names must match the groups from the inventory setting file `~/ansible-hdp/inventory/static/group_vars/all`. The chosen components are split into two lists: clients and services. The chosen Component layout must respect Ambari Blueprint restrictions - for example if a single `NAMENODE` is configured, there must also be a `SECONDARY_NAMENODE` component. |
+| blueprint_dynamic              | Settings for the dynamic blueprint template - only used if `blueprint_file` is set to `blueprint_dynamic.j2`. The role names must match the groups from the inventory setting file `~/ansible-hortonworks/inventory/static/group_vars/all`. The chosen components are split into two lists: clients and services. The chosen Component layout must respect Ambari Blueprint restrictions - for example if a single `NAMENODE` is configured, there must also be a `SECONDARY_NAMENODE` component. |
 
 
 # Install the cluster
@@ -249,7 +249,7 @@ Make sure you set the `CLOUD_TO_USE` environment variable to `static`.
 
 ```
 export CLOUD_TO_USE=static
-cd ~/ansible-hdp*/ && bash install_cluster.sh
+cd ~/ansible-hortonworks*/ && bash install_cluster.sh
 ```
 
 You may need to load the environment variables if this is a new session:

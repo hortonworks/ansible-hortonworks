@@ -203,7 +203,7 @@
 
    APPENDIX: Parts under the GPL3 license.
    
-   The dynamic inventory files under the ansible-hdp/inventory/ folder are part of Ansible and are under the GPL3 license.
+   The dynamic inventory files under the ansible-hortonworks/inventory/ folder are part of Ansible and are under the GPL3 license.
    
    The rest is covered by the above Apache License.
    
