@@ -184,25 +184,6 @@ And roles can have any names and any number of nodes but they should correspond 
 | ambari_server   | Set it to `true` if the role also defines an Ambari Server. The number of nodes with this role should be 1. If there are more than 1 node, ambari-server will be installed on all of them, but only the first one (in alphabetical order) will be used by the Ambari Agents. |
 
 
-# Build the Cloud environment
-
-Run the script that will build the Cloud environment.
-
-Set first the `CLOUD_TO_USE` environment variable to `openstack`.
-
-```
-export CLOUD_TO_USE=openstack
-cd ~/ansible-hortonworks*/ && bash build_cloud.sh
-```
-
-You may need to load the environment variables if this is a new session:
-
-```
-source ~/ansible/bin/activate
-source ~/*-openrc.sh
-```
-
-
 # Set the cluster variables
 
 ## cluster config file
@@ -211,7 +192,7 @@ Modify the file at `~/ansible-hortonworks/playbooks/group_vars/all` to set the c
 
 | Variable                   | Description                                                                                                 |
 | -------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| cluster_name               | The name of the cluster.                                                                                    |
+| cluster_name               | The name of the cluster. This is also used by default in the cloud components that require uniqueness, such as the name of the nodes or tags. |
 | ambari_version             | The Ambari version, in the full, 4-number form, for example: `2.5.1.0`.                                     |
 | hdp_version                | The HDP version, in the full, 4-number form, for example: `2.6.1.0`.                                        |
 | hdf_version                | The HDF version, in the full, 4-number form, for example: `3.0.1.0`.                                        |
@@ -291,6 +272,25 @@ Modify the file at `~/ansible-hortonworks/playbooks/group_vars/ambari-server` to
 | blueprint_name                 | The name of the blueprint as it will be stored in Ambari.                                                  |
 | blueprint_file                 | The path to the blueprint file that will be uploaded to Ambari. It can be an absolute path or relative to the `roles/ambari-blueprint/templates` folder. The blueprint file can also contain [Jinja2 Template](http://jinja.pocoo.org/docs/dev/templates/) variables. |
 | blueprint_dynamic              | Settings for the dynamic blueprint template - only used if `blueprint_file` is set to `blueprint_dynamic.j2`. The role names must match the roles from the inventory setting file `~/ansible-hortonworks/inventory/openstack/group_vars/all`. The chosen components are split into two lists: clients and services. The chosen Component layout must respect Ambari Blueprint restrictions - for example if a single `NAMENODE` is configured, there must also be a `SECONDARY_NAMENODE` component. |
+
+
+# Build the Cloud environment
+
+Run the script that will build the Cloud environment.
+
+Set first the `CLOUD_TO_USE` environment variable to `openstack`.
+
+```
+export CLOUD_TO_USE=openstack
+cd ~/ansible-hortonworks*/ && bash build_cloud.sh
+```
+
+You may need to load the environment variables if this is a new session:
+
+```
+source ~/ansible/bin/activate
+source ~/*-openrc.sh
+```
 
 
 # Install the cluster
