@@ -36,7 +36,7 @@ This node must be able to connect to the cluster nodes via SSH and to the Google
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade   
-   pip install pycparser ansible backports.ssl_match_hostname apache-libcloud
+   pip install pycparser ansible==2.3.2 backports.ssl_match_hostname apache-libcloud
    ```
 
 
@@ -69,7 +69,7 @@ This node must be able to connect to the cluster nodes via SSH and to the Google
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade
-   pip install pycparser ansible backports.ssl_match_hostname apache-libcloud
+   pip install pycparser ansible==2.3.2 backports.ssl_match_hostname apache-libcloud
    ```
 
 

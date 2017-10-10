@@ -25,7 +25,7 @@ For a full list of supported features check [bellow](#features).
 
 ## [Requirements](id:requirements)
 
-- Ansible >= 2.2.1
+- Ansible >= 2.2.1, < 2.4.0
 
 - Expects CentOS/RHEL, Ubuntu, Amazon Linux or SLES hosts
 

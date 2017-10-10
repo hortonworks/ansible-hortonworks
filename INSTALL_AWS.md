@@ -36,7 +36,7 @@ This node must be able to connect to the cluster nodes via SSH and to the AWS AP
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade   
-   pip install pycparser ansible boto
+   pip install pycparser ansible==2.3.2 boto
    ```
 
 
@@ -69,7 +69,7 @@ This node must be able to connect to the cluster nodes via SSH and to the AWS AP
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade
-   pip install pycparser ansible boto
+   pip install pycparser ansible==2.3.2 boto
    ```
 
 

@@ -42,7 +42,7 @@ It can even be one of the cluster nodes.
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade   
-   pip install pycparser functools32 pytz ansible
+   pip install pycparser functools32 pytz ansible==2.3.2
    ```
 
 
@@ -83,7 +83,7 @@ It can even be one of the cluster nodes.
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade
-   pip install pycparser functools32 pytz ansible
+   pip install pycparser functools32 pytz ansible==2.3.2
    ```
 
 
