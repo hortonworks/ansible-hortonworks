@@ -20,7 +20,7 @@ external_dns: yes                                         # set to yes to use th
 disable_firewall: no                                      # set to yes to disable the existing local firewall service (iptables, firewalld, ufw)
 
 ############################
-## security configuration ##
+## security configuration ##                              # only useful if blueprint is dynamic
 ############################
 
 security: 'none'                                          # can be set to 'none', 'mit-kdc' or 'active-directory'

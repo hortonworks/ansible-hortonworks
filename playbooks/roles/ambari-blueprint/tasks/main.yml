@@ -18,22 +18,22 @@
 - name: Fail if HA NameNode prerequisites are not met
   fail:
     msg: "HA NameNode has been requested but there are less than 3 JournalNodes."
-  when: blueprint_file == 'blueprint_dynamic.j2' and namenode_groups|length > 1 and journalnode_groups|length < 3
+  when: namenode_groups is defined and namenode_groups|length > 1 and journalnode_groups is defined and journalnode_groups|length < 3
 
 - name: Fail if Ranger prerequisites are not met
   fail:
     msg: "Ranger has been requested to be installed but the database option is embedded."
-  when: rangeradmin_hosts|length > 0 and database == 'embedded'
+  when: rangeradmin_hosts is defined and rangeradmin_hosts|length > 0 and database == 'embedded'
 
 - name: Fail if Streamline prerequisites are not met
   fail:
     msg: "Streamline has been requested to be installed but the database option is embedded."
-  when: streamline_hosts|length > 0 and database == 'embedded'
+  when: streamline_hosts is defined and streamline_hosts|length > 0 and database == 'embedded'
 
 - name: Fail if Registry prerequisites are not met
   fail:
     msg: "Registry has been requested to be installed but the database option is embedded."
-  when: streamline_hosts|length > 0 and database == 'embedded'
+  when: registry_hosts is defined and registry_hosts|length > 0 and database == 'embedded'
 
 - name: Upload the blueprint and the cluster creation template
   template:

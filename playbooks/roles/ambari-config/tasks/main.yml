@@ -47,8 +47,7 @@
       with_items:
         - "ambari.post.user.creation.hook.enabled=true"
         - "ambari.post.user.creation.hook=/var/lib/ambari-server/resources/scripts/post-user-creation-hook.sh"
-    - meta: flush_handlers
-  when: namenode_groups|length > 0
+  when: install_hdp is defined and install_hdp
 
 - block:
     - name: "Install the HDF Management Pack"
@@ -92,4 +91,4 @@
         body_format: raw
         status_code: 200,201,202
         return_content: no
-  when: hdf_hosts|length > 0
+  when: install_hdf is defined and install_hdf

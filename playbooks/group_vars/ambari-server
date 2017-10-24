@@ -11,7 +11,7 @@ cluster_template_file: 'cluster_template.j2'                    # the cluster cr
 
 
 ############################
-## database configuration ##
+## database configuration ##                                    # only useful if blueprint is dynamic
 ############################
 
 database: 'embedded'                                            # can be set to 'embedded', 'postgres', 'mysql' or 'mariadb'
@@ -37,7 +37,7 @@ database_options:
   streamline_db_password: 'streamline'
 
 ##########################
-## ranger configuration ##
+## ranger configuration ##                                      # only useful if blueprint is dynamic
 ##########################
 
 ranger_options:                                                 # only used if RANGER_ADMIN is part of the blueprint stack

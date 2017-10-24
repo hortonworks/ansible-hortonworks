@@ -12,23 +12,25 @@
   hosts: ambari-server
   gather_facts: False
   tasks:
-    - block:
-      - name: Initialize the lists of components
-        set_fact:
-          namenode_groups: []
-          resourcemanager_groups: []
-          journalnode_groups: []
-          zookeeper_groups: []
-          zookeeper_hosts: []
-          hiveserver_hosts: []
-          oozie_hosts: []
-          rangeradmin_groups: []
-          rangeradmin_hosts: []
-          streamline_hosts: []
-          registry_hosts: []
-          hdf_hosts: []
-        no_log: True
+    - name: Initialize the control variables
+      set_fact:
+        namenode_groups: []
+        resourcemanager_groups: []
+        journalnode_groups: []
+        zookeeper_groups: []
+        zookeeper_hosts: []
+        hiveserver_hosts: []
+        oozie_hosts: []
+        rangeradmin_groups: []
+        rangeradmin_hosts: []
+        streamline_hosts: []
+        registry_hosts: []
+        hdf_hosts: []
+        install_hdp: False
+        install_hdf: False
+      no_log: True
 
+    - block:
       - name: Populate the namenode groups list
         set_fact:
           namenode_groups: "{{ namenode_groups }} + [ '{{ item.role }}' ]"
@@ -113,4 +115,39 @@
         with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
         no_log: True
 
+      - name: Set the install_hdp variable
+        set_fact:
+          install_hdp: True
+        when: namenode_groups|length > 0
+
+      - name: Set the install_hdf variable
+        set_fact:
+          install_hdf: True
+        when: hdf_hosts|length > 0
       when: hostvars[inventory_hostname]['blueprint_file'] == 'blueprint_dynamic.j2'
+
+    - block:
+      - name: Set the blueprint path (relative to ambari-blueprint role)
+        set_fact:
+          blueprint_file_path: "{{ 'roles/ambari-blueprint/templates/' + blueprint_file }}"
+        when: blueprint_file|list|first != '/' and blueprint_file|list|first != '~'
+
+      - name: Set the blueprint path (absolute)
+        set_fact:
+          blueprint_file_path: "{{ blueprint_file }}"
+        when: blueprint_file|list|first == '/' or blueprint_file|list|first == '~'
+
+      - name: Read the blueprint content
+        set_fact:
+          blueprint_content: "{{ lookup('file', blueprint_file_path) }}"
+
+      - name: Set the install_hdp variable
+        set_fact:
+          install_hdp: True
+        when: blueprint_content | string | search("NAMENODE")
+
+      - name: Set the install_hdf variable
+        set_fact:
+          install_hdf: True
+        when: blueprint_content | string | search("NIFI_MASTER") or blueprint_content | string | search("STREAMLINE_SERVER") or blueprint_content | string | search("REGISTRY_SERVER")
+      when: hostvars[inventory_hostname]['blueprint_file'] != 'blueprint_dynamic.j2'
