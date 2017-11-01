@@ -1,0 +1,46 @@
+---
+- name: Load variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}-{{ ansible_distribution_major_version }}.yml"
+        - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}.yml"
+        - "{{ ansible_os_family|lower }}-{{ ansible_distribution_major_version }}.yml"
+        - "{{ ansible_os_family|lower }}.yml"
+        - defaults.yml
+      paths:
+        - ../vars
+
+- name: Download the Ambari repository definition
+  get_url:
+    url: "{{ ambari_repo_url }}"
+    dest: "{{ ambari_repo_destination }}"
+    force: yes
+
+- name: Add Ambari repository key (apt)
+  apt_key:
+    keyserver: "{{ ambari_repo_keyserver }}"
+    id: "{{ ambari_repo_key }}"
+  when: ansible_os_family|lower == "debian"
+
+- block:
+    - name: Upload HDP-UTILS repository file (SLES 12)
+      template:
+        src: hdp-utils-suse.repo.j2
+        dest: /etc/zypp/repos.d/HDP-UTILS.repo
+        mode: 0644
+
+    - name: Make sure libsnappy1 is absent (bug in SLES 12 HDP-UTILS repo)
+      zypper:
+        name: libsnappy1
+        state: absent
+
+    - name: Install snappy from HDP-UTILS repo (bug in SLES 12 HDP-UTILS repo)
+      zypper:
+        name: "{{ item }}"
+        state: present
+        oldpackage: yes
+      with_items:
+        - "snappy-1.0.5-1"
+        - "snappy-devel-1.0.5-1"
+  when: ansible_os_family|lower == "suse" and ansible_distribution_major_version|int == 12
