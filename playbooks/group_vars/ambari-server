@@ -1,6 +1,7 @@
 ---
 ambari_admin_user: 'admin'
-ambari_admin_password: 'admin'
+ambari_admin_password: 'admin'                                  # the password for the above admin user
+ambari_admin_default_password: 'admin'                          # no need to change this (unless the Ambari default changes)
 wait: true                                                      # wait for the cluster to finish installing
 wait_timeout: 3600                                              # 60 minutes
 

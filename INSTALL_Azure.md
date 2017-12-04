@@ -217,8 +217,9 @@ Modify the file at `~/ansible-hortonworks/playbooks/group_vars/ambari-server` to
 
 | Variable                       | Description                                                                                                |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
-| ambari_admin_user              | The Ambari admin username, normally `admin`.                                                               |
-| ambari_admin_password          | The Ambari password of the `ambari_admin_user` user previously set.                                        |
+| ambari_admin_user              | The Ambari administrator's username, normally `admin`. This user and the password bellow are used to login to Ambari for API requests. |
+| ambari_admin_password          | The Ambari password of the `ambari_admin_user` user previously set. If the username is `admin` and this password is different than the default `admin`, the `ambari-config` role will change the default password with the one set here. |
+| ambari_admin_default_password  | The default password for the Ambari `admin` user. This is normally `admin` after Ambari is first installed. No need to change this unless there's a change in the Ambari codebase. |
 | wait / wait_timeout            | Set this to `true` if you want the playbook to wait for the cluster to be successfully built after applying the blueprint. The timeout setting controls for how long (in seconds) should it wait for the cluster build. |
 | default_password               | A default password for all required passwords which are not specified in the blueprint.                                                                               |
 | config_recommendation_strategy | Configuration field which specifies the strategy of applying configuration recommendations to a cluster as explained in the [documentation](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-ClusterCreationTemplateStructure). |
