@@ -25,6 +25,19 @@
 - meta: flush_handlers
 
 - block:
+    - name: Install mysql database required packages (for hive embedded)
+      package:
+        name: "{{ item }}"
+        update_cache: yes
+        state: present
+      with_items: "{{ mysql_packages }}"
+
+    - name: Configure the Ambari JDBC driver for mysql (for hive embedded)
+      shell: /usr/sbin/ambari-server setup --jdbc-db=mysql --jdbc-driver={{ mysql_jdbc_location }}
+      notify: Restart ambari-server
+  when: database == "embedded" and hiveserver_hosts is defined and hiveserver_hosts|length > 0
+
+- block:
     - name: Install {{ database }} required packages
       package:
         name: "{{ item }}"
