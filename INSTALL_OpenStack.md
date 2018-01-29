@@ -15,14 +15,14 @@ This node must be able to connect to the cluster nodes via SSH and to the OpenSt
 
 As OpenStack environments are usually private, you might need to build such a node in the OpenStack environment.
 
-## Mac OSX
+## macOS
 
 1. Install the required packages
 
    ```
    brew install python
-   pip install virtualenv
-   pip install virtualenvwrapper
+   pip2 install virtualenv
+   pip2 install virtualenvwrapper
    ```
 
 
@@ -45,8 +45,10 @@ As OpenStack environments are usually private, you might need to build such a no
 4. Turn off SSL validation (required if your OpenStack endpoints don't use trusted certs)
 
    ```
-   add setting "verify": false at the end of the file ~/ansible/lib/python2.7/site-packages/os_client_config/defaults.json
-   ```
+   defaults_json_path=~/ansible/lib/python2.7/site-packages/os_client_config/defaults.json; grep -q verify $defaults_json_path || sed -i'' -e '/{$/ a\
+   "verify": false,\
+   ' $defaults_json_path
+ ```
 
 5. Install the SSH private key
 
