@@ -14,6 +14,40 @@ Before building anything, the build node / workstation from where Ansible will r
 This node must be able to connect to the cluster nodes via SSH and to the Google Compute Engine APIs via HTTPS.
 
 
+## macOS
+
+1. Install the required packages
+
+   ```
+   brew install python
+   pip2 install virtualenv
+   pip2 install virtualenvwrapper
+   ```
+
+
+2. Create and source the Python virtual environment
+
+   ```
+   virtualenv ~/ansible; source ~/ansible/bin/activate 
+   ```
+
+
+3. Install the required Python packages inside the virtualenv
+
+   ```
+   pip install setuptools --upgrade
+   pip install pip --upgrade   
+   pip install pycparser ansible==2.3.2 backports.ssl_match_hostname apache-libcloud
+   ```
+
+
+4. Generate the SSH public/private key pair that will be loaded onto the cluster nodes (if none exists). Replace `google-user` with the non-root administrative user you want to use to login to the cluster nodes. You can also specify a different path for the key. 
+
+   ```
+   ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -C google-user
+   ```
+
+
 ## CentOS/RHEL 7
 
 1. Install the required packages

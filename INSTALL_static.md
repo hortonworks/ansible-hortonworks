@@ -20,6 +20,48 @@ This node must be able to connect to the cluster nodes via SSH.
 It can even be one of the cluster nodes.
 
 
+## macOS
+
+1. Install the required packages
+
+   ```
+   brew install python
+   pip2 install virtualenv
+   pip2 install virtualenvwrapper
+   ```
+
+
+2. Create and source the Python virtual environment
+
+   ```
+   virtualenv ~/ansible; source ~/ansible/bin/activate 
+   ```
+
+
+3. Install the required Python packages inside the virtualenv
+
+   ```
+   pip install setuptools --upgrade
+   pip install pip --upgrade   
+   pip install pycparser functools32 pytz ansible==2.3.2
+   ```
+
+
+4. (Optional) Generate the SSH private key
+
+   The build node / workstation will need to login via SSH to the cluster nodes.
+   
+   This can be done either by using a username and a password or with SSH keys.
+   
+   For the SSH keys method, the SSH private key needs to be placed or generated on the workstation, normally under .ssh, for example: `~/.ssh/id_rsa`.
+   
+   To generate a new key, run the following:
+
+   ```
+   ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -C google-user
+   ```
+
+
 ## CentOS/RHEL 7
 
 1. Install the required packages
