@@ -15,6 +15,50 @@ This node must be able to connect to the cluster nodes via SSH and to the OpenSt
 
 As OpenStack environments are usually private, you might need to build such a node in the OpenStack environment.
 
+## macOS
+
+1. Install the required packages
+
+   ```
+   brew install python
+   pip2 install virtualenv
+   pip2 install virtualenvwrapper
+   ```
+
+
+2. Create and source the Python virtual environment
+
+   ```
+   virtualenv ~/ansible; source ~/ansible/bin/activate
+   ```
+
+
+3. Install the required Python packages inside the virtualenv
+
+   ```
+   pip install setuptools --upgrade
+   pip install pip --upgrade
+   pip install pycparser functools32 pytz ansible==2.3.2 shade
+   ```
+
+
+4. Turn off SSL validation (required if your OpenStack endpoints don't use trusted certs)
+
+   ```
+   defaults_json_path=~/ansible/lib/python2.7/site-packages/os_client_config/defaults.json; grep -q verify $defaults_json_path || sed -i'' -e '/{$/ a\
+   "verify": false,\
+   ' $defaults_json_path
+ ```
+
+5. Install the SSH private key
+
+   The build node / workstation will need to login via SSH to the cluster nodes.
+
+   For this to succeed, the SSH private key needs to be placed on the build node / workstation, normally under .ssh, for example: `~/.ssh/field.pem`. It can be placed under any path as this file will be referenced later.
+
+   It should have `400` permissions: `chmod 0400 ~/.ssh/field.pem`.
+
+   The SSH public key must be present on the OpenStack environment as it will be referenced when the nodes will be built (this can be checked on the Dashboard, under `Compute` -> `Access and Security` -> `Key Pairs` tab).
 
 ## CentOS/RHEL 7
 
