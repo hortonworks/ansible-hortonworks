@@ -15,6 +15,7 @@ This node must be able to connect to the cluster nodes via SSH and to the OpenSt
 
 As OpenStack environments are usually private, you might need to build such a node in the OpenStack environment.
 
+
 ## macOS
 
 1. Install the required packages
@@ -38,7 +39,7 @@ As OpenStack environments are usually private, you might need to build such a no
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade
-   pip install pycparser functools32 pytz ansible==2.3.2 shade
+   pip install pycparser functools32 pytz ansible==2.3.2 shade python-openstackclient
    ```
 
 
@@ -48,7 +49,8 @@ As OpenStack environments are usually private, you might need to build such a no
    defaults_json_path=~/ansible/lib/python2.7/site-packages/os_client_config/defaults.json; grep -q verify $defaults_json_path || sed -i'' -e '/{$/ a\
    "verify": false,\
    ' $defaults_json_path
- ```
+   ```
+
 
 5. Install the SSH private key
 
@@ -59,6 +61,7 @@ As OpenStack environments are usually private, you might need to build such a no
    It should have `400` permissions: `chmod 0400 ~/.ssh/field.pem`.
 
    The SSH public key must be present on the OpenStack environment as it will be referenced when the nodes will be built (this can be checked on the Dashboard, under `Compute` -> `Access and Security` -> `Key Pairs` tab).
+
 
 ## CentOS/RHEL 7
 
@@ -82,7 +85,7 @@ As OpenStack environments are usually private, you might need to build such a no
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade   
-   pip install pycparser functools32 pytz ansible==2.3.2 shade
+   pip install pycparser functools32 pytz ansible==2.3.2 shade python-openstackclient
    ```
 
 
@@ -126,7 +129,7 @@ As OpenStack environments are usually private, you might need to build such a no
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade
-   pip install pycparser functools32 pytz ansible==2.3.2 shade
+   pip install pycparser functools32 pytz ansible==2.3.2 shade python-openstackclient
    ```
 
 
