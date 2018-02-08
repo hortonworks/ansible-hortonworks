@@ -256,6 +256,7 @@
         "nifi_user" : "nifi"
       }
     },
+{% if streamline_hosts|length > 0 %}
     {
       "streamline-common" : {
         {% if database == "mysql" or database == "mariadb" -%}
@@ -276,6 +277,8 @@
         "streamline.storage.query.timeout" : "30"
       }
     },
+{% endif %}
+{% if registry_hosts|length > 0 %}
     {
       "registry-common" : {
         {% if database == "mysql" or database == "mariadb" -%}
@@ -296,6 +299,7 @@
         "registry.storage.query.timeout" : "30"
       }
     },
+{% endif %}
 {% endif %}
 {% if namenode_groups|length > 0 %}
     {
