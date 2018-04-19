@@ -16,7 +16,7 @@
     - role: database
       when: database != "embedded" and not database_options.external_hostname|default('')
 
-- name: Apply the krb5-client role to the hadoop-cluster groupp
+- name: Apply the krb5-client role to the hadoop-cluster group
   hosts: hadoop-cluster
   any_errors_fatal: true
   become: yes
