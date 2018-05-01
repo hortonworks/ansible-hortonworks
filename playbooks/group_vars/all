@@ -18,6 +18,7 @@ oraclejdk_options:                                        # only used when java 
 
 external_dns: yes                                         # set to yes to use the existing DNS (when no, it will update the /etc/hosts file - must be set to 'no' when using Azure)
 disable_firewall: no                                      # set to yes to disable the existing local firewall service (iptables, firewalld, ufw)
+accept_gpl: yes                                           # set to yes to allow Ambari to install GPL licensed libraries
 
 ############################
 ## security configuration ##                              # only useful if blueprint is dynamic

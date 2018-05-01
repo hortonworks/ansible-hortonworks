@@ -11,6 +11,15 @@
       paths:
         - ../vars
 
+- name: Set the GPL Licensed setting in Ambari
+  lineinfile:
+    dest: /etc/ambari-server/conf/ambari.properties
+    backup: no
+    state: present
+    regexp: "^gpl.license.accepted.*"
+    line: "gpl.license.accepted={{ (accept_gpl|default(omit)|bool == true) | ternary('true', 'false') }}"
+  notify: Restart ambari-server
+
 - name: Attempt to change the default Ambari admin password
   uri:
     url: http://{{ ansible_fqdn }}:8080/api/v1/users/admin

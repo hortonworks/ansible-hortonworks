@@ -58,7 +58,7 @@ It can even be one of the cluster nodes.
    To generate a new key, run the following:
 
    ```
-   ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -C google-user
+   ssh-keygen -q -t rsa -f ~/.ssh/id_rsa
    ```
 
 
@@ -99,7 +99,7 @@ It can even be one of the cluster nodes.
    To generate a new key, run the following:
 
    ```
-   ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -C google-user
+   ssh-keygen -q -t rsa -f ~/.ssh/id_rsa
    ```
 
 
@@ -218,6 +218,7 @@ Modify the file at `~/ansible-hortonworks/playbooks/group_vars/all` to set the c
 | .remote_files              | If this variable is set to `yes` then the tarball and JCE files must already be present on the remote system. If set to `no` then the files will be copied by Ansible (from the Ansible controller to the remote systems). |
 | external_dns               | This controls the type of DNS to be used. If `yes` it will use whatever DNS is currently set up. If `no` it will populate the `/etc/hosts` file with all cluster nodes. |
 | disable_firewall           | This variable controls the local firewall service (iptables, firewalld, ufw). Sometimes, a local firewall service might run and block inter-node cluster communication. In these circumstances the local firewall service should be disabled as traffic rules should be provided by an external firewall such as a Cisco ASA. Set to `yes` to disable the existing local firewall service if it blocks the inter-node cluster communication. |
+| accept_gpl                 | Set to `yes` to enable Ambari Server to download and install GPL Licensed packages as explained on the [documentation](https://docs.hortonworks.com/HDPDocuments/Ambari-2.6.1.5/bk_ambari-administration/content/enabling_lzo.html). |
 
 ### security configuration
 
