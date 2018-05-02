@@ -11,7 +11,7 @@ If the infrastructure already exists, it can also use a static inventory.
 
 It can use a static blueprint or generate a blueprint based on the components selected in the Ansible variables file.
 
-For a full list of supported features check [bellow](#features).
+For a full list of supported features check [below](#features).
 
 
 ## [Installation](id:installation)
