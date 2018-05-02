@@ -359,14 +359,6 @@
         password: "{{ database_options.ambari_db_password }}"
         state: present
 
-    - name: Create the ambari database user and host based access for localhost (mysql)
-      mysql_user:
-        name: "{{ database_options.ambari_db_username }}"
-        host: "localhost"
-        priv: "{{ database_options.ambari_db_name }}.*:ALL"
-        password: "{{ database_options.ambari_db_password }}"
-        state: present
-
     - name: Create the hive database (mysql)
       mysql_db:
         name: "{{ database_options.hive_db_name }}"
