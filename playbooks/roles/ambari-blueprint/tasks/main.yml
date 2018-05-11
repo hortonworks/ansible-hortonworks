@@ -74,6 +74,7 @@
     body: " {{ cluster_blueprint.content | b64decode }}"
     body_format: raw
     status_code: 200,201,202,404
+    timeout: 60
     return_content: no
 
 - name: Check if a cluster {{ cluster_name }} already exists
@@ -108,6 +109,7 @@
     body: " {{ cluster_template.content | b64decode }}"
     body_format: raw
     status_code: 200,201,202
+    timeout: 120
     return_content: yes
   register: cluster_create_task
 
