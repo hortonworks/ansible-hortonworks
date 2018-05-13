@@ -34,3 +34,13 @@ security_options:
   ldap_url: 'ldaps://ad.example.com:636'                  # only used when security is set to 'active-directory'
   container_dn: 'OU=hadoop,DC=example,DC=com'             # only used when security is set to 'active-directory'
   http_authentication: no                                 # set to yes to enable HTTP authentication (SPNEGO)
+
+
+############################
+## helper variables       ##                              # don't change these unless there is a reason
+############################
+
+hdp_minor_version: "{{ hdp_version | regex_replace('.[0-9]+.[0-9]+[0-9_-]*$','') }}"
+hdp_major_version: "{{ hdp_minor_version.split('.').0 }}"
+hdf_minor_version: "{{ hdf_version | regex_replace('.[0-9]+.[0-9]+[0-9_-]*$','') }}"
+hdf_major_version: "{{ hdf_minor_version.split('.').0 }}"

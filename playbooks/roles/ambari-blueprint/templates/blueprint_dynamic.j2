@@ -536,6 +536,6 @@
     },
 {% endif %}
     "stack_name" : "{% if namenode_groups|length > 0 %}HDP{% else %}HDF{% endif %}",
-    "stack_version" : "{% if namenode_groups|length > 0 %}{{ hdp_version | regex_replace('.[0-9]+.[0-9]+[0-9_-]*$','') }}{% else %}{{ hdf_version | regex_replace('.[0-9]+.[0-9]+[0-9_-]*$','') }}{% endif %}"
+    "stack_version" : "{% if namenode_groups|length > 0 %}{{ hdp_minor_version }}{% else %}{{ hdf_minor_version }}{% endif %}"
   }
 }
