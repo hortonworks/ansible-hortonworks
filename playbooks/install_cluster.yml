@@ -5,6 +5,4 @@
 
 - include: "configure_ambari.yml"
 
-- include: "apply_blueprint.yml"
-
 - include: "post_install.yml"
