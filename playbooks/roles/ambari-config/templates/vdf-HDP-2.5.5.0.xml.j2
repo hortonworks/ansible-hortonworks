@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<repository-version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="version_definition.xsd">
+  <release>
+{% include 'vdf-HDP-part-release.j2' %}
+  </release>
+  <manifest>
+    <service id="HBASE-112" name="HBASE" version="1.1.2"/>
+    <service id="SQOOP-146" name="SQOOP" version="1.4.6"/>
+    <service id="MAHOUT-090" name="MAHOUT" version="0.9.0"/>
+    <service id="ATLAS-070" name="ATLAS" version="0.7.0"/>
+    <service id="FLUME-152" name="FLUME" version="1.5.2"/>
+    <service id="SLIDER-0910" name="SLIDER" version="0.91.0"/>
+    <service id="TEZ-070" name="TEZ" version="0.7.0"/>
+    <service id="RANGER-060" name="RANGER" version="0.6.0"/>
+    <service id="RANGER_KMS-060" name="RANGER_KMS" version="0.6.0"/>
+    <service id="KAFKA-0100" name="KAFKA" version="0.10.0"/>
+    <service id="OOZIE-420" name="OOZIE" version="4.2.0"/>
+    <service id="ZEPPELIN-060" name="ZEPPELIN" version="0.6.0"/>
+    <service id="ACCUMULO-170" name="ACCUMULO" version="1.7.0"/>
+    <service id="STORM-101" name="STORM" version="1.0.1"/>
+    <service id="ZOOKEEPER-346" name="ZOOKEEPER" version="3.4.6"/>
+    <service id="SPARK-163" name="SPARK" version="1.6.3"/>
+    <service id="SPARK2-202" name="SPARK2" version="2.0.2"/>
+    <service id="HIVE-121000" name="HIVE" version="1.2.1000"/>
+    <service id="KNOX-090" name="KNOX" version="0.9.0"/>
+    <service id="PIG-0160" name="PIG" version="0.16.0"/>
+    <service id="FALCON-0100" name="FALCON" version="0.10.0"/>
+    <service id="HDFS-273" name="HDFS" version="2.7.3"/>
+    <service id="YARN-273" name="YARN" version="2.7.3"/>
+    <service id="MAPREDUCE2-273" name="MAPREDUCE2" version="2.7.3"/>
+  </manifest>
+  <available-services/>
+  <repository-info>
+{% include 'vdf-HDP-part-repository-info.j2' %}
+  </repository-info>
+</repository-version>

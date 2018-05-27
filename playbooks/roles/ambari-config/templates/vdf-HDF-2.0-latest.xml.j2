@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<repository-version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="version_definition.xsd">
+  <release>
+{% include 'vdf-HDF-part-release.j2' %}
+  </release>
+  <manifest>
+    <service id="STORM-101" name="STORM" version="1.0.1"/>
+    <service id="RANGER-060" name="RANGER" version="0.6.0"/>
+    <service id="RANGER_KMS-060" name="RANGER_KMS" version="0.6.0"/>
+    <service id="KAFKA-0100" name="KAFKA" version="0.10.0"/>
+    <service id="ZOOKEEPER-346" name="ZOOKEEPER" version="3.4.6"/>
+  </manifest>
+  <available-services/>
+  <repository-info>
+{% include 'vdf-HDF-part-repository-info.j2' %}
+  </repository-info>
+</repository-version>

@@ -35,6 +35,69 @@
   when: ambari_admin_user == 'admin' and ambari_admin_password != ambari_admin_default_password
 
 - block:
+  - name: Attempt to read the HDF repo build.id file
+    uri:
+      url: "{{ hdf_main_repo_url }}/build.id"
+      method: GET
+      return_content: yes
+    register: hdf_repo_build_id
+
+  - name: Set the HDF build number
+    set_fact:
+      hdf_build_number: "{{ (hdf_repo_build_id.content|from_yaml).BUILD_NUMBER }}"
+
+  - name: Set the HDF mpack filename
+    set_fact:
+      mpack_filename: "hdf-ambari-mpack-{{ hdf_version }}-{{ hdf_build_number }}.tar.gz"
+
+  - name: "Install the HDF Management Pack"
+    shell: "echo yes | ambari-server install-mpack --mpack={{ hdf_main_repo_url }}/tars/hdf_ambari_mp/{{ mpack_filename }}"
+    notify: Restart ambari-server
+    args:
+      creates: "/var/lib/ambari-server/resources/mpacks/{{ mpack_filename | regex_replace('.tar.gz$','') }}"
+    when: hdf_major_version|int >= 3
+
+  - name: "Install the HDF Management Pack (with --purge)"
+    shell: "echo yes | ambari-server install-mpack --mpack={{ hdf_main_repo_url }}/tars/hdf_ambari_mp/{{ mpack_filename }} --purge"
+    notify: Restart ambari-server
+    args:
+      creates: "/var/lib/ambari-server/resources/mpacks/{{ mpack_filename | regex_replace('.tar.gz$','') }}"
+    when: hdf_major_version|int < 3
+
+  - meta: flush_handlers
+
+  - name: "Modify the HDF base_url repository for HDF {{ hdf_minor_version }}"
+    uri:
+      url: http://{{ ansible_fqdn }}:8080/api/v1/stacks/HDF/versions/{{ hdf_minor_version }}/{{ main_os_target }}/repositories/HDF-{{ hdf_minor_version }}
+      method: PUT
+      force_basic_auth: yes
+      user: "{{ ambari_admin_user }}"
+      password: "{{ ambari_admin_password }}"
+      headers: '{"X-Requested-By":"ambari"}'
+      body: " {\"Repositories\" : { \"repo_name\": \"HDF\", \"base_url\" : \"{{ hdf_main_repo_url }}\", \"verify_base_url\": true } }"
+      body_format: raw
+      status_code: 200,201,202
+      return_content: no
+    when: ambari_version is version_compare('2.6', '<')
+
+  - name: Upload the HDF Version Definition file for HDF-only clusters (Ambari 2.6+)
+    template:
+      src: "{{ item }}"
+      dest: "/tmp/cluster_vdf.xml"
+      mode: 0640
+      force: yes
+    with_first_found:
+      - files:
+          - "vdf-HDF-{{ hdf_version }}.xml.j2"
+          - "vdf-HDF-{{ hdf_minor_version }}-latest.xml.j2"
+          - "vdf-HDF-{{ hdf_major_version }}-latest.xml.j2"
+        paths:
+          - ../templates
+    when: ambari_version is version_compare('2.6', '>=') and not install_hdp|default(false)
+  when: install_hdf is defined and install_hdf
+
+- block:
+  - block:
     - name: "Modify the HDP base_url repository for HDP {{ hdp_minor_version }}"
       uri:
         url: http://{{ ansible_fqdn }}:8080/api/v1/stacks/HDP/versions/{{ hdp_minor_version }}/{{ main_os_target }}/repositories/HDP-{{ hdp_minor_version }}
@@ -60,48 +123,75 @@
         body_format: raw
         status_code: 200,201,202
         return_content: no
+    when: ambari_version is version_compare('2.6', '<')
 
-    - name: ​Enable User Home Directory Creation
-      lineinfile:
-        dest: /etc/ambari-server/conf/ambari.properties
-        state: present
-        line: "{{ item }}"
-      notify: Restart ambari-server
-      with_items:
-        - "ambari.post.user.creation.hook.enabled=true"
-        - "ambari.post.user.creation.hook=/var/lib/ambari-server/resources/scripts/post-user-creation-hook.sh"
+  - block:
+    - name: Attempt to read the HDP repo build.id file (Ambari >= 2.6)
+      uri:
+        url: "{{ hdp_main_repo_url }}/build.id"
+        method: GET
+        return_content: yes
+      register: hdp_repo_build_id
+
+    - name: Set the HDP build number (Ambari >= 2.6)
+      set_fact:
+        hdp_build_number: "{{ (hdp_repo_build_id.content|from_yaml).BUILD_NUMBER }}"
+
+    - name: Upload the HDP Version Definition file (Ambari >= 2.6)
+      template:
+        src: "{{ item }}"
+        dest: "/tmp/cluster_vdf.xml"
+        mode: 0640
+        force: yes
+      with_first_found:
+        - files:
+            - "vdf-HDP-{{ hdp_version }}.xml.j2"
+            - "vdf-HDP-{{ hdp_minor_version }}-latest.xml.j2"
+            - "vdf-HDP-{{ hdp_major_version }}-latest.xml.j2"
+          paths:
+            - ../templates
+    when: ambari_version is version_compare('2.6', '>=')
+
+  - name: ​Enable User Home Directory Creation
+    lineinfile:
+      dest: /etc/ambari-server/conf/ambari.properties
+      state: present
+      line: "{{ item }}"
+    notify: Restart ambari-server
+    with_items:
+      - "ambari.post.user.creation.hook.enabled=true"
+      - "ambari.post.user.creation.hook=/var/lib/ambari-server/resources/scripts/post-user-creation-hook.sh"
   when: install_hdp is defined and install_hdp
 
 - block:
-    - name: "Install the HDF Management Pack"
-      shell: "echo yes | ambari-server install-mpack --mpack={{ hdf_main_repo_url }}/tars/hdf_ambari_mp/{{ mpack_filename }}"
-      notify: Restart ambari-server
-      args:
-        creates: "/var/lib/ambari-server/resources/mpacks/{{ mpack_filename | regex_replace('.tar.gz$','') }}"
-      when: hdf_major_version|int >= 3
+  - name: Attempt to get an existing VDF for the required version (Ambari >= 2.6)
+    uri:
+      url: "http://{{ ansible_fqdn }}:8080/api/v1/version_definitions?VersionDefinition/release/version={{ (install_hdp|default(false) == true) | ternary(hdp_version,hdf_version) }}"
+      method: GET
+      force_basic_auth: yes
+      user: "{{ ambari_admin_user }}"
+      password: "{{ ambari_admin_password }}"
+      headers: '{"X-Requested-By":"ambari"}'
+      status_code: 200,201,202
+      return_content: yes
+    register: existing_vdf
 
-    - name: "Install the HDF Management Pack (with --purge)"
-      shell: "echo yes | ambari-server install-mpack --mpack={{ hdf_main_repo_url }}/tars/hdf_ambari_mp/{{ mpack_filename }} --purge"
-      notify: Restart ambari-server
-      args:
-        creates: "/var/lib/ambari-server/resources/mpacks/{{ mpack_filename | regex_replace('.tar.gz$','') }}"
-      when: hdf_major_version|int < 3
+  - name: Register the VDF with Ambari (Ambari >= 2.6)
+    uri:
+      url: http://{{ ansible_fqdn }}:8080/api/v1/version_definitions
+      method: POST
+      force_basic_auth: yes
+      user: "{{ ambari_admin_user }}"
+      password: "{{ ambari_admin_password }}"
+      headers: '{"X-Requested-By":"ambari"}'
+      body: " {\"VersionDefinition\":{ \"version_url\":\"file:/tmp/cluster_vdf.xml\"}}"
+      body_format: raw
+      status_code: 200,201,202
+      return_content: no
+    when: (existing_vdf.content|from_yaml)['items'] | length == 0
+  when: ambari_version is version_compare('2.6', '>=')
 
-    - meta: flush_handlers
-
-    - name: "Modify the HDF base_url repository for HDF {{ hdf_minor_version }}"
-      uri:
-        url: http://{{ ansible_fqdn }}:8080/api/v1/stacks/HDF/versions/{{ hdf_minor_version }}/{{ main_os_target }}/repositories/HDF-{{ hdf_minor_version }}
-        method: PUT
-        force_basic_auth: yes
-        user: "{{ ambari_admin_user }}"
-        password: "{{ ambari_admin_password }}"
-        headers: '{"X-Requested-By":"ambari"}'
-        body: " {\"Repositories\" : { \"repo_name\": \"HDF\", \"base_url\" : \"{{ hdf_main_repo_url }}\", \"verify_base_url\": true } }"
-        body_format: raw
-        status_code: 200,201,202
-        return_content: no
-  when: install_hdf is defined and install_hdf
+- meta: flush_handlers
 
 - name: Make sure all of the Ambari Agents have registered
   uri:
