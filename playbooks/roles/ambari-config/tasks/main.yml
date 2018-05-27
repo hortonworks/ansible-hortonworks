@@ -73,6 +73,21 @@
   when: install_hdp is defined and install_hdp
 
 - block:
+    - name: Attempt to read the HDF repo build.id file
+      uri:
+        url: "{{ hdf_main_repo_url }}/build.id"
+        method: GET
+        return_content: yes
+      register: hdf_repo_build_id
+
+    - name: Set the HDF build number
+      set_fact:
+        hdf_build_number: "{{ (hdf_repo_build_id.content|from_yaml).BUILD_NUMBER }}"
+
+    - name: Set the HDF mpack filename
+      set_fact:
+        mpack_filename: "hdf-ambari-mpack-{{ hdf_version }}-{{ hdf_build_number }}.tar.gz"
+
     - name: "Install the HDF Management Pack"
       shell: "echo yes | ambari-server install-mpack --mpack={{ hdf_main_repo_url }}/tars/hdf_ambari_mp/{{ mpack_filename }}"
       notify: Restart ambari-server
