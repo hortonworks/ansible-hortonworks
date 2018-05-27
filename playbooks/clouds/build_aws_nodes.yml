@@ -7,6 +7,11 @@
     ami_id: "{{ outer_loop.image }}"
   register: current_ami
 
+- name: Fail if the AMI does not provide any information
+  fail:
+    msg: "The AMI {{ outer_loop.image }} does not exist in region {{ cloud_config.region }} or it does not provide any information."
+  when: current_ami['results'] | length == 0
+
 - name: Create {{ outer_loop.role }} node(s) (EBS root volume)
   ec2:
     region: "{{ cloud_config.region }}"
