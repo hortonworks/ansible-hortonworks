@@ -1,16 +1,16 @@
 ---
 cluster_name: 'mytestcluster'
 
-ambari_version: '2.5.2.0'                                 # must be the 4-part full version number
-hdp_version: '2.6.2.0'                                    # must be the 4-part full version number
-hdf_version: '3.0.1.1'                                    # must be the 4-part full version number
+ambari_version: '2.6.2.0'                                 # must be the 4-part full version number
+hdp_version: '2.6.5.0'                                    # must be the 4-part full version number
+hdf_version: '3.1.1.0'                                    # must be the 4-part full version number
 
 repo_base_url: 'http://public-repo-1.hortonworks.com'     # change this if using a Local Repository
 
 java: 'embedded'                                          # can be set to 'embedded', 'openjdk' or 'oraclejdk'
 oraclejdk_options:                                        # only used when java is set to 'oraclejdk'
   base_folder: '/usr/java'                                # the folder where the Java package should be unpacked to
-  tarball_location: '/tmp/jdk-8u131-linux-x64.tar.gz'     # the location of the tarball on the remote system or on the Ansible controller
+  tarball_location: '/tmp/jdk-8u171-linux-x64.tar.gz'     # the location of the tarball on the remote system or on the Ansible controller
   jce_location: '/tmp/jce_policy-8.zip'                   # the location of the JCE package on the remote system or on the Ansible controller
   remote_files: no                                        # set to yes to indicate the files are already on the remote systems, otherwise they will be copied by Ansible from the Ansible controller
 
