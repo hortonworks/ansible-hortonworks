@@ -1,0 +1,16 @@
+    <os family="{{ baseurl_os_family }}">
+      <package-version>{{ hdf_version|replace('-','_') }}_*</package-version>
+      <repo>
+        <baseurl>{{ hdf_main_repo_url }}</baseurl>
+        <repoid>HDF-{{ hdf_minor_version }}</repoid>
+        <reponame>HDF</reponame>
+        <unique>true</unique>
+      </repo>
+      <repo>
+        <baseurl>{{ utils_repo_url }}</baseurl>
+        <repoid>HDP-UTILS-1.1.0.21</repoid>
+        <reponame>HDP-UTILS</reponame>
+        <unique>false</unique>
+      </repo>
+    </os>
+

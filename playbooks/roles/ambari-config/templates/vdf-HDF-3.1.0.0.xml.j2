@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<repository-version xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="version_definition.xsd">
+  <release>
+{% include 'vdf-HDF-part-release.j2' %}
+  </release>
+  <manifest>
+    <service id="KAFKA-100" name="KAFKA" version="1.0.0"/>
+    <service id="STREAMLINE-060" name="STREAMLINE" version="0.6.0"/>
+    <service id="MINIFI-040" name="MINIFI" version="0.4.0"/>
+    <service id="NIFI-150" name="NIFI" version="1.5.0"/>
+    <service id="RANGER-070" name="RANGER" version="0.7.0"/>
+    <service id="RANGER_KMS-070" name="RANGER_KMS" version="0.7.0"/>
+    <service id="REGISTRY-050" name="REGISTRY" version="0.5.0"/>
+    <service id="ZOOKEEPER-346" name="ZOOKEEPER" version="3.4.6"/>
+    <service id="STORM-111" name="STORM" version="1.1.1"/>
+    <service id="NIFI_REGISTRY-010" name="NIFI_REGISTRY" version="0.1.0"/>
+  </manifest>
+  <available-services/>
+  <repository-info>
+{% include 'vdf-HDF-part-repository-info.j2' %}
+  </repository-info>
+</repository-version>
