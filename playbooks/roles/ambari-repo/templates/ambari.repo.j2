@@ -1,0 +1,7 @@
+[ambari-{{ ambari_version }}]
+name=ambari Version - ambari-{{ ambari_version }}
+baseurl={{ ambari_repo_url }}
+gpgcheck=0
+gpgkey={{ ambari_repo_url }}/RPM-GPG-KEY/RPM-GPG-KEY-Jenkins
+enabled=1
+priority=1

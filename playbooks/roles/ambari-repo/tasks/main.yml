@@ -11,9 +11,9 @@
       paths:
         - ../vars
 
-- name: Download the Ambari repository definition
-  get_url:
-    url: "{{ ambari_repo_url }}"
+- name: Upload the Ambari repository file
+  template:
+    src: "{{ ambari_repo_template }}"
     dest: "{{ ambari_repo_destination }}"
     force: yes
 
