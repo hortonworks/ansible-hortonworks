@@ -48,6 +48,6 @@
       with_items: "{{ cloud_config.security_groups }}"
 
     - name: Build Azure Nodes
-      include: build_azure_nodes.yml
+      include_tasks: build_azure_nodes.yml
       when: item.count > 0
       with_items: "{{ nodes }}"

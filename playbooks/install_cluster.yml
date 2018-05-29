@@ -1,10 +1,10 @@
 ---
-- include: "prepare_nodes.yml"
+- import_playbook: "prepare_nodes.yml"
 
-- include: "install_ambari.yml"
+- import_playbook: "install_ambari.yml"
 
-- include: "configure_ambari.yml"
+- import_playbook: "configure_ambari.yml"
 
-- include: "apply_blueprint.yml"
+- import_playbook: "apply_blueprint.yml"
 
-- include: "post_install.yml"
+- import_playbook: "post_install.yml"

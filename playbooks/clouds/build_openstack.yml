@@ -8,6 +8,6 @@
     - ../../inventory/openstack/group_vars/all
   tasks:
     - name: Build Openstack Nodes
-      include: build_openstack_nodes.yml
+      include_tasks: build_openstack_nodes.yml
       when: item.count > 0
       with_items: "{{ nodes }}"

@@ -1,5 +1,5 @@
 ---
-- include: "set_variables.yml"
+- import_playbook: "set_variables.yml"
 
 - name: Apply the ambari-agent role to the hadoop-cluster group
   hosts: hadoop-cluster
