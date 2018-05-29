@@ -116,7 +116,7 @@
     - name: Fail if the user could not be created (postgres)
       fail:
         msg: The user could not be created. Error is {{ createuser_results.stderr }}!
-      when: createuser_results|failed and not createuser_results.stderr|search("role .* already exists")
+      when: createuser_results is failed and not createuser_results.stderr is search("role .* already exists")
 
     - name: Create the ambari database (postgres)
       shell: su - postgres -c "createdb -O {{ database_options.ambari_db_username }} {{ database_options.ambari_db_name }}"
@@ -128,7 +128,7 @@
     - name: Fail if the database could not be created (postgres)
       fail:
         msg: The database could not be created. Error is {{ createdb_results.stderr }}!
-      when: createdb_results|failed and not createdb_results.stderr|search("database .* already exists")
+      when: createdb_results is failed and not createdb_results.stderr is search("database .* already exists")
 
     - name: Create the ambari database schema (postgres)
       shell: su - postgres -c "psql -d {{ database_options.ambari_db_name }} -c \"CREATE SCHEMA {{ database_options.ambari_db_name }} AUTHORIZATION {{ database_options.ambari_db_username }};\""
@@ -140,7 +140,7 @@
     - name: Fail if the database schema could not be created (postgres)
       fail:
         msg: The database schema could not be created. Error is {{ createschema_results.stderr }}!
-      when: createschema_results|failed and not createschema_results.stderr|search("schema .* already exists")
+      when: createschema_results is failed and not createschema_results.stderr is search("schema .* already exists")
 
     - name: Set the ambari user search_path (postgres)
       shell: su - postgres -c "psql -d {{ database_options.ambari_db_name }} -c \"ALTER ROLE {{ database_options.ambari_db_username }} SET search_path to '{{ database_options.ambari_db_name }}', 'public';\""
@@ -166,7 +166,7 @@
     - name: Fail if the user could not be created (postgres)
       fail:
         msg: The user could not be created. Error is {{ createuser_results.stderr }}!
-      when: hiveserver_hosts is defined and hiveserver_hosts|length > 0 and createuser_results|failed and not createuser_results.stderr|search("role .* already exists")
+      when: hiveserver_hosts is defined and hiveserver_hosts|length > 0 and createuser_results is failed and not createuser_results.stderr is search("role .* already exists")
 
     - name: Create the hive database (postgres)
       shell: su - postgres -c "createdb -O {{ database_options.hive_db_username }} {{ database_options.hive_db_name }}"
@@ -179,7 +179,7 @@
     - name: Fail if the database could not be created (postgres)
       fail:
         msg: The database could not be created. Error is {{ createdb_results.stderr }}!
-      when: hiveserver_hosts is defined and hiveserver_hosts|length > 0 and createdb_results|failed and not createdb_results.stderr|search("database .* already exists")
+      when: hiveserver_hosts is defined and hiveserver_hosts|length > 0 and createdb_results is failed and not createdb_results.stderr is search("database .* already exists")
 
     - name: Configure access for the hive user (postgres)
       lineinfile:
@@ -202,7 +202,7 @@
     - name: Fail if the user could not be created (postgres)
       fail:
         msg: The user could not be created. Error is {{ createuser_results.stderr }}!
-      when: oozie_hosts is defined and oozie_hosts|length > 0 and createuser_results|failed and not createuser_results.stderr|search("role .* already exists")
+      when: oozie_hosts is defined and oozie_hosts|length > 0 and createuser_results is failed and not createuser_results.stderr is search("role .* already exists")
 
     - name: Create the oozie database (postgres)
       shell: su - postgres -c "createdb -O {{ database_options.oozie_db_username }} {{ database_options.oozie_db_name }}"
@@ -215,7 +215,7 @@
     - name: Fail if the database could not be created (postgres)
       fail:
         msg: The database could not be created. Error is {{ createdb_results.stderr }}!
-      when: oozie_hosts is defined and oozie_hosts|length > 0 and createdb_results|failed and not createdb_results.stderr|search("database .* already exists")
+      when: oozie_hosts is defined and oozie_hosts|length > 0 and createdb_results is failed and not createdb_results.stderr is search("database .* already exists")
 
     - name: Configure access for the oozie user (postgres)
       lineinfile:
@@ -238,7 +238,7 @@
     - name: Fail if the user could not be created (postgres)
       fail:
         msg: The user could not be created. Error is {{ createuser_results.stderr }}!
-      when: rangeradmin_hosts is defined and rangeradmin_hosts|length > 0 and createuser_results|failed and not createuser_results.stderr|search("role .* already exists")
+      when: rangeradmin_hosts is defined and rangeradmin_hosts|length > 0 and createuser_results is failed and not createuser_results.stderr is search("role .* already exists")
 
     - name: Create the ranger admin database (postgres)
       shell: su - postgres -c "createdb -O {{ database_options.rangeradmin_db_username }} {{ database_options.rangeradmin_db_name }}"
@@ -251,7 +251,7 @@
     - name: Fail if the database could not be created (postgres)
       fail:
         msg: The database could not be created. Error is {{ createdb_results.stderr }}!
-      when: rangeradmin_hosts is defined and rangeradmin_hosts|length > 0 and createdb_results|failed and not createdb_results.stderr|search("database .* already exists")
+      when: rangeradmin_hosts is defined and rangeradmin_hosts|length > 0 and createdb_results is failed and not createdb_results.stderr is search("database .* already exists")
 
     - name: Configure access for the ranger admin database user (postgres)
       lineinfile:
@@ -274,7 +274,7 @@
     - name: Fail if the user could not be created (postgres)
       fail:
         msg: The user could not be created. Error is {{ createuser_results.stderr }}!
-      when: registry_hosts is defined and registry_hosts|length > 0 and createuser_results|failed and not createuser_results.stderr|search("role .* already exists")
+      when: registry_hosts is defined and registry_hosts|length > 0 and createuser_results is failed and not createuser_results.stderr is search("role .* already exists")
 
     - name: Create the registry database (postgres)
       shell: su - postgres -c "createdb -O {{ database_options.registry_db_username }} {{ database_options.registry_db_name }}"
@@ -287,7 +287,7 @@
     - name: Fail if the database could not be created (postgres)
       fail:
         msg: The database could not be created. Error is {{ createdb_results.stderr }}!
-      when: registry_hosts is defined and registry_hosts|length > 0 and createdb_results|failed and not createdb_results.stderr|search("database .* already exists")
+      when: registry_hosts is defined and registry_hosts|length > 0 and createdb_results is failed and not createdb_results.stderr is search("database .* already exists")
 
     - name: Configure access for the registry database user (postgres)
       lineinfile:
@@ -310,7 +310,7 @@
     - name: Fail if the user could not be created (postgres)
       fail:
         msg: The user could not be created. Error is {{ createuser_results.stderr }}!
-      when: streamline_hosts is defined and streamline_hosts|length > 0 and createuser_results|failed and not createuser_results.stderr|search("role .* already exists")
+      when: streamline_hosts is defined and streamline_hosts|length > 0 and createuser_results is failed and not createuser_results.stderr is search("role .* already exists")
 
     - name: Create the streamline database (postgres)
       shell: su - postgres -c "createdb -O {{ database_options.streamline_db_username }} {{ database_options.streamline_db_name }}"
@@ -323,7 +323,7 @@
     - name: Fail if the database could not be created (postgres)
       fail:
         msg: The database could not be created. Error is {{ createdb_results.stderr }}!
-      when: streamline_hosts is defined and streamline_hosts|length > 0 and createdb_results|failed and not createdb_results.stderr|search("database .* already exists")
+      when: streamline_hosts is defined and streamline_hosts|length > 0 and createdb_results is failed and not createdb_results.stderr is search("database .* already exists")
 
     - name: Configure access for the streamline database user (postgres)
       lineinfile:

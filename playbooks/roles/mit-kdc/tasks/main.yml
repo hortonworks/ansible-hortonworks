@@ -41,7 +41,7 @@
 - name: Fail if the admin principal could not be created
   fail:
     msg: The admin principal could not be created. Error is {{ addprinc_result.stderr }}
-  when: addprinc_result|failed or not (addprinc_result.stdout|search("Principal .* created") or addprinc_result.stderr|search("Principal or policy already exists while creating"))
+  when: addprinc_result is failed or not (addprinc_result.stdout is search("Principal .* created") or addprinc_result.stderr is search("Principal or policy already exists while creating"))
 
 - name: Set the ACL for the admin user
   lineinfile:
