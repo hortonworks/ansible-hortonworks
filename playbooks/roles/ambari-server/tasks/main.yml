@@ -61,7 +61,7 @@
 
     - name: Load the Ambari Server postgres schema
       shell: "PGPASSFILE=/tmp/.pgpass-ambari psql -h {{ database_options.external_hostname|default(ansible_fqdn,true) }} -U {{ database_options.ambari_db_username }} -p {{ postgres_port }} -w -d {{ database_options.ambari_db_name }} < /var/lib/ambari-server/resources/Ambari-DDL-Postgres-CREATE.sql"
-      when: database == "postgres" and check_results|failed
+      when: database == "postgres" and check_results is failed
 
     - name: Delete the .pgpass file
       file:
@@ -85,7 +85,7 @@
     - name: Fail if the mysql schema could not be loaded
       fail:
         msg: Schema could not be loaded. Error is {{ import_results.msg }}!
-      when: import_results|failed and not import_results.msg|search("Table .* already exists")
+      when: import_results is failed and not import_results.msg is search("Table .* already exists")
 
     - name: Configure the Ambari JDBC driver
       shell: /usr/sbin/ambari-server setup --jdbc-db={{ database | regex_replace('mariadb', 'mysql') }} --jdbc-driver={{ hostvars[inventory_hostname][database + '_jdbc_location'] }}

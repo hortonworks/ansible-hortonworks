@@ -23,7 +23,7 @@
   yum:
     name: "{{ epel_url }}"
     state: installed
-  when: ansible_os_family|lower == "redhat" and epel_result|failed
+  when: ansible_os_family|lower == "redhat" and epel_result is failed
 
 - name: Install required packages
   package:
@@ -33,7 +33,7 @@
   with_items: "{{ packages|default([]) }}"
 
 - name: Install Java
-  include: java.yml
+  include_tasks: java.yml
   when: java != "embedded"
 
 - name: Make sure the NTP service is started
@@ -118,7 +118,7 @@
 - meta: flush_handlers
 
 - name: Configure tuned (RHEL/CentOS 7)
-  include: tuned.yml
+  include_tasks: tuned.yml
   when: ansible_os_family|lower == "redhat" and ansible_distribution_major_version|int == 7
 
 - block:
