@@ -1,5 +1,5 @@
 ---
-- include: "set_variables.yml"
+- import_playbook: "set_variables.yml"
 
 - name: Gather facts from all nodes
   hosts: hadoop-cluster

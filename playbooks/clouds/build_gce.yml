@@ -35,6 +35,6 @@
       retries: 120
 
     - name: Build GCE Nodes
-      include: build_gce_nodes.yml
+      include_tasks: build_gce_nodes.yml
       when: item.count > 0
       with_items: "{{ nodes }}"

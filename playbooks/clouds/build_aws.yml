@@ -66,6 +66,6 @@
         wait: yes
 
     - name: Build AWS Nodes
-      include: build_aws_nodes.yml
+      include_tasks: build_aws_nodes.yml
       when: item.count > 0
       with_items: "{{ nodes }}"
