@@ -505,6 +505,7 @@
   ],
 
   "host_groups" : [
+    {% set ns = namespace(hivedb_embedded_defined=false) %}
     {% for node_group in blueprint_dynamic if groups[node_group.role] is defined and groups[node_group.role]|length > 0 -%}
 
     {
@@ -519,7 +520,7 @@
 {% endif %}
 
         {% for service in node_group.services -%}
-        { "name" : "{{ service }}" }{% if service == "HIVE_METASTORE" and database == "embedded" %},{ "name" : "MYSQL_SERVER" }{% endif %}{% if not loop.last %},{% endif %}
+        { "name" : "{{ service }}" }{% if service == "HIVE_METASTORE" and database == "embedded" and not ns.hivedb_embedded_defined %},{ "name" : "MYSQL_SERVER" }{% set ns.hivedb_embedded_defined=true %}{% endif %}{% if not loop.last %},{% endif %}
 
         {% endfor %}
 
