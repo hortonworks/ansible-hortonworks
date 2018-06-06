@@ -7,7 +7,7 @@ cloud_config:
   subnet_name: '{{ cluster_name }}-subnet'
   subnet_cidr: '10.0.10.0/24'
   internet_gateway: true                                           # Only set to false if using local repos (node will be without Internet access)
-  admin_username: ec2-user
+  admin_username: ubuntu                                           # Depends on the image, usually can be set to ubuntu, centos or ec2-user
   ssh:
     keyname: "{{ cluster_name }}-key"
     publickey: '~/.ssh/id_rsa.pub'
@@ -26,8 +26,8 @@ cloud_config:
 nodes:
   - role: "hdp-master"
     count: 1
-    image: ami-7d50491b                                            # Amazon Linux AMI 2017.03.1 in eu-west-1
-    type: r3.xlarge
+    image: ami-a26d53db                                            # Ubuntu 14.04 AMI in eu-west-1 only (change this ID if using a different region)
+    type: r4.xlarge
     public_ip: true
     security_groups: default_cluster_access,ambari_access
     root_volume:
@@ -38,8 +38,8 @@ nodes:
 
   - role: "hdp-slave"
     count: 3
-    image: ami-7d50491b                                            # Amazon Linux AMI 2017.03.1 in eu-west-1
-    type: r3.large
+    image: ami-a26d53db                                            # Ubuntu 14.04 AMI in eu-west-1 only (change this ID if using a different region)
+    type: m5.xlarge
     public_ip: true
     security_groups: default_cluster_access
     root_volume:
@@ -49,8 +49,8 @@ nodes:
 
   - role: "hdp-edge"
     count: 0
-    image: ami-7d50491b                                            # Amazon Linux AMI 2017.03.1 in eu-west-1
-    type: m3.medium
+    image: ami-a26d53db                                            # Ubuntu 14.04 AMI in eu-west-1 only (change this ID if using a different region)
+    type: m4.large
     public_ip: true
     security_groups: default_cluster_access
     root_volume:
