@@ -2,15 +2,15 @@
 - set_fact: outer_loop="{{ item }}"
 
 - name: Get AMI information
-  ec2_ami_find:
+  ec2_ami_facts:
     region: "{{ cloud_config.region }}"
-    ami_id: "{{ outer_loop.image }}"
+    image_ids: "{{ outer_loop.image }}"
   register: current_ami
 
 - name: Fail if the AMI does not provide any information
   fail:
     msg: "The AMI {{ outer_loop.image }} does not exist in region {{ cloud_config.region }} or it does not provide any information."
-  when: current_ami['results'] | length == 0
+  when: current_ami['images'] | length == 0
 
 - name: Create {{ outer_loop.role }} node(s) (EBS root volume)
   ec2:
@@ -24,7 +24,7 @@
     key_name: "{{ cloud_config.ssh.keyname }}"
     exact_count: "{{ outer_loop.count }}"
     volumes:
-      - device_name: "{{ current_ami['results'][0]['root_device_name'] }}"
+      - device_name: "{{ current_ami['images'][0]['root_device_name'] }}"
         volume_type: "{{ outer_loop.root_volume.type }}"
         volume_size: "{{ outer_loop.root_volume.size }}"
         delete_on_termination: true
