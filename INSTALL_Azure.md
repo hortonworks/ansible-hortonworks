@@ -37,7 +37,7 @@ This node must be able to connect to the cluster nodes via SSH and to the Azure 
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade   
-   pip install pycparser ansible==2.3.2 azure==2.0.0rc5 msrest msrestazure
+   pip install ansible[azure]
    ```
 
 
@@ -70,7 +70,7 @@ This node must be able to connect to the cluster nodes via SSH and to the Azure 
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade   
-   pip install pycparser ansible==2.3.2 azure==2.0.0rc5 msrest msrestazure
+   pip install ansible[azure]
    ```
 
 
@@ -103,7 +103,7 @@ This node must be able to connect to the cluster nodes via SSH and to the Azure 
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade
-   pip install pycparser ansible==2.3.2 azure==2.0.0rc5 msrest msrestazure
+   pip install ansible[azure]
    ```
 
 
@@ -118,7 +118,7 @@ This node must be able to connect to the cluster nodes via SSH and to the Azure 
 
 1. Create a service principal
 
-   Use the following [guide](https://azure.microsoft.com/en-us/documentation/articles/resource-group-create-service-principal-portal) to create a Service Principal.
+   Use the following [guide](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal) to create a Service Principal.
 
    After the tutorial the following should have been obtained:
    * Subscription ID (from the Subscription page in the Azure portal)
@@ -173,15 +173,15 @@ This section contains variables that are cluster specific and are used by all no
 | Variable        | Description                                                                                                |
 | --------------- | ---------------------------------------------------------------------------------------------------------- |
 | name_suffix     | A suffix that will be appended to the name of all nodes. Usually it's a domain, but can be anything or even the empty string `''`. It's recommended to set this to a domain name when using the Azure internal DNS otherwise the cluster won't use FQDN nodes. |
-| location        | The Azure Region as described [here](https://azure.microsoft.com/en-gb/regions/).                          |
+| location        | The Azure Region as described [here](https://azure.microsoft.com/en-gb/global-infrastructure/regions/).                          |
 | admin_username  | The Linux user with sudo permissions. Can be customized in Azure as it's used when building the nodes.     |
 | ssh.privatekey  | Local path to the SSH private key that will be used to login into the nodes. This can be the key generated as part of the Build Setup, step 4. |
 | ssh.publickey   | Local path to the SSH public key that will be placed on cluster nodes at build time.                                        |
-| resource_group  | A container that holds related resources for an application. It will be created if it doesn't exist. Details [here](https://azure.microsoft.com/en-gb/documentation/articles/resource-group-overview/). |
-| storage_account | A namespace to store and access Azure Storage data objects. It will be created if it doesn't exist. Must be an unique name across all Azure. Details [here](https://azure.microsoft.com/en-gb/documentation/articles/storage-create-storage-account/). |
-| network         | The Azure virtual network (VNet). It will be created if it doesn't exist. The address range can be customized. Details [here](https://azure.microsoft.com/en-gb/documentation/articles/virtual-networks-overview/). |
-| subnet          | Subnet is a range of IP addresses in the VNet previously set. The subnet should be dedicated to only one cluster. It will be created if it doesn't exist. Details [here](https://azure.microsoft.com/en-gb/documentation/articles/virtual-networks-overview/#subnets). |
-| security_groups | A list of Access Control List (ACL) associated with the subnet. Details [here](https://azure.microsoft.com/en-gb/documentation/articles/virtual-networks-nsg/). |
+| resource_group  | A container that holds related resources for an application. It will be created if it doesn't exist. Details [here](https://docs.microsoft.com/en-gb/azure/azure-resource-manager/resource-group-overview). |
+| storage_account | A namespace to store and access Azure Storage data objects. It will be created if it doesn't exist. Must be an unique name across all Azure. Details [here](https://docs.microsoft.com/en-us/azure/storage/common/storage-create-storage-account). |
+| network         | The Azure virtual network (VNet). It will be created if it doesn't exist. The address range can be customized. Details [here](https://docs.microsoft.com/en-gb/azure/virtual-network/virtual-networks-overview). |
+| subnet          | Subnet is a range of IP addresses in the VNet previously set. The subnet should be dedicated to only one cluster. It will be created if it doesn't exist. Details [here](https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-vnet-plan-design-arm#subnets). |
+| security_groups | A list of Access Control List (ACL) associated with the subnet. Details [here](https://docs.microsoft.com/en-us/azure/virtual-network/security-overview). |
 
 
 ## nodes config
@@ -198,8 +198,8 @@ And roles can have any names and any number of nodes but they should correspond 
 | --------------- | ------------------------------------------------------------------------- |
 | role            | The name of the role. This will be appended to the cluster name in order to form a unique group in the Azure Resource Group. This group is used to derive the nodes names (if node count is greater than 1, numbers will be appended to the group name to uniquely identify nodes). |
 | count           | The number of nodes to be built with this role. |
-| image           | The OS image to be used. More details [here](https://azure.microsoft.com/en-gb/documentation/articles/virtual-machines-linux-cli-ps-findimage/). |
-| flavor          | The flavor / size of the node. A list of all the flavors can be found [here](https://azure.microsoft.com/en-gb/documentation/articles/virtual-machines-linux-sizes/) and the pricing [here](https://azure.microsoft.com/en-gb/pricing/details/virtual-machines/linux/#Windows). |
+| image           | The OS image to be used. More details about how to find an image [here](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/cli-ps-findimage). |
+| flavor          | The flavor / size of the node. A list of all the flavors can be found [here](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/sizes) and the pricing [here](https://azure.microsoft.com/en-gb/pricing/details/virtual-machines/linux/). |
 | public_ip       | If the VM should have a Public IP assigned to it. Required if the build node does not have access to the private IP range of the cluster nodes. |
 | security_group  | The security group that should be applied to the node.                                                             |
 | ambari_server   | Set it to `true` if the role also defines an Ambari Server. The number of nodes with this role should be 1. If there are more than 1 node, ambari-server will be installed on all of them, but only the first one (in alphabetical order) will be used by the Ambari Agents. |

@@ -28,10 +28,14 @@
       azure_rm_networkinterface:
         resource_group: "{{ cloud_config.resource_group }}"
         name: "NIC-{{ cluster_name }}-{{ outer_loop.role }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
-        public_ip_address_name: "IP-{{ cluster_name }}-{{ outer_loop.role }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
         virtual_network_name: "{{ cloud_config.network.name }}"
         subnet_name: "{{ cloud_config.subnet.name }}"
         security_group_name: "{{ outer_loop.security_group }}"
+        ip_configurations:
+          - name: "ipconfig-{{ cluster_name }}-{{ outer_loop.role }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
+            public_ip_address_name: "IP-{{ cluster_name }}-{{ outer_loop.role }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
+            public_ip_allocation_method: Static
+            primary: True
       loop_control:
         loop_var: local_loop
       with_sequence: count="{{ outer_loop.count }}" format=-%02x
@@ -55,10 +59,12 @@
       azure_rm_networkinterface:
         resource_group: "{{ cloud_config.resource_group }}"
         name: "NIC-{{ cluster_name }}-{{ outer_loop.role }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
-        public_ip: false
         virtual_network_name: "{{ cloud_config.network.name }}"
         subnet_name: "{{ cloud_config.subnet.name }}"
         security_group_name: "{{ outer_loop.security_group }}"
+        ip_configurations:
+          - name: "ipconfig-{{ cluster_name }}-{{ outer_loop.role }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"
+            primary: True
       loop_control:
         loop_var: local_loop
       with_sequence: count="{{ outer_loop.count }}" format=-%02x
@@ -75,7 +81,7 @@
       register: current_private_nics
       until: current_private_nics.finished
       retries: 120
-  when: outer_loop.public_ip|default(false)|bool
+  when: not outer_loop.public_ip|default(false)|bool
 
 - name: Create {{ outer_loop.role }} node(s)
   azure_rm_virtualmachine:
