@@ -10,19 +10,19 @@ cloud_config:
 nodes:
   - role: "hdp-master"
     count: 1
-    image: CentOS 7.2
+    image: CentOS 7.4
     flavor: m3.xlarge
     public_ip: false
     ambari_server: true
 
   - role: "hdp-slave"
     count: 2
-    image: CentOS 7.2
+    image: CentOS 7.4
     flavor: m3.large
     public_ip: false
 
   - role: "hdp-edge"
     count: 0
-    image: CentOS 7.2
+    image: CentOS 7.4
     flavor: m3.medium
     public_ip: false

@@ -39,7 +39,7 @@ As OpenStack environments are usually private, you might need to build such a no
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade
-   pip install pycparser functools32 pytz ansible==2.3.2 shade python-openstackclient
+   pip install ansible shade python-openstackclient==3.12.0 os-client-config==1.28.0
    ```
 
 
@@ -85,7 +85,7 @@ As OpenStack environments are usually private, you might need to build such a no
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade   
-   pip install pycparser functools32 pytz ansible==2.3.2 shade python-openstackclient
+   pip install ansible shade python-openstackclient==3.12.0 os-client-config==1.28.0
    ```
 
 
@@ -129,7 +129,7 @@ As OpenStack environments are usually private, you might need to build such a no
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade
-   pip install pycparser functools32 pytz ansible==2.3.2 shade python-openstackclient
+   pip install ansible shade python-openstackclient==3.12.0 os-client-config==1.28.0
    ```
 
 
