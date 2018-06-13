@@ -1,9 +1,9 @@
 ---
 cluster_name: 'mytestcluster'
 
-ambari_version: '2.6.2.0'                                 # must be the 4-part full version number
+ambari_version: '2.6.2.2'                                 # must be the 4-part full version number
 hdp_version: '2.6.5.0'                                    # must be the 4-part full version number
-hdf_version: '3.1.1.0'                                    # must be the 4-part full version number
+hdf_version: '3.1.2.0'                                    # must be the 4-part full version number
 
 repo_base_url: 'http://public-repo-1.hortonworks.com'     # change this if using a Local Repository
 
