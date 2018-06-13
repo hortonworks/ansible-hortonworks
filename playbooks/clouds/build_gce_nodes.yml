@@ -33,7 +33,8 @@
     name: "{{ cluster_name }}-{{ outer_loop.role }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}{{ cloud_config.name_suffix|default('') }}"
     image: "{{ outer_loop.image }}"
     machine_type: "{{ outer_loop.type }}"
-    network: "{{ cloud_config.network.name }}"
+    network: "{{ cloud_config.vpc_name }}"
+    subnetwork: "{{ cloud_config.subnet_name }}"
     external_ip: "{{ (outer_loop.public_ip|default(false)|bool == true) | ternary('ephemeral','none') }}"
     disks:
       - "{{ cluster_name }}-{{ outer_loop.role }}{{ (outer_loop.count > 1) | ternary(local_loop,'') }}"

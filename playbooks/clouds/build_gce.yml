@@ -7,14 +7,17 @@
     - ../group_vars/all
     - ../../inventory/gce/group_vars/all
   tasks:
-    - name: Create {{ cloud_config.network.name }} Network
+    - name: Create the {{ cloud_config.vpc_name }} VPC network
       gce_net:
-        name: "{{ cloud_config.network.name }}"
-        ipv4_range: "{{ cloud_config.network.address }}"
+        name: "{{ cloud_config.vpc_name }}"
+        mode: custom
+        subnet_name: "{{ cloud_config.subnet_name }}"
+        subnet_region: "{{ cloud_config.region }}"
+        ipv4_range: "{{ cloud_config.subnet_cidr }}"
 
     - name: Create firewall rules
       gce_net:
-        name: "{{ cloud_config.network.name }}"
+        name: "{{ cloud_config.vpc_name }}"
         fwname: "{{ item.name }}"
         allowed: "{{ item.allowed }}"
         src_range: "{{ item.src_range }}"
