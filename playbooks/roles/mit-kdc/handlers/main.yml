@@ -1,7 +1,11 @@
 ---
 - name: Restart krb5
-  service: name={{ kdc_service_name }} state=restarted
+  service:
+    name: "{{ kdc_service_name }}"
+    state: restarted
   notify: Restart kadmin
 
 - name: Restart kadmin
-  service: name={{ kadmin_service_name }} state=restarted
+  service:
+    name: "{{ kadmin_service_name }}"
+    state: restarted

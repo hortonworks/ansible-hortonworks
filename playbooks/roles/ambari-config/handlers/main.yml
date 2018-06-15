@@ -1,9 +1,13 @@
 ---
 - name: Restart ambari-agent
-  service: name=ambari-agent state=restarted
+  service:
+    name: ambari-agent
+    state: restarted
 
 - name: Restart ambari-server
-  service: name=ambari-server state=restarted
+  service:
+    name: ambari-server
+    state: restarted
   notify: "Wait for Ambari Server to start listening on port 8080"
 
 - name: Wait for Ambari Server to start listening on port 8080
