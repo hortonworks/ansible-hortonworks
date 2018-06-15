@@ -65,7 +65,7 @@
 
     - name: Delete the .pgpass file
       file:
-        dest: /tmp/.pgpass-ambari
+        path: /tmp/.pgpass-ambari
         state: absent
       when: database == "postgres"
 
@@ -117,7 +117,7 @@
 
 - name: Increase the Ambari Server startup timeout
   lineinfile:
-    dest: /etc/ambari-server/conf/ambari.properties
+    path: /etc/ambari-server/conf/ambari.properties
     state: present
     line: 'server.startup.web.timeout=120'
   notify: Restart ambari-server

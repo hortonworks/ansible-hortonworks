@@ -8,7 +8,7 @@
 
 - name: Set the Ambari Server in the agent configuration
   lineinfile:
-    dest: /etc/ambari-agent/conf/ambari-agent.ini
+    path: /etc/ambari-agent/conf/ambari-agent.ini
     regexp: "^hostname="
     line: "hostname={{ hostvars[groups['ambari-server']|sort|list|first]['ansible_fqdn'] }}"
     state: present

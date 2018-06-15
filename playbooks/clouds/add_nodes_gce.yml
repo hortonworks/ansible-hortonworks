@@ -5,7 +5,6 @@
   add_host:
     name: "{{ hostvars[local_loop].gce_name }}"
     ansible_host: "{{ (outer_loop.public_ip|default(false)== true) | ternary(hostvars[local_loop].gce_public_ip,hostvars[local_loop].gce_private_ip) }}"
-    ansible_ssh_host: "{{ (outer_loop.public_ip|default(false)== true) | ternary(hostvars[local_loop].gce_public_ip,hostvars[local_loop].gce_private_ip) }}"
     ansible_user: "{{ cloud_config.admin_username|default('root') }}"
     ansible_ssh_private_key_file: "{{ cloud_config.ssh.privatekey }}"
     ansible_become_user: root
@@ -19,7 +18,6 @@
   add_host:
     name: "{{ hostvars[local_loop].gce_name }}"
     ansible_host: "{{ (outer_loop.public_ip|default(false)== true) | ternary(hostvars[local_loop].gce_public_ip,hostvars[local_loop].gce_private_ip) }}"
-    ansible_ssh_host: "{{ (outer_loop.public_ip|default(false)== true) | ternary(hostvars[local_loop].gce_public_ip,hostvars[local_loop].gce_private_ip) }}"
     ansible_user: "{{ cloud_config.admin_username|default('root') }}"
     ansible_ssh_private_key_file: "{{ cloud_config.ssh.privatekey }}"
     ansible_become_user: root

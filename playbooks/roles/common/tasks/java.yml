@@ -27,7 +27,7 @@
         remote_src: "{{ oraclejdk_options.remote_files }}"
         list_files: yes
         keep_newer: yes
-      register: "tarball_content"
+      register: tarball_content
 
     - name: Set the new JDK folder name
       set_fact:

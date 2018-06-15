@@ -49,7 +49,7 @@
 
 - name: Add mappings to /etc/hosts
   lineinfile:
-    dest: /etc/hosts
+    path: /etc/hosts
     line: "{{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }} {{ hostvars[item]['ansible_nodename'] }}"
     insertafter: "^127..*$"
     state: present
@@ -65,7 +65,7 @@
 
 - name: Set nofile and nproc limits
   blockinfile:
-    dest: /etc/security/limits.d/99-hadoop.conf
+    path: /etc/security/limits.d/99-hadoop.conf
     create: yes
     mode: 0644
     block: |
@@ -83,17 +83,18 @@
     reload: yes
     ignoreerrors: yes
 
-- name: Stop the {{ firewall_service_name }} firewall service
-  service:
-    name: "{{ firewall_service_name }}"
-    state: stopped
-  when: disable_firewall
+- block:
+    - name: Stop the {{ firewall_service_name }} firewall service
+      service:
+        name: "{{ firewall_service_name }}"
+        state: stopped
+      ignore_errors: true
 
-- name: Disable the {{ firewall_service_name }} firewall service
-  service:
-    name: "{{ firewall_service_name }}"
-    enabled: no
-  ignore_errors: true
+    - name: Disable the {{ firewall_service_name }} firewall service
+      service:
+        name: "{{ firewall_service_name }}"
+        enabled: no
+      ignore_errors: true
   when: disable_firewall
 
 - name: Disable selinux
@@ -108,7 +109,7 @@
 
 - name: Disable Transparent Huge Pages in Grub 2
   lineinfile:
-    dest: /etc/default/grub
+    path: /etc/default/grub
     state: present
     line: 'GRUB_CMDLINE_LINUX=$GRUB_CMDLINE_LINUX" transparent_hugepage=never"'
   when: (ansible_os_family|lower == "redhat" and ansible_distribution_major_version|int == 7) or (ansible_os_family|lower == "debian" and ansible_distribution_major_version|int >= 7) or (ansible_os_family|lower == "suse" and ansible_distribution_major_version|int == 12)

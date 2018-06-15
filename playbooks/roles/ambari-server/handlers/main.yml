@@ -1,13 +1,18 @@
 ---
 - name: Reload systemd
-  command: systemctl daemon-reload
+  systemd:
+    daemon_reload: yes
   when: (ansible_os_family|lower == "redhat" and ansible_distribution_major_version|int == 7) or (ansible_os_family|lower == "suse" and ansible_distribution_major_version|int == 12)
 
 - name: Restart ambari-agent
-  service: name=ambari-agent state=restarted
+  service:
+    name: ambari-agent
+    state: restarted
 
 - name: Restart ambari-server
-  service: name=ambari-server state=restarted
+  service:
+    name: ambari-server
+    state: restarted
   notify: "Wait for Ambari Server to start listening on port 8080"
 
 - name: Wait for Ambari Server to start listening on port 8080
