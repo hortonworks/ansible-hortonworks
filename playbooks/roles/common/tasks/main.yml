@@ -50,6 +50,7 @@
 - name: Add mappings to /etc/hosts
   lineinfile:
     path: /etc/hosts
+    regexp: "^{{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}.*"
     line: "{{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }} {{ hostvars[item]['ansible_nodename'] }}"
     insertafter: "^127..*$"
     state: present
