@@ -46,6 +46,7 @@
 - name: Set the ACL for the admin user
   lineinfile:
     path: "{{ kdc_acl_file }}"
+    regexp: "^\\*/admin@{{ security_options.realm | upper }}.*"
     line: "*/admin@{{ security_options.realm | upper }}  *"
     insertbefore: EOF
     state: present
