@@ -240,9 +240,9 @@ Modify the file at `~/ansible-hortonworks/playbooks/group_vars/all` to set the c
 | Variable                   | Description                                                                                                 |
 | -------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | cluster_name               | The name of the cluster. This is also used by default in the cloud components that require uniqueness, such as the name of the nodes or tags. |
-| ambari_version             | The Ambari version, in the full, 4-number form, for example: `2.5.1.0`.                                     |
-| hdp_version                | The HDP version, in the full, 4-number form, for example: `2.6.1.0`.                                        |
-| hdf_version                | The HDF version, in the full, 4-number form, for example: `3.0.1.0`.                                        |
+| ambari_version             | The Ambari version, in the full, 4-number form, for example: `2.6.2.2`.                                     |
+| hdp_version                | The HDP version, in the full, 4-number form, for example: `2.6.5.0`.                                        |
+| hdf_version                | The HDF version, in the full, 4-number form, for example: `3.1.2.0`.                                        |
 | repo_base_url              | The base URL for the repositories. Change this to the local web server url if using a Local Repository. `/HDP/<OS>/2.x/updates/<latest.version>` (or `/HDF/..`) will be appended to this value to set it accordingly if there are additional URL paths. |
 | java                       | Can be set to `embedded` (default - downloaded by Ambari), `openjdk` or `oraclejdk`. If `oraclejdk` is selected, then the `.x64.tar.gz` package must be downloaded in advance from [Oracle](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html). Same with the [JCE](http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html) package. These files can be copied to all nodes in advanced or only to the Ansible Controller and Ansible will copy them. This behaviour is controlled by the `oraclejdk_options.remote_files` setting. |
 | oraclejdk_options          | These options are only relevant if `java` is set to `oraclejdk`. |
@@ -286,23 +286,17 @@ Modify the file at `~/ansible-hortonworks/playbooks/group_vars/ambari-server` to
 
 ### database configuration
 
-| Variable                       | Description                                                                                                |
-| ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
-| database                       | The type of database that should be used. A choice between `embedded` (Ambari default), `postgres`, `mysql` or `mariadb`. |
-| database_options               | These options are only relevant for the non-`embedded` database. |
-| .external_hostname             | The hostname/IP of the database server. This needs to be prepared as per the [documentation](https://docs.hortonworks.com/HDPDocuments/Ambari-2.5.1.0/bk_ambari-administration/content/ch_amb_ref_using_non_default_databases.html). No need to load any schema, this will be done by Ansible, but the users and databases must be created in advance. If left empty `''` then the playbooks will install the database server on the Ambari node and prepare everything. To change any settings (like the version or repository path) modify the OS specific files under the `playbooks/roles/database/vars/` folder. |
-| .ambari_db_name                | The name of the database Ambari should use. |
-| .ambari_db_username            | The username that Ambari should use to connect to its database. |
-| .ambari_db_password            | The password for the above user. |
-| .hive_db_name                  | The name of the database Hive should use. |
-| .hive_db_username              | The username that Hive should use to connect to its database. |
-| .hive_db_password              | The password for the above user. |
-| .oozie_db_name                 | The name of the database Oozie should use. |
-| .oozie_db_username             | The username that Oozie should use to connect to its database. |
-| .oozie_db_password             | The password for the above user. |
-| .rangeradmin_db_name           | The name of the database Ranger Admin should use. |
-| .rangeradmin_db_username       | The username that Ranger Admin should use to connect to its database. | |
-| .rangeradmin_db_password       | The password for the above user. |
+| Variable                                 | Description                                                                                                |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| database                                 | The type of database that should be used. A choice between `embedded` (Ambari default), `postgres`, `mysql` or `mariadb`. |
+| database_options                         | These options are only relevant for the non-`embedded` database. |
+| .external_hostname                       | The hostname/IP of the database server. This needs to be prepared as per the [documentation](https://docs.hortonworks.com/HDPDocuments/Ambari-2.6.2.0/bk_ambari-administration/content/ch_amb_ref_using_existing_databases.html). No need to load any schema, this will be done by Ansible, but the users and databases must be created in advance. If left empty `''` then the playbooks will install the database server on the Ambari node and prepare everything with the settings defined bellow. To change any settings (like the version or repository path) modify the OS specific files under the `playbooks/roles/database/vars/` folder. |
+| .ambari_db_name,_username,_password      | The name of the database that Ambari should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |
+| .hive_db_name,_username,_password        | The name of the database that Hive should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |
+| .oozie_db_name,_username,_password       | The name of the database that Oozie should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |
+| .rangeradmin_db_name,_username,_password | The name of the database that Ranger Admin should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |
+| .registry_db_name,_username,_password    | The name of the database that Schema Registry should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |
+| .streamline_db_name,_username,_password  | The name of the database that SAM should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |
 
 ### ranger configuration
 

@@ -116,14 +116,15 @@ This node must be able to connect to the cluster nodes via SSH and to the AWS AP
 
 # Setup the AWS credentials file
 
-Ansible AWS modules use the boto Python library. Boto can manage credentials using a config file (more details [here](http://boto.readthedocs.io/en/latest/boto_config_tut.html) but for the purpose of this guide we'll use environment variables.
+Ansible AWS modules use the boto Python library. Boto can manage credentials using a config file (more details about boto [here](http://boto.readthedocs.io/en/latest/boto_config_tut.html) but for the purpose of this guide we'll use environment variables.
 
+And more details about how authentication to AWS works in Ansible is on the [Ansible Guide](https://docs.ansible.com/ansible/latest/scenario_guides/guide_aws.html#authentication).
 
 1. Get the AWS access key and secret
 
    Decide on the account you want to use for the purpose of these scripts or create a new one in IAM (with a `PowerUserAccess` policy attached to it).
    
-   [Create](http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html#Using_CreateAccessKey) an Access Key if none is present.
+   [Create](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html#Using_CreateAccessKey) an Access Key if none is present.
    
    Obtain the `Access Key ID` and the `Secret Access Key`.
 
@@ -165,16 +166,16 @@ This section contains variables that are cluster specific and are used by all no
 
 | Variable           | Description                                                                                             |
 | ------------------ | ------------------------------------------------------------------------------------------------------- |
-| region             | The AWS Region as described [here](http://docs.aws.amazon.com/general/latest/gr/rande.html#ec2_region). |
+| region             | The AWS Region as described [here](https://docs.aws.amazon.com/general/latest/gr/rande.html#ec2_region). |
 | zone               | The AWS Availability Zone from the previously set Region. More details [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html#using-regions-availability-zones-describe). |
-| vpc_name /vpc_cidr | The Amazon Virtual Private Cloud as described [here](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Introduction.html). It will be created if it doesn't exist. The name and the CIDR uniquely identify a VPC so set these variables accordingly if you want to build in an existing VPC. |
-| subnet_cidr        | Subnet is a range of IP addresses in the VPC as described [here](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Subnets.html). |
-| internet_gateway   | Set this to `true` if the VPC has an Internet Gateway. Without one, the cluster nodes cannot reach the Internet (useful to download packages) so only set this to `false` if the nodes will use repositories located in the same VPC. More details about Internet Gateways [here](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Internet_Gateway.html). |
+| vpc_name /vpc_cidr | The Amazon Virtual Private Cloud as described [here](https://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Introduction.html). It will be created if it doesn't exist. The name and the CIDR uniquely identify a VPC so set these variables accordingly if you want to build in an existing VPC. |
+| subnet_cidr        | Subnet is a range of IP addresses in the VPC as described [here](https://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Subnets.html). |
+| internet_gateway   | Set this to `true` if the VPC has an Internet Gateway. Without one, the cluster nodes cannot reach the Internet (useful to download packages) so only set this to `false` if the nodes will use repositories located in the same VPC. More details about Internet Gateways [here](https://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Internet_Gateway.html). |
 | admin_username     | The Linux user with sudo permissions. Usually this is `ec2-user`.                                          |
 | ssh.keyname        | The name of the AWS SSH key that will be placed on cluster nodes at build time. Can be an existing one otherwise a new key will be uploaded. |
 | ssh.privatekey     | Local path to the SSH private key that will be used to login into the nodes. This can be the key generated as part of the Build Setup, step 5. |
 | ssh.publickey      | Local path to the SSH public key that will be placed on cluster nodes at build time. This public key will be uploaded to AWS if one doesn't exist. |
-| security_groups    | A list of Access Control List (ACL) associated with the subnet. Details [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-network-security.html#vpc-security-groups). By default, nodes in the same security group are not allowed to communicate to each other unless there is a rule to allow traffic originating from the same group. This rule is defined in the `default_cluster_access` security group and should be kept as it is. |
+| security_groups    | A list of Access Control List (ACL) associated with the subnet. Details [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-network-security.html#vpc-security-groups). By default, nodes in the same security group are not allowed to communicate to each other unless there is a rule to allow traffic originating from the same group. This rule is defined in the `default_cluster_access` security group and should be kept as it is. |
 
 
 ## nodes config
@@ -191,11 +192,11 @@ And roles can have any names and any number of nodes but they should correspond 
 | --------------- | ------------------------------------------------------------------------- |
 | role            | The name of the role. This will be appended to the cluster name in order to form a unique group in the AWS VPC. Other roles can be added to correspond with the required architecture. |
 | count           | The number of nodes to be built with this role. |
-| image           | The AMI ID of the OS image to be used. More details [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html). The easiest way to find out the ID is by using the EC2 console and clicking on the `Launch Instance` button. |
+| image           | The AMI ID of the OS image to be used. More details [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html). The easiest way to find out the ID is by using the EC2 console and clicking on the `Launch Instance` button. |
 | type            | The instance-type / size of the node. A list of all the instance-types can be found [here](https://aws.amazon.com/ec2/instance-types/) and the pricing [here](https://aws.amazon.com/ec2/pricing/). |
 | public_ip       | If the VM should have a Public IP assigned to it. Required if the build node does not have access to the private IP range of the cluster nodes. |
 | security_groups | The security groups that should be applied to the node. The nodes should have at least the default security group that allows traffic in the same group. |
-| root_volume     | The vast majority of AMIs require an EBS root volume. The default size of this root volume is small, irrespective of the instance-type, so use this variable to set the size of the root volume to the desired value. More details about root devices [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/RootDeviceStorage.html) and about types of EBS Volumes [here](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html). |
+| root_volume     | The vast majority of AMIs require an EBS root volume. The default size of this root volume is small, irrespective of the instance-type, so use this variable to set the size of the root volume to the desired value. More details about root devices [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/RootDeviceStorage.html) and about types of EBS Volumes [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html). |
 | ambari_server   | Set it to `true` if the role also defines an Ambari Server. The number of nodes with this role should be 1. If there are more than 1 node, ambari-server will be installed on all of them, but only the first one (in alphabetical order) will be used by the Ambari Agents. |
 
 
@@ -208,9 +209,9 @@ Modify the file at `~/ansible-hortonworks/playbooks/group_vars/all` to set the c
 | Variable                   | Description                                                                                                 |
 | -------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | cluster_name               | The name of the cluster. This is also used by default in the cloud components that require uniqueness, such as the VPC name or tags. |
-| ambari_version             | The Ambari version, in the full, 4-number form, for example: `2.5.1.0`.                                     |
-| hdp_version                | The HDP version, in the full, 4-number form, for example: `2.6.1.0`.                                        |
-| hdf_version                | The HDF version, in the full, 4-number form, for example: `3.0.1.0`.                                        |
+| ambari_version             | The Ambari version, in the full, 4-number form, for example: `2.6.2.2`.                                     |
+| hdp_version                | The HDP version, in the full, 4-number form, for example: `2.6.5.0`.                                        |
+| hdf_version                | The HDF version, in the full, 4-number form, for example: `3.1.2.0`.                                      |
 | repo_base_url              | The base URL for the repositories. Change this to the local web server url if using a Local Repository. `/HDP/<OS>/2.x/updates/<latest.version>` (or `/HDF/..`) will be appended to this value to set it accordingly if there are additional URL paths. |
 | java                       | Can be set to `embedded` (default - downloaded by Ambari), `openjdk` or `oraclejdk`. If `oraclejdk` is selected, then the `.x64.tar.gz` package must be downloaded in advance from [Oracle](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html). Same with the [JCE](http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html) package. These files can be copied to all nodes in advanced or only to the Ansible Controller and Ansible will copy them. This behaviour is controlled by the `oraclejdk_options.remote_files` setting. |
 | oraclejdk_options          | These options are only relevant if `java` is set to `oraclejdk`. |
@@ -254,23 +255,17 @@ Modify the file at `~/ansible-hortonworks/playbooks/group_vars/ambari-server` to
 
 ### database configuration
 
-| Variable                       | Description                                                                                                |
-| ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
-| database                       | The type of database that should be used. A choice between `embedded` (Ambari default), `postgres`, `mysql` or `mariadb`. |
-| database_options               | These options are only relevant for the non-`embedded` database. |
-| .external_hostname             | The hostname/IP of the database server. This needs to be prepared as per the [documentation](https://docs.hortonworks.com/HDPDocuments/Ambari-2.5.1.0/bk_ambari-administration/content/ch_amb_ref_using_non_default_databases.html). No need to load any schema, this will be done by Ansible, but the users and databases must be created in advance. If left empty `''` then the playbooks will install the database server on the Ambari node and prepare everything. To change any settings (like the version or repository path) modify the OS specific files under the `playbooks/roles/database/vars/` folder. |
-| .ambari_db_name                | The name of the database Ambari should use. |
-| .ambari_db_username            | The username that Ambari should use to connect to its database. |
-| .ambari_db_password            | The password for the above user. |
-| .hive_db_name                  | The name of the database Hive should use. |
-| .hive_db_username              | The username that Hive should use to connect to its database. |
-| .hive_db_password              | The password for the above user. |
-| .oozie_db_name                 | The name of the database Oozie should use. |
-| .oozie_db_username             | The username that Oozie should use to connect to its database. |
-| .oozie_db_password             | The password for the above user. |
-| .rangeradmin_db_name           | The name of the database Ranger Admin should use. |
-| .rangeradmin_db_username       | The username that Ranger Admin should use to connect to its database. | |
-| .rangeradmin_db_password       | The password for the above user. |
+| Variable                                 | Description                                                                                                |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| database                                 | The type of database that should be used. A choice between `embedded` (Ambari default), `postgres`, `mysql` or `mariadb`. |
+| database_options                         | These options are only relevant for the non-`embedded` database. |
+| .external_hostname                       | The hostname/IP of the database server. This needs to be prepared as per the [documentation](https://docs.hortonworks.com/HDPDocuments/Ambari-2.6.2.0/bk_ambari-administration/content/ch_amb_ref_using_existing_databases.html). No need to load any schema, this will be done by Ansible, but the users and databases must be created in advance. If left empty `''` then the playbooks will install the database server on the Ambari node and prepare everything with the settings defined bellow. To change any settings (like the version or repository path) modify the OS specific files under the `playbooks/roles/database/vars/` folder. |
+| .ambari_db_name,_username,_password      | The name of the database that Ambari should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |
+| .hive_db_name,_username,_password        | The name of the database that Hive should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |
+| .oozie_db_name,_username,_password       | The name of the database that Oozie should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |
+| .rangeradmin_db_name,_username,_password | The name of the database that Ranger Admin should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |
+| .registry_db_name,_username,_password    | The name of the database that Schema Registry should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |
+| .streamline_db_name,_username,_password  | The name of the database that SAM should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |
 
 ### ranger configuration
 
