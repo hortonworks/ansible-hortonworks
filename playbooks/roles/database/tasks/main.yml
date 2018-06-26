@@ -40,7 +40,7 @@
 
     - name: Add mysql repository key (apt)
       apt_key:
-        keyserver: "{{ mysql_repo_keyserver }}"
+        data: "{{ lookup('file', mysql_repo_keyfile) }}"
         id: "{{ mysql_repo_key }}"
       when: ansible_os_family|lower == "debian"
   when: database == "mysql"

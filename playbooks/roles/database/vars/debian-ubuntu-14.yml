@@ -9,7 +9,7 @@ postgres_hba_file: /etc/postgresql/9.3/main/pg_hba.conf
 
 mysql_repo_url: 'http://repo.mysql.com/apt/ubuntu/'
 mysql_repo_key: '5072E1F5'
-mysql_repo_keyserver: 'pgp.mit.edu'
+mysql_repo_keyfile: 'mysql_pubkey.asc'
 mysql_packages:
   - mysql-community-server
   - python-mysqldb
