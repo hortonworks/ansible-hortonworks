@@ -1,6 +1,5 @@
 ---
 packages:
-  - python27-httplib2       # required for calling Ambari API from Ansible
   - openssh-clients         # scp required by Ambari
   - curl                    # curl required by Ambari
   - unzip                   # unzip required by Ambari
@@ -14,5 +13,3 @@ openjdk_package: java-1.8.0-openjdk-devel
 ntp_service_name: ntpd
 
 firewall_service_name: iptables
-
-epel_url: "http://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm"

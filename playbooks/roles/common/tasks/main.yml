@@ -11,20 +11,6 @@
       paths:
         - ../vars
 
-- name: Install epel
-  yum:
-    name: epel-release
-    state: installed
-  ignore_errors: true
-  register: epel_result
-  when: ansible_os_family|lower == "redhat"
-
-- name: Install epel from rpm
-  yum:
-    name: "{{ epel_url }}"
-    state: installed
-  when: ansible_os_family|lower == "redhat" and epel_result is failed
-
 - name: Install required packages
   package:
     name: "{{ item }}"

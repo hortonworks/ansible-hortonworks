@@ -1,6 +1,5 @@
 ---
 packages:
-  - python-httplib2         # required for calling Ambari API from Ansible
   - openssh-client          # scp required by Ambari
   - curl                    # curl required by Ambari
   - unzip                   # unzip required by Ambari
