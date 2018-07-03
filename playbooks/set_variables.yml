@@ -8,7 +8,30 @@
       include_tasks: "clouds/add_nodes_{{ cloud_name }}.yml"
       with_items: "{{ nodes|default(omit) }}"
 
-- name: Create the required Ansible variables
+- name: Create the Ansible helper variables for all nodes
+  hosts: hadoop-cluster
+  gather_facts: False
+  tasks:
+    - name: Check if /usr/bin/python exists
+      raw: bash -c "test -e /usr/bin/python && echo -n exists || echo -n"
+      register: default_python2_path
+
+    - name: Check if /usr/bin/python3 exists
+      raw: bash -c "test -e /usr/bin/python3 && echo -n exists || echo -n"
+      register: default_python3_path
+      when: default_python2_path.stdout == ""
+
+    - name: Fail if no standard python path could be found
+      fail:
+        msg: "Python could not be found at /usr/bin/python or /usr/bin/python3. If using a custom python path, set the 'ansible_python_interpreter' inventory variable to the valid path for your environment."
+      when: default_python2_path.stdout == "" and default_python3_path.stdout != "exists"
+
+    - name: Set the ansible_python_interpreter to /usr/bin/python3
+      set_fact:
+        ansible_python_interpreter: "/usr/bin/python3"
+      when: default_python3_path.stdout is defined and default_python3_path.stdout == "exists"
+
+- name: Create the Ansible helper variables for the ambari-server
   hosts: ambari-server
   gather_facts: False
   tasks:
