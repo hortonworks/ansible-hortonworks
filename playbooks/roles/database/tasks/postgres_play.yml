@@ -28,11 +28,5 @@
   when: createdb_results is failed and not createdb_results.stderr is search("database .* already exists")
 
 - name: Configure access for the {{ db_username }} user ({{ database }})
-  lineinfile:
-    path: "{{ postgres_hba_file }}"
-    regexp: "^host {{ db_name }} {{ db_username }} {{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 .*"
-    line: "host {{ db_name }} {{ db_username }} {{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 md5"
-    insertbefore: EOF
-    state: present
-  notify: Restart postgres
+  include_tasks: postgres_play_db_access.yml
   with_items: "{{ db_client_hosts }}"

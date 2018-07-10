@@ -13,11 +13,6 @@
     state: present
   with_items: "{{ db_client_hosts }}"
 
-- name: Create the {{ db_username }} database user and IP based access ({{ database }})
-  mysql_user:
-    name: "{{ db_username }}"
-    host: "{{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}"
-    priv: "{{ db_name }}.*:ALL"
-    password: "{{ db_password }}"
-    state: present
+- name: Configure IP based access for the {{ db_username }} user ({{ database }})
+  include_tasks: mysql_play_db_access.yml
   with_items: "{{ db_client_hosts }}"
