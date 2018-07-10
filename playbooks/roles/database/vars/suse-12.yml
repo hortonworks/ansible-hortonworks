@@ -1,6 +1,6 @@
 ---
 postgres_packages:
-  - postgresql94-server
+  - postgresql96-server
 postgres_service_name: postgresql
 postgres_initdb_command: systemctl start postgresql
 postgres_config_file: /var/lib/pgsql/data/postgresql.conf
