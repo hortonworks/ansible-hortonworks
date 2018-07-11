@@ -17,47 +17,65 @@
   when: database == "mariadb" and ((ansible_os_family|lower == "suse" and ansible_distribution_major_version|int == 11) or ansible_os_family|lower == "debian")
 
 - block:
-    - name: Upload mysql repository file (yum)
-      template:
-        src: mysql-community.repo.j2
-        dest: /etc/yum.repos.d/mysql-community.repo
-        mode: 0644
+    - name: Add the mysql repository (yum)
+      yum_repository:
+        name: mysql-community
+        description: "MySQL {{ mysql_version }} Community Server"
+        baseurl: "{{ mysql_repo_url }}"
+        state: present
+        gpgcheck: yes
+        gpgkey: "{{ mysql_repo_key }}"
       when: ansible_os_family|lower == "redhat"
 
-    - name: Upload mysql repository file (zypper)
-      template:
-        src: mysql-community-suse.repo.j2
-        dest: /etc/zypp/repos.d/mysql-community.repo
-        mode: 0644
+    - name: Add the mysql repository (zypper)
+      zypper_repository:
+        name: mysql-community
+        description: "MySQL {{ mysql_version }} Community Server"
+        repo: "{{ mysql_repo_url }}"
+        state: present
+        disable_gpg_check : yes
+        runrefresh: yes
       when: ansible_os_family|lower == "suse"
 
-    - name: Upload mysql repository file (apt)
-      template:
-        src: mysql.list.j2
-        dest: /etc/apt/sources.list.d/mysql.list
-        mode: 0644
+    - name: Add the mysql repository key (apt)
+      apt_key:
+        data: "{{ lookup('file', mysql_repo_keyfile) }}"
+        id: "{{ mysql_repo_key }}"
       when: ansible_os_family|lower == "debian"
 
-    - name: Add mysql repository key (apt)
-      apt_key:
-        keyserver: "{{ mysql_repo_keyserver }}"
-        id: "{{ mysql_repo_key }}"
+    - name: Add the mysql repository (apt)
+      apt_repository:
+        filename: mysql
+        repo: "{{ item }}"
+        state: present
+        update_cache: yes
+      with_items:
+        - "deb {{ mysql_repo_url }} {{ ansible_lsb.codename }} mysql-apt-config"
+        - "deb {{ mysql_repo_url }} {{ ansible_lsb.codename }} mysql-{{ mysql_version }}"
+        - "deb {{ mysql_repo_url }} {{ ansible_lsb.codename }} mysql-tools"
+        - "deb-src {{ mysql_repo_url }} {{ ansible_lsb.codename }} mysql-{{ mysql_version }}"
       when: ansible_os_family|lower == "debian"
   when: database == "mysql"
 
 - block:
-    - name: Upload mariadb repository file (yum)
-      template:
-        src: mariadb.repo.j2
-        dest: /etc/yum.repos.d/mariadb.repo
-        mode: 0644
+    - name: Add the mariadb repository (yum)
+      yum_repository:
+        name: mariadb
+        description: "MariaDB"
+        baseurl: "{{ mariadb_repo_url }}"
+        state: present
+        gpgcheck: yes
+        gpgkey: "{{ mariadb_repo_key }}"
       when: ansible_os_family|lower == "redhat"
 
-    - name: Upload mariadb repository file (zypper)
-      template:
-        src: mariadb-suse.repo.j2
-        dest: /etc/zypp/repos.d/mariadb.repo
-        mode: 0644
+    - name: Add the mariadb repository (zypper)
+      zypper_repository:
+        name: mariadb
+        description: "MariaDB"
+        repo: "{{ mariadb_repo_url }}"
+        state: present
+        disable_gpg_check : yes
+        runrefresh: yes
       when: ansible_os_family|lower == "suse"
   when: database == "mariadb"
 
@@ -68,22 +86,37 @@
     state: present
   with_items: "{{ hostvars[inventory_hostname][database + '_packages'] }}"
 
-- name: Initiate postgres
-  become: yes
-  shell: "{{ postgres_initdb_command }}"
-  args:
-    creates: "{{ postgres_hba_file }}"
-    warn: false
+- block:
+    - name: Initiate postgres
+      become: yes
+      shell: "{{ postgres_initdb_command }}"
+      args:
+        creates: "{{ postgres_hba_file }}"
+        warn: false
+
+    - name: Configure postgres to listen on all interfaces
+      lineinfile:
+        path: "{{ postgres_config_file }}"
+        line: "listen_addresses = '*'"
+        regexp: '^#?listen_addresses\s+='
+        state: present
+      notify: Restart postgres
   when: database == "postgres"
 
-- name: Configure postgres to listen on all interfaces
-  lineinfile:
-    path: "{{ postgres_config_file }}"
-    line: "listen_addresses = '*'"
-    regexp: '^#?listen_addresses\s+='
-    state: present
-  notify: Restart postgres
-  when: database == "postgres"
+- block:
+    - name: Configure {{ database }} to listen on all interfaces
+      ini_file:
+        path: "{{ (database == 'mariadb') | ternary(mariadb_config_file, mysql_config_file) }}"
+        create: no
+        section: "mysqld"
+        option: "bind-address"
+        value: "*"
+        no_extra_spaces: yes
+        state: present
+      notify: Restart {{ database }}
+  when: database == "mysql" or database == "mariadb"
+
+- meta: flush_handlers
 
 - name: Make sure the {{ database }} service is started
   service:
@@ -96,401 +129,55 @@
     enabled: yes
   ignore_errors: true
 
-- block:
-    - name: Generate MD5 passwords
-      set_fact:
-        ambari_db_password_md5: "md5{{ (database_options.ambari_db_password~database_options.ambari_db_username) | hash('md5') }}"
-        hive_db_password_md5: "md5{{ (database_options.hive_db_password~database_options.hive_db_username) | hash('md5') }}"
-        oozie_db_password_md5: "md5{{ (database_options.oozie_db_password~database_options.oozie_db_username) | hash('md5') }}"
-        rangeradmin_db_password_md5: "md5{{ (database_options.rangeradmin_db_password~database_options.rangeradmin_db_username) | hash('md5') }}"
-        registry_db_password_md5: "md5{{ (database_options.registry_db_password~database_options.registry_db_username) | hash('md5') }}"
-        streamline_db_password_md5: "md5{{ (database_options.streamline_db_password~database_options.streamline_db_username) | hash('md5') }}"
+- name: Prepare the ambari database
+  include_tasks: "{{ database | regex_replace('mariadb', 'mysql') }}_play.yml"
+  vars:
+    db_name: "{{ database_options.ambari_db_name }}"
+    db_username: "{{ database_options.ambari_db_username }}"
+    db_password: "{{ database_options.ambari_db_password }}"
+    db_client_hosts: "{{ inventory_hostname }}"
 
-    - name: Create the ambari database user (postgres)
-      shell: su - postgres -c "psql -c \"CREATE ROLE {{ database_options.ambari_db_username }} ENCRYPTED PASSWORD '{{ ambari_db_password_md5 }}' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN;\""
-      args:
-        warn: false
-      register: createuser_results
-      ignore_errors: true
+- name: Prepare the hive database
+  include_tasks: "{{ database | regex_replace('mariadb', 'mysql') }}_play.yml"
+  vars:
+    db_name: "{{ database_options.hive_db_name }}"
+    db_username: "{{ database_options.hive_db_username }}"
+    db_password: "{{ database_options.hive_db_password }}"
+    db_client_hosts: "{{ hiveserver_hosts }}"
+  when: hiveserver_hosts is defined and hiveserver_hosts|length > 0
 
-    - name: Fail if the user could not be created (postgres)
-      fail:
-        msg: The user could not be created. Error is {{ createuser_results.stderr }}!
-      when: createuser_results is failed and not createuser_results.stderr is search("role .* already exists")
+- name: Prepare the oozie database
+  include_tasks: "{{ database | regex_replace('mariadb', 'mysql') }}_play.yml"
+  vars:
+    db_name: "{{ database_options.oozie_db_name }}"
+    db_username: "{{ database_options.oozie_db_username }}"
+    db_password: "{{ database_options.oozie_db_password }}"
+    db_client_hosts: "{{ oozie_hosts }}"
+  when: oozie_hosts is defined and oozie_hosts|length > 0
 
-    - name: Create the ambari database (postgres)
-      shell: su - postgres -c "createdb -O {{ database_options.ambari_db_username }} {{ database_options.ambari_db_name }}"
-      args:
-        warn: false
-      register: createdb_results
-      ignore_errors: true
+- name: Prepare the ranger database
+  include_tasks: "{{ database | regex_replace('mariadb', 'mysql') }}_play.yml"
+  vars:
+    db_name: "{{ database_options.rangeradmin_db_name }}"
+    db_username: "{{ database_options.rangeradmin_db_username }}"
+    db_password: "{{ database_options.rangeradmin_db_password }}"
+    db_client_hosts: "{{ rangeradmin_hosts }}"
+  when: rangeradmin_hosts is defined and rangeradmin_hosts|length > 0
 
-    - name: Fail if the database could not be created (postgres)
-      fail:
-        msg: The database could not be created. Error is {{ createdb_results.stderr }}!
-      when: createdb_results is failed and not createdb_results.stderr is search("database .* already exists")
+- name: Prepare the registry database
+  include_tasks: "{{ database | regex_replace('mariadb', 'mysql') }}_play.yml"
+  vars:
+    db_name: "{{ database_options.registry_db_name }}"
+    db_username: "{{ database_options.registry_db_username }}"
+    db_password: "{{ database_options.registry_db_password }}"
+    db_client_hosts: "{{ registry_hosts }}"
+  when: registry_hosts is defined and registry_hosts|length > 0
 
-    - name: Create the ambari database schema (postgres)
-      shell: su - postgres -c "psql -d {{ database_options.ambari_db_name }} -c \"CREATE SCHEMA {{ database_options.ambari_db_name }} AUTHORIZATION {{ database_options.ambari_db_username }};\""
-      args:
-        warn: false
-      register: createschema_results
-      ignore_errors: true
-
-    - name: Fail if the database schema could not be created (postgres)
-      fail:
-        msg: The database schema could not be created. Error is {{ createschema_results.stderr }}!
-      when: createschema_results is failed and not createschema_results.stderr is search("schema .* already exists")
-
-    - name: Set the ambari user search_path (postgres)
-      shell: su - postgres -c "psql -d {{ database_options.ambari_db_name }} -c \"ALTER ROLE {{ database_options.ambari_db_username }} SET search_path to '{{ database_options.ambari_db_name }}', 'public';\""
-      args:
-        warn: false
-
-    - name: Configure access for the ambari user (postgres)
-      lineinfile:
-        path: "{{ postgres_hba_file }}"
-        regexp: "^host {{ database_options.ambari_db_name }} {{ database_options.ambari_db_username }} {{ hostvars[inventory_hostname]['ansible_'~hostvars[inventory_hostname].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 .*"
-        line: "host {{ database_options.ambari_db_name }} {{ database_options.ambari_db_username }} {{ hostvars[inventory_hostname]['ansible_'~hostvars[inventory_hostname].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 md5"
-        insertbefore: EOF
-        state: present
-      notify: Restart postgres
-
-    - name: Create the hive database user (postgres)
-      shell: su - postgres -c "psql -c \"CREATE ROLE {{ database_options.hive_db_username }} ENCRYPTED PASSWORD '{{ hive_db_password_md5 }}' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN;\""
-      args:
-        warn: false
-      register: createuser_results
-      ignore_errors: true
-      when: hiveserver_hosts is defined and hiveserver_hosts|length > 0
-
-    - name: Fail if the user could not be created (postgres)
-      fail:
-        msg: The user could not be created. Error is {{ createuser_results.stderr }}!
-      when: hiveserver_hosts is defined and hiveserver_hosts|length > 0 and createuser_results is failed and not createuser_results.stderr is search("role .* already exists")
-
-    - name: Create the hive database (postgres)
-      shell: su - postgres -c "createdb -O {{ database_options.hive_db_username }} {{ database_options.hive_db_name }}"
-      args:
-        warn: false
-      register: createdb_results
-      ignore_errors: true
-      when: hiveserver_hosts is defined and hiveserver_hosts|length > 0
-
-    - name: Fail if the database could not be created (postgres)
-      fail:
-        msg: The database could not be created. Error is {{ createdb_results.stderr }}!
-      when: hiveserver_hosts is defined and hiveserver_hosts|length > 0 and createdb_results is failed and not createdb_results.stderr is search("database .* already exists")
-
-    - name: Configure access for the hive user (postgres)
-      lineinfile:
-        path: "{{ postgres_hba_file }}"
-        regexp: "^host {{ database_options.hive_db_name }} {{ database_options.hive_db_username }} {{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 .*"
-        line: "host {{ database_options.hive_db_name }} {{ database_options.hive_db_username }} {{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 md5"
-        insertbefore: EOF
-        state: present
-      notify: Restart postgres
-      with_items: "{{ hiveserver_hosts }}"
-      when: hiveserver_hosts is defined and hiveserver_hosts|length > 0
-
-    - name: Create the oozie database user (postgres)
-      shell: su - postgres -c "psql -c \"CREATE ROLE {{ database_options.oozie_db_username }} ENCRYPTED PASSWORD '{{ oozie_db_password_md5 }}' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN;\""
-      args:
-        warn: false
-      register: createuser_results
-      ignore_errors: true
-      when: oozie_hosts is defined and oozie_hosts|length > 0
-
-    - name: Fail if the user could not be created (postgres)
-      fail:
-        msg: The user could not be created. Error is {{ createuser_results.stderr }}!
-      when: oozie_hosts is defined and oozie_hosts|length > 0 and createuser_results is failed and not createuser_results.stderr is search("role .* already exists")
-
-    - name: Create the oozie database (postgres)
-      shell: su - postgres -c "createdb -O {{ database_options.oozie_db_username }} {{ database_options.oozie_db_name }}"
-      args:
-        warn: false
-      register: createdb_results
-      ignore_errors: true
-      when: oozie_hosts is defined and oozie_hosts|length > 0
-
-    - name: Fail if the database could not be created (postgres)
-      fail:
-        msg: The database could not be created. Error is {{ createdb_results.stderr }}!
-      when: oozie_hosts is defined and oozie_hosts|length > 0 and createdb_results is failed and not createdb_results.stderr is search("database .* already exists")
-
-    - name: Configure access for the oozie user (postgres)
-      lineinfile:
-        path: "{{ postgres_hba_file }}"
-        regexp: "^host {{ database_options.oozie_db_name }} {{ database_options.oozie_db_username }} {{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 .*"
-        line: "host {{ database_options.oozie_db_name }} {{ database_options.oozie_db_username }} {{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 md5"
-        insertbefore: EOF
-        state: present
-      notify: Restart postgres
-      with_items: "{{ oozie_hosts }}"
-      when: oozie_hosts is defined and oozie_hosts|length > 0
-
-    - name: Create the ranger admin database user (postgres)
-      shell: su - postgres -c "psql -c \"CREATE ROLE {{ database_options.rangeradmin_db_username }} ENCRYPTED PASSWORD '{{ rangeradmin_db_password_md5 }}' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN;\""
-      args:
-        warn: false
-      register: createuser_results
-      ignore_errors: true
-      when: rangeradmin_hosts is defined and rangeradmin_hosts|length > 0
-
-    - name: Fail if the user could not be created (postgres)
-      fail:
-        msg: The user could not be created. Error is {{ createuser_results.stderr }}!
-      when: rangeradmin_hosts is defined and rangeradmin_hosts|length > 0 and createuser_results is failed and not createuser_results.stderr is search("role .* already exists")
-
-    - name: Create the ranger admin database (postgres)
-      shell: su - postgres -c "createdb -O {{ database_options.rangeradmin_db_username }} {{ database_options.rangeradmin_db_name }}"
-      args:
-        warn: false
-      register: createdb_results
-      ignore_errors: true
-      when: rangeradmin_hosts is defined and rangeradmin_hosts|length > 0
-
-    - name: Fail if the database could not be created (postgres)
-      fail:
-        msg: The database could not be created. Error is {{ createdb_results.stderr }}!
-      when: rangeradmin_hosts is defined and rangeradmin_hosts|length > 0 and createdb_results is failed and not createdb_results.stderr is search("database .* already exists")
-
-    - name: Configure access for the ranger admin database user (postgres)
-      lineinfile:
-        path: "{{ postgres_hba_file }}"
-        regexp: "^host {{ database_options.rangeradmin_db_name }} {{ database_options.rangeradmin_db_username }} {{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 .*"
-        line: "host {{ database_options.rangeradmin_db_name }} {{ database_options.rangeradmin_db_username }} {{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 md5"
-        insertbefore: EOF
-        state: present
-      notify: Restart postgres
-      with_items: "{{ rangeradmin_hosts }}"
-      when: rangeradmin_hosts is defined and rangeradmin_hosts|length > 0
-
-    - name: Create the registry database user (postgres)
-      shell: su - postgres -c "psql -c \"CREATE ROLE {{ database_options.registry_db_username }} ENCRYPTED PASSWORD '{{ registry_db_password_md5 }}' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN;\""
-      args:
-        warn: false
-      register: createuser_results
-      ignore_errors: true
-      when: registry_hosts is defined and registry_hosts|length > 0
-
-    - name: Fail if the user could not be created (postgres)
-      fail:
-        msg: The user could not be created. Error is {{ createuser_results.stderr }}!
-      when: registry_hosts is defined and registry_hosts|length > 0 and createuser_results is failed and not createuser_results.stderr is search("role .* already exists")
-
-    - name: Create the registry database (postgres)
-      shell: su - postgres -c "createdb -O {{ database_options.registry_db_username }} {{ database_options.registry_db_name }}"
-      args:
-        warn: false
-      register: createdb_results
-      ignore_errors: true
-      when: registry_hosts is defined and registry_hosts|length > 0
-
-    - name: Fail if the database could not be created (postgres)
-      fail:
-        msg: The database could not be created. Error is {{ createdb_results.stderr }}!
-      when: registry_hosts is defined and registry_hosts|length > 0 and createdb_results is failed and not createdb_results.stderr is search("database .* already exists")
-
-    - name: Configure access for the registry database user (postgres)
-      lineinfile:
-        path: "{{ postgres_hba_file }}"
-        regexp: "^host {{ database_options.registry_db_name }} {{ database_options.registry_db_username }} {{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 .*"
-        line: "host {{ database_options.registry_db_name }} {{ database_options.registry_db_username }} {{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 md5"
-        insertbefore: EOF
-        state: present
-      notify: Restart postgres
-      with_items: "{{ registry_hosts }}"
-      when: registry_hosts is defined and registry_hosts|length > 0
-
-    - name: Create the streamline database user (postgres)
-      shell: su - postgres -c "psql -c \"CREATE ROLE {{ database_options.streamline_db_username }} ENCRYPTED PASSWORD '{{ streamline_db_password_md5 }}' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN;\""
-      args:
-        warn: false
-      register: createuser_results
-      ignore_errors: true
-      when: streamline_hosts is defined and streamline_hosts|length > 0
-
-    - name: Fail if the user could not be created (postgres)
-      fail:
-        msg: The user could not be created. Error is {{ createuser_results.stderr }}!
-      when: streamline_hosts is defined and streamline_hosts|length > 0 and createuser_results is failed and not createuser_results.stderr is search("role .* already exists")
-
-    - name: Create the streamline database (postgres)
-      shell: su - postgres -c "createdb -O {{ database_options.streamline_db_username }} {{ database_options.streamline_db_name }}"
-      args:
-        warn: false
-      register: createdb_results
-      ignore_errors: true
-      when: streamline_hosts is defined and streamline_hosts|length > 0
-
-    - name: Fail if the database could not be created (postgres)
-      fail:
-        msg: The database could not be created. Error is {{ createdb_results.stderr }}!
-      when: streamline_hosts is defined and streamline_hosts|length > 0 and createdb_results is failed and not createdb_results.stderr is search("database .* already exists")
-
-    - name: Configure access for the streamline database user (postgres)
-      lineinfile:
-        path: "{{ postgres_hba_file }}"
-        regexp: "^host {{ database_options.streamline_db_name }} {{ database_options.streamline_db_username }} {{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 .*"
-        line: "host {{ database_options.streamline_db_name }} {{ database_options.streamline_db_username }} {{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}/32 md5"
-        insertbefore: EOF
-        state: present
-      notify: Restart postgres
-      with_items: "{{ streamline_hosts }}"
-      when: streamline_hosts is defined and streamline_hosts|length > 0
-  when: database == "postgres"
-
-- block:
-    - name: Create the ambari database (mysql)
-      mysql_db:
-        name: "{{ database_options.ambari_db_name }}"
-        state: present
-
-    - name: Create the ambari database user and host based access (mysql)
-      mysql_user:
-        name: "{{ database_options.ambari_db_username }}"
-        host: "{{ hostvars[inventory_hostname]['ansible_fqdn'] }}"
-        priv: "{{ database_options.ambari_db_name }}.*:ALL"
-        password: "{{ database_options.ambari_db_password }}"
-        state: present
-
-    - name: Create the ambari database user and IP based access (mysql)
-      mysql_user:
-        name: "{{ database_options.ambari_db_username }}"
-        host: "{{ hostvars[inventory_hostname]['ansible_'~hostvars[inventory_hostname].ansible_default_ipv4.alias]['ipv4']['address'] }}"
-        priv: "{{ database_options.ambari_db_name }}.*:ALL"
-        password: "{{ database_options.ambari_db_password }}"
-        state: present
-
-    - name: Create the hive database (mysql)
-      mysql_db:
-        name: "{{ database_options.hive_db_name }}"
-        state: present
-      when: hiveserver_hosts is defined and hiveserver_hosts|length > 0
-
-    - name: Create the hive database user and host based access (mysql)
-      mysql_user:
-        name: "{{ database_options.hive_db_username }}"
-        host: "{{ hostvars[item]['ansible_fqdn'] }}"
-        priv: "{{ database_options.hive_db_name }}.*:ALL"
-        password: "{{ database_options.hive_db_password }}"
-        state: present
-      with_items: "{{ hiveserver_hosts }}"
-      when: hiveserver_hosts is defined and hiveserver_hosts|length > 0
-
-    - name: Create the hive database user and IP based access (mysql)
-      mysql_user:
-        name: "{{ database_options.hive_db_username }}"
-        host: "{{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}"
-        priv: "{{ database_options.hive_db_name }}.*:ALL"
-        password: "{{ database_options.hive_db_password }}"
-        state: present
-      with_items: "{{ hiveserver_hosts }}"
-      when: hiveserver_hosts is defined and hiveserver_hosts|length > 0
-
-    - name: Create the oozie database (mysql)
-      mysql_db:
-        name: "{{ database_options.oozie_db_name }}"
-        state: present
-      when: oozie_hosts is defined and oozie_hosts|length > 0
-
-    - name: Create the oozie database user and host based access (mysql)
-      mysql_user:
-        name: "{{ database_options.oozie_db_username }}"
-        host: "{{ hostvars[item]['ansible_fqdn'] }}"
-        priv: "{{ database_options.oozie_db_name }}.*:ALL"
-        password: "{{ database_options.oozie_db_password }}"
-        state: present
-      with_items: "{{ oozie_hosts }}"
-      when: oozie_hosts is defined and oozie_hosts|length > 0
-
-    - name: Create the oozie database user and IP based access (mysql)
-      mysql_user:
-        name: "{{ database_options.oozie_db_username }}"
-        host: "{{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}"
-        priv: "{{ database_options.oozie_db_name }}.*:ALL"
-        password: "{{ database_options.oozie_db_password }}"
-        state: present
-      with_items: "{{ oozie_hosts }}"
-      when: oozie_hosts is defined and oozie_hosts|length > 0
-
-    - name: Create the ranger admin database (mysql)
-      mysql_db:
-        name: "{{ database_options.rangeradmin_db_name }}"
-        state: present
-      when: rangeradmin_hosts is defined and rangeradmin_hosts|length > 0
-
-    - name: Create the ranger admin database user and host based access (mysql)
-      mysql_user:
-        name: "{{ database_options.rangeradmin_db_username }}"
-        host: "{{ hostvars[item]['ansible_fqdn'] }}"
-        priv: "{{ database_options.rangeradmin_db_name }}.*:ALL"
-        password: "{{ database_options.rangeradmin_db_password }}"
-        state: present
-      with_items: "{{ rangeradmin_hosts }}"
-      when: rangeradmin_hosts is defined and rangeradmin_hosts|length > 0
-
-    - name: Create the ranger admin database user and IP based access (mysql)
-      mysql_user:
-        name: "{{ database_options.rangeradmin_db_username }}"
-        host: "{{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}"
-        priv: "{{ database_options.rangeradmin_db_name }}.*:ALL"
-        password: "{{ database_options.rangeradmin_db_password }}"
-        state: present
-      with_items: "{{ rangeradmin_hosts }}"
-      when: rangeradmin_hosts is defined and rangeradmin_hosts|length > 0
-
-    - name: Create the registry database (mysql)
-      mysql_db:
-        name: "{{ database_options.registry_db_name }}"
-        state: present
-      when: registry_hosts is defined and registry_hosts|length > 0
-
-    - name: Create the registry database user and host based access (mysql)
-      mysql_user:
-        name: "{{ database_options.registry_db_username }}"
-        host: "{{ hostvars[item]['ansible_fqdn'] }}"
-        priv: "{{ database_options.registry_db_name }}.*:ALL"
-        password: "{{ database_options.registry_db_password }}"
-        state: present
-      with_items: "{{ registry_hosts }}"
-      when: registry_hosts is defined and registry_hosts|length > 0
-
-    - name: Create the registry database user and IP based access (mysql)
-      mysql_user:
-        name: "{{ database_options.registry_db_username }}"
-        host: "{{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}"
-        priv: "{{ database_options.registry_db_name }}.*:ALL"
-        password: "{{ database_options.registry_db_password }}"
-        state: present
-      with_items: "{{ registry_hosts }}"
-      when: registry_hosts is defined and registry_hosts|length > 0
-
-    - name: Create the streamline database (mysql)
-      mysql_db:
-        name: "{{ database_options.streamline_db_name }}"
-        state: present
-      when: streamline_hosts is defined and streamline_hosts|length > 0
-
-    - name: Create the streamline database user and host based access (mysql)
-      mysql_user:
-        name: "{{ database_options.streamline_db_username }}"
-        host: "{{ hostvars[item]['ansible_fqdn'] }}"
-        priv: "{{ database_options.streamline_db_name }}.*:ALL"
-        password: "{{ database_options.streamline_db_password }}"
-        state: present
-      with_items: "{{ streamline_hosts }}"
-      when: streamline_hosts is defined and streamline_hosts|length > 0
-
-    - name: Create the streamline database user and IP based access (mysql)
-      mysql_user:
-        name: "{{ database_options.streamline_db_username }}"
-        host: "{{ hostvars[item]['ansible_'~hostvars[item].ansible_default_ipv4.alias]['ipv4']['address'] }}"
-        priv: "{{ database_options.streamline_db_name }}.*:ALL"
-        password: "{{ database_options.streamline_db_password }}"
-        state: present
-      with_items: "{{ streamline_hosts }}"
-      when: streamline_hosts is defined and streamline_hosts|length > 0
-  when: database == "mysql" or database == "mariadb"
+- name: Prepare the streamline database
+  include_tasks: "{{ database | regex_replace('mariadb', 'mysql') }}_play.yml"
+  vars:
+    db_name: "{{ database_options.streamline_db_name }}"
+    db_username: "{{ database_options.streamline_db_username }}"
+    db_password: "{{ database_options.streamline_db_password }}"
+    db_client_hosts: "{{ streamline_hosts }}"
+  when: streamline_hosts is defined and streamline_hosts|length > 0

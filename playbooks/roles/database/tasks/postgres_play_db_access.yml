@@ -1,0 +1,15 @@
+---
+- set_fact: outer_loop="{{ item }}"
+
+- name: Configure access for the {{ db_username }} user from {{ outer_loop }} ({{ database }})
+  lineinfile:
+    path: "{{ postgres_hba_file }}"
+    regexp: "^host {{ db_name }} {{ db_username }} {{ hostvars[outer_loop]['ansible_'~local_loop]['ipv4']['address'] }}/32 .*"
+    line: "host {{ db_name }} {{ db_username }} {{ hostvars[outer_loop]['ansible_'~local_loop]['ipv4']['address'] }}/32 md5"
+    insertbefore: EOF
+    state: present
+  loop_control:
+    loop_var: local_loop
+  notify: Restart postgres
+  with_items: "{{ hostvars[outer_loop]['ansible_interfaces'] }}"
+  when: local_loop != 'lo'

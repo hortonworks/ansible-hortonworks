@@ -2,7 +2,7 @@
 openjdk_path: /usr/lib64/jvm/java-1.8.0-openjdk
 
 postgres_packages:
-  - postgresql94
+  - postgresql96
   - postgresql-jdbc
 postgres_jdbc_location: /usr/share/java/postgresql-jdbc.jar
 

@@ -1,0 +1,18 @@
+---
+- name: Create the {{ db_name }} database ({{ database }})
+  mysql_db:
+    name: "{{ db_name }}"
+    state: present
+
+- name: Create the {{ db_username }} database user and host based access ({{ database }})
+  mysql_user:
+    name: "{{ db_username }}"
+    host: "{{ hostvars[item]['ansible_fqdn'] }}"
+    priv: "{{ db_name }}.*:ALL"
+    password: "{{ db_password }}"
+    state: present
+  with_items: "{{ db_client_hosts }}"
+
+- name: Configure IP based access for the {{ db_username }} user ({{ database }})
+  include_tasks: mysql_play_db_access.yml
+  with_items: "{{ db_client_hosts }}"
