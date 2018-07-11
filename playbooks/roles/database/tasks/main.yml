@@ -17,47 +17,65 @@
   when: database == "mariadb" and ((ansible_os_family|lower == "suse" and ansible_distribution_major_version|int == 11) or ansible_os_family|lower == "debian")
 
 - block:
-    - name: Upload mysql repository file (yum)
-      template:
-        src: mysql-community.repo.j2
-        dest: /etc/yum.repos.d/mysql-community.repo
-        mode: 0644
+    - name: Add the mysql repository (yum)
+      yum_repository:
+        name: mysql-community
+        description: "MySQL {{ mysql_version }} Community Server"
+        baseurl: "{{ mysql_repo_url }}"
+        state: present
+        gpgcheck: yes
+        gpgkey: "{{ mysql_repo_key }}"
       when: ansible_os_family|lower == "redhat"
 
-    - name: Upload mysql repository file (zypper)
-      template:
-        src: mysql-community-suse.repo.j2
-        dest: /etc/zypp/repos.d/mysql-community.repo
-        mode: 0644
+    - name: Add the mysql repository (zypper)
+      zypper_repository:
+        name: mysql-community
+        description: "MySQL {{ mysql_version }} Community Server"
+        repo: "{{ mysql_repo_url }}"
+        state: present
+        disable_gpg_check : yes
+        runrefresh: yes
       when: ansible_os_family|lower == "suse"
 
-    - name: Upload mysql repository file (apt)
-      template:
-        src: mysql.list.j2
-        dest: /etc/apt/sources.list.d/mysql.list
-        mode: 0644
-      when: ansible_os_family|lower == "debian"
-
-    - name: Add mysql repository key (apt)
+    - name: Add the mysql repository key (apt)
       apt_key:
         data: "{{ lookup('file', mysql_repo_keyfile) }}"
         id: "{{ mysql_repo_key }}"
       when: ansible_os_family|lower == "debian"
+
+    - name: Add the mysql repository (apt)
+      apt_repository:
+        filename: mysql
+        repo: "{{ item }}"
+        state: present
+        update_cache: yes
+      with_items:
+        - "deb {{ mysql_repo_url }} {{ ansible_lsb.codename }} mysql-apt-config"
+        - "deb {{ mysql_repo_url }} {{ ansible_lsb.codename }} mysql-{{ mysql_version }}"
+        - "deb {{ mysql_repo_url }} {{ ansible_lsb.codename }} mysql-tools"
+        - "deb-src {{ mysql_repo_url }} {{ ansible_lsb.codename }} mysql-{{ mysql_version }}"
+      when: ansible_os_family|lower == "debian"
   when: database == "mysql"
 
 - block:
-    - name: Upload mariadb repository file (yum)
-      template:
-        src: mariadb.repo.j2
-        dest: /etc/yum.repos.d/mariadb.repo
-        mode: 0644
+    - name: Add the mariadb repository (yum)
+      yum_repository:
+        name: mariadb
+        description: "MariaDB"
+        baseurl: "{{ mariadb_repo_url }}"
+        state: present
+        gpgcheck: yes
+        gpgkey: "{{ mariadb_repo_key }}"
       when: ansible_os_family|lower == "redhat"
 
-    - name: Upload mariadb repository file (zypper)
-      template:
-        src: mariadb-suse.repo.j2
-        dest: /etc/zypp/repos.d/mariadb.repo
-        mode: 0644
+    - name: Add the mariadb repository (zypper)
+      zypper_repository:
+        name: mariadb
+        description: "MariaDB"
+        repo: "{{ mariadb_repo_url }}"
+        state: present
+        disable_gpg_check : yes
+        runrefresh: yes
       when: ansible_os_family|lower == "suse"
   when: database == "mariadb"
 
