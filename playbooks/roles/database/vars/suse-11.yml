@@ -14,3 +14,4 @@ mysql_packages:
   - mysql-community-server
   - python-mysql
 mysql_service_name: mysql
+mysql_config_file: /etc/my.cnf

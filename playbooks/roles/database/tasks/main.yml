@@ -68,22 +68,37 @@
     state: present
   with_items: "{{ hostvars[inventory_hostname][database + '_packages'] }}"
 
-- name: Initiate postgres
-  become: yes
-  shell: "{{ postgres_initdb_command }}"
-  args:
-    creates: "{{ postgres_hba_file }}"
-    warn: false
+- block:
+    - name: Initiate postgres
+      become: yes
+      shell: "{{ postgres_initdb_command }}"
+      args:
+        creates: "{{ postgres_hba_file }}"
+        warn: false
+
+    - name: Configure postgres to listen on all interfaces
+      lineinfile:
+        path: "{{ postgres_config_file }}"
+        line: "listen_addresses = '*'"
+        regexp: '^#?listen_addresses\s+='
+        state: present
+      notify: Restart postgres
   when: database == "postgres"
 
-- name: Configure postgres to listen on all interfaces
-  lineinfile:
-    path: "{{ postgres_config_file }}"
-    line: "listen_addresses = '*'"
-    regexp: '^#?listen_addresses\s+='
-    state: present
-  notify: Restart postgres
-  when: database == "postgres"
+- block:
+    - name: Configure {{ database }} to listen on all interfaces
+      ini_file:
+        path: "{{ (database == 'mariadb') | ternary(mariadb_config_file, mysql_config_file) }}"
+        create: no
+        section: "mysqld"
+        option: "bind-address"
+        value: "*"
+        no_extra_spaces: yes
+        state: present
+      notify: Restart {{ database }}
+  when: database == "mysql" or database == "mariadb"
+
+- meta: flush_handlers
 
 - name: Make sure the {{ database }} service is started
   service:

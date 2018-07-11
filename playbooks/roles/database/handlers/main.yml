@@ -3,3 +3,13 @@
   service:
     name: "{{ postgres_service_name }}"
     state: restarted
+
+- name: Restart mysql
+  service:
+    name: "{{ mysql_service_name }}"
+    state: restarted
+
+- name: Restart mariadb
+  service:
+    name: "{{ mariadb_service_name }}"
+    state: restarted

@@ -13,6 +13,7 @@ mysql_packages:
   - mysql-community-server
   - MySQL-python
 mysql_service_name: mysqld
+mysql_config_file: /etc/my.cnf
 
 mariadb_version: '10.2'
 mariadb_repo_url: 'http://yum.mariadb.org/{{ mariadb_version }}/centos6-amd64'
@@ -21,3 +22,4 @@ mariadb_packages:
   - MariaDB-server
   - MySQL-python
 mariadb_service_name: mysql
+mariadb_config_file: /etc/my.cnf.d/server.cnf
