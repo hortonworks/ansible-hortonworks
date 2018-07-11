@@ -3,6 +3,7 @@ openjdk_path: /usr/lib/jvm/java-1.8.0-openjdk.x86_64
 
 postgres_packages:
   - postgresql
+  - python-psycopg2
   - postgresql-jdbc
 postgres_jdbc_location: /usr/share/java/postgresql-jdbc.jar
 
