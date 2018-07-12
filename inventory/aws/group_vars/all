@@ -26,7 +26,7 @@ cloud_config:
 nodes:
   - role: "hdp-master"
     count: 1
-    image: ami-a26d53db                                            # Ubuntu 14.04 AMI in eu-west-1 only (change this ID if using a different region)
+    image: ami-2a7d75c0                                            # Ubuntu 16.04 AMI in eu-west-1 only (change this ID if using a different region)
     type: r4.xlarge
     public_ip: true
     security_groups: default_cluster_access,ambari_access
@@ -38,7 +38,7 @@ nodes:
 
   - role: "hdp-slave"
     count: 3
-    image: ami-a26d53db                                            # Ubuntu 14.04 AMI in eu-west-1 only (change this ID if using a different region)
+    image: ami-2a7d75c0                                            # Ubuntu 16.04 AMI in eu-west-1 only (change this ID if using a different region)
     type: m5.xlarge
     public_ip: true
     security_groups: default_cluster_access
@@ -49,7 +49,7 @@ nodes:
 
   - role: "hdp-edge"
     count: 0
-    image: ami-a26d53db                                            # Ubuntu 14.04 AMI in eu-west-1 only (change this ID if using a different region)
+    image: ami-2a7d75c0                                            # Ubuntu 16.04 AMI in eu-west-1 only (change this ID if using a different region)
     type: m4.large
     public_ip: true
     security_groups: default_cluster_access
