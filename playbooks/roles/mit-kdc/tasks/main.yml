@@ -18,18 +18,18 @@
     state: present
   with_items: "{{ kdc_packages }}"
 
-- name: Create the KDC database for realm {{ security_options.realm | upper }}
-  shell: "{{ kdc_init_command }} -r {{ security_options.realm | upper }} -P {{ security_options.kdc_master_key }}"
-  args:
-    creates: "{{ kdc_database_file }}"
-  notify: Restart krb5
-
 - name: Upload the KDC configuration file
   template:
     src: kdc.conf.j2
     dest: "{{ kdc_config_file }}"
     mode: 0600
     force: yes
+  notify: Restart krb5
+
+- name: Create the KDC database for realm {{ security_options.realm | upper }}
+  shell: "{{ kdc_init_command }} -r {{ security_options.realm | upper }} -P {{ security_options.kdc_master_key }}"
+  args:
+    creates: "{{ kdc_database_file }}"
   notify: Restart krb5
 
 - meta: flush_handlers
