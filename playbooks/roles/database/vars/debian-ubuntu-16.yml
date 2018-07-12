@@ -1,0 +1,17 @@
+---
+postgres_packages:
+  - postgresql
+postgres_service_name: postgresql
+postgres_initdb_command: service postgresql initdb
+postgres_config_file: /etc/postgresql/9.5/main/postgresql.conf
+postgres_hba_file: /etc/postgresql/9.5/main/pg_hba.conf
+
+mysql_version: '5.7'
+mysql_repo_url: 'http://repo.mysql.com/apt/ubuntu/'
+mysql_repo_key: '5072E1F5'
+mysql_repo_keyfile: 'mysql_pubkey.asc'
+mysql_packages:
+  - mysql-community-server
+  - python3-mysqldb
+mysql_service_name: mysql
+mysql_config_file: /etc/mysql/mysql.conf.d/mysqld.cnf

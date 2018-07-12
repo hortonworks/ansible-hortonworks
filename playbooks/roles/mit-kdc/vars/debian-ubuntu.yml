@@ -11,4 +11,4 @@ kadmin_command: kadmin.local
 
 kdc_config_file: /etc/krb5kdc/kdc.conf
 kdc_acl_file: /etc/krb5kdc/kadm5.acl
-kdc_database_file: /etc/krb5kdc/principal
+kdc_database_file: /var/lib/krb5kdc/principal

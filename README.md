@@ -93,8 +93,8 @@ Currently, these playbooks are divided into the following parts:
 - [x] CentOS/RHEL 6 support
 - [x] CentOS/RHEL 7 support
 - [x] Ubuntu 14 support
-- [ ] Ubuntu 16 support
-- [x] Amazon Linux AMI (2016.x, 2017.x and 2018.x) working
+- [x] Ubuntu 16 support
+- [x] Amazon Linux AMI (2016.x and 2017.x) working
 - [x] SUSE Linux Enterprise Server 11 support
 - [x] SUSE Linux Enterprise Server 12 support
 
