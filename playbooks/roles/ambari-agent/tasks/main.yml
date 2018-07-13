@@ -24,7 +24,10 @@
     value: "PROTOCOL_TLSv1_2"
     state: present
   notify: Restart ambari-agent
-  when: (ansible_python_version is version_compare('2.7.9', '>=') and ansible_os_family|lower == "debian") or (ansible_python_version is version_compare('2.7', '>=') and ((ansible_os_family|lower == "redhat" and ansible_distribution_major_version|int >= 7) or (ansible_os_family|lower == "suse" and ansible_distribution_major_version|int >= 12)))
+  when: (ansible_python_version is version_compare('2.7.9', '>=') and ansible_os_family|lower == "debian") or
+        (ansible_python_version is version_compare('2.7', '>=') and ((ansible_os_family|lower == "redhat" and ansible_distribution_major_version|int >= 7) or
+                                                                     (ansible_os_family|lower == "suse" and ansible_distribution_major_version|int >= 12) or
+                                                                     (ansible_os_family|lower == "redhat" and ansible_distribution|lower == "amazon")))
 
 - meta: flush_handlers
 
