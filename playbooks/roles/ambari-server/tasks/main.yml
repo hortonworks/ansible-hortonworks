@@ -1,7 +1,7 @@
 ---
 - name: Load default variables
   include_vars:
-    file: '../defaults/main.yml'
+    file: 'defaults/main.yml'
 
 - name: Load variables
   include_vars: "{{ item }}"
@@ -13,7 +13,7 @@
         - "{{ ansible_os_family|lower }}.yml"
         - defaults.yml
       paths:
-        - ../vars
+        - ../ambari-server/vars
 
 - name: Install the ambari-server package
   package:

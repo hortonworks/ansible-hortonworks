@@ -9,7 +9,7 @@
         - "{{ ansible_os_family|lower }}.yml"
         - defaults.yml
       paths:
-        - ../vars
+        - ../ambari-config/vars
 
 - name: Set the GPL Licensed setting in Ambari
   lineinfile:

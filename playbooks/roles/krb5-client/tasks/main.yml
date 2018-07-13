@@ -9,7 +9,7 @@
         - "{{ ansible_os_family|lower }}.yml"
         - defaults.yml
       paths:
-        - ../vars
+        - ../krb5-client/vars
 
 - name: Install the Kerberos client package
   package:

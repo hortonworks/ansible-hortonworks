@@ -9,7 +9,7 @@
         - "{{ ansible_os_family|lower }}.yml"
         - defaults.yml
       paths:
-        - ../vars
+        - ../ambari-repo/vars
 
 - name: Upload the Ambari repository file
   template:
