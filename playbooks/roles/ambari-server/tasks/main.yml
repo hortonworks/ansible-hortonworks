@@ -25,12 +25,32 @@
 - meta: flush_handlers
 
 - block:
-    - name: Install mysql database required packages (for hive embedded)
+    - name: Install mysql required packages (for hive embedded)
       package:
         name: "{{ item }}"
         update_cache: yes
         state: present
       with_items: "{{ mysql_packages }}"
+
+    - block:
+        - name: Install mysql-server on Ubuntu 16 (for hive embedded)
+          apt:
+            name: 'mysql-server'
+            update_cache: yes
+            state: present
+
+        - name: Configure mysql to listen on all interfaces (Ubuntu 16)
+          ini_file:
+            path: '/etc/mysql/mysql.conf.d/mysqld.cnf'
+            create: no
+            section: 'mysqld'
+            option: 'bind-address'
+            value: '*'
+            no_extra_spaces: yes
+            state: present
+      when: ansible_distribution|lower == "ubuntu" and ansible_distribution_major_version|int == 16
+      run_once: true
+      delegate_to: "{{ hiveserver_hosts[0] }}"
 
     - name: Configure the Ambari JDBC driver for mysql (for hive embedded)
       shell: /usr/sbin/ambari-server setup --jdbc-db=mysql --jdbc-driver={{ mysql_jdbc_location }}
