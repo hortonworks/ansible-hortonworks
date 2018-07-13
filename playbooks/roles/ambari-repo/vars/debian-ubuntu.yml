@@ -3,4 +3,4 @@ ambari_repo_url: "{{ repo_base_url }}/ambari/{{ ansible_distribution|lower }}{{ 
 ambari_repo_template: "ambari.list.j2"
 ambari_repo_destination: "/etc/apt/sources.list.d/ambari.list"
 ambari_repo_key: "B9733A7A07513CAD"
-ambari_repo_keyserver: "keyserver.ubuntu.com"
+ambari_repo_keyfile: 'ambari_pubkey.asc'

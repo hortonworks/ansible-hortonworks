@@ -19,7 +19,7 @@
 
 - name: Add Ambari repository key (apt)
   apt_key:
-    keyserver: "{{ ambari_repo_keyserver }}"
+    data: "{{ lookup('file', ambari_repo_keyfile) }}"
     id: "{{ ambari_repo_key }}"
   when: ansible_os_family|lower == "debian"
 
