@@ -1,4 +1,2 @@
 ---
 ambari_repo_url: "{{ repo_base_url }}/ambari/suse{{ ansible_distribution_major_version }}/2.x/updates/{{ ambari_version }}"
-ambari_repo_template: "ambari.repo.j2"
-ambari_repo_destination: "/etc/zypp/repos.d/ambari.repo"
