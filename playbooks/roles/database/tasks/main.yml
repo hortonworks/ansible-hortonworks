@@ -84,7 +84,7 @@
     name: "{{ item }}"
     update_cache: yes
     state: present
-  with_items: "{{ hostvars[inventory_hostname][database + '_packages'] }}"
+  with_items: "{{ hostvars[inventory_hostname][database + '_packages'] | join(',') }}"
 
 - block:
     - name: Initiate postgres

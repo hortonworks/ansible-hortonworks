@@ -16,7 +16,7 @@
     name: "{{ item }}"
     update_cache: yes
     state: present
-  with_items: "{{ packages|default([]) }}"
+  with_items: "{{ packages | join(',') }}"
 
 - name: Install Java
   include_tasks: java.yml

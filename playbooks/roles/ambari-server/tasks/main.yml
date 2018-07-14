@@ -30,7 +30,7 @@
         name: "{{ item }}"
         update_cache: yes
         state: present
-      with_items: "{{ mysql_packages }}"
+      with_items: "{{ mysql_packages | join(',') }}"
 
     - block:
         - name: Install mysql-server on Ubuntu 16 (for hive embedded)
@@ -63,7 +63,7 @@
         name: "{{ item }}"
         update_cache: yes
         state: present
-      with_items: "{{ hostvars[inventory_hostname][database + '_packages'] }}"
+      with_items: "{{ hostvars[inventory_hostname][database + '_packages'] | join(',') }}"
 
     - block:
         - name: Load the Ambari Server schema (postgres)
