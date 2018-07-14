@@ -14,6 +14,14 @@
         <unique>true</unique>
       </repo>
 {% endif %}
+{% if install_hdpsearch|default(false) %}
+      <repo>
+        <baseurl>{{ hdpsearch_main_repo_url }}</baseurl>
+        <repoid>HDP-SOLR-{{ hdpsearch_version }}</repoid>
+        <reponame>HDP-SOLR</reponame>
+        <unique>true</unique>
+      </repo>
+{% endif %}
 {% if hdp_version is version_compare('2.6.4.0', '>=') %}
       <repo>
         <baseurl>{{ gpl_repo_url }}</baseurl>

@@ -1,7 +1,7 @@
 ansible-hortonworks
 -----------
 
-These Ansible playbooks will build a Hortonworks cluster (either Hortonworks Data Platform or Hortonworks DataFlow) using Ambari Blueprints. For a full list of supported features check [below](#features).
+These Ansible playbooks will build a Hortonworks cluster (Hortonworks Data Platform and / or Hortonworks DataFlow) using Ambari Blueprints. For a full list of supported features check [below](#features).
 
 - This includes building the cloud infrastructure and taking care of the prerequisites.
 
@@ -23,7 +23,7 @@ These Ansible playbooks will build a Hortonworks cluster (either Hortonworks Dat
 
 ## [Requirements](id:requirements)
 
-- Ansible 2.5
+- Ansible 2.5+
 
 - Expects CentOS/RHEL, Ubuntu, Amazon Linux or SLES hosts
 
@@ -121,6 +121,7 @@ Currently, these playbooks are divided into the following parts:
 - [x] Build HDP clusters
 - [x] Build HDF clusters
 - [x] Build HDP clusters with HDF nodes
+- [x] Build HDP clusters with HDP Search (Solr) addon
 - [x] Build clusters with a specific JSON blueprint (static)
 - [x] Build clusters with a generated JSON blueprint (dynamic based on Jinja2 template and variables)
 - [x] Wait for the cluster to be built
