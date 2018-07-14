@@ -16,7 +16,7 @@
     name: "{{ item }}"
     update_cache: yes
     state: present
-  with_items: "{{ kdc_packages }}"
+  with_items: "{{ kdc_packages | join(',') }}"
 
 - name: Upload the KDC configuration file
   template:
