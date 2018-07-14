@@ -11,11 +11,26 @@
       paths:
         - ../ambari-repo/vars
 
-- name: Upload the Ambari repository file
-  template:
-    src: "{{ ambari_repo_template }}"
-    dest: "{{ ambari_repo_destination }}"
-    force: yes
+- name: Add the Ambari repository (yum)
+  yum_repository:
+    name: "ambari-{{ ambari_version }}"
+    description: "ambari Version - ambari-{{ ambari_version }}"
+    baseurl: "{{ ambari_repo_url }}"
+    file: 'ambari'
+    state: present
+    gpgcheck: yes
+    gpgkey: "{{ ambari_repo_url }}/RPM-GPG-KEY/RPM-GPG-KEY-Jenkins"
+  when: ansible_os_family|lower == "redhat"
+
+- name: Add the Ambari repository (zypper)
+  zypper_repository:
+    name: "ambari-{{ ambari_version }}"
+    description: "ambari Version - ambari-{{ ambari_version }}"
+    repo: "{{ ambari_repo_url }}"
+    state: present
+    disable_gpg_check : yes
+    runrefresh: yes
+  when: ansible_os_family|lower == "suse"
 
 - name: Add Ambari repository key (apt)
   apt_key:
@@ -23,12 +38,23 @@
     id: "{{ ambari_repo_key }}"
   when: ansible_os_family|lower == "debian"
 
+- name: Add the Ambari repository (apt)
+  apt_repository:
+    filename: ambari
+    repo: "deb {{ ambari_repo_url }} Ambari main"
+    state: present
+    update_cache: yes
+  when: ansible_os_family|lower == "debian"
+
 - block:
-    - name: Upload HDP-UTILS repository file (SLES 12)
-      template:
-        src: hdp-utils-suse.repo.j2
-        dest: /etc/zypp/repos.d/HDP-UTILS.repo
-        mode: 0644
+    - name: Temporarily add the HDP-UTILS repository (SLES 12)
+      zypper_repository:
+        name: temp-HDP-UTILS
+        description: "HDP-UTILS-1.1.0.21"
+        repo: "{{ repo_base_url }}/HDP-UTILS-1.1.0.21/repos/sles12"
+        state: present
+        disable_gpg_check : yes
+        runrefresh: yes
 
     - name: Make sure libsnappy1 is absent (bug in SLES 12 HDP-UTILS repo)
       zypper:
@@ -43,4 +69,10 @@
       with_items:
         - "snappy-1.0.5-1"
         - "snappy-devel-1.0.5-1"
+
+    - name: Remove the HDP-UTILS repository previously added (SLES 12)
+      zypper_repository:
+        name: temp-HDP-UTILS
+        state: absent
+        runrefresh: yes
   when: ansible_os_family|lower == "suse" and ansible_distribution_major_version|int == 12
