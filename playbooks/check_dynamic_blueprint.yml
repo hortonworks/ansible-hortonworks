@@ -1,0 +1,84 @@
+---
+- name: Check if the dynamic blueprint requested configuration is correct
+  hosts: ambari-server
+  gather_facts: False
+  tasks:
+    - name: Fail if some of the blueprint roles do not have inventory hosts assigned
+      fail:
+        msg: "The blueprint role '{{ item.role }}' does not have a corresponding Ansible inventory group or this group is empty."
+      when: groups[item.role] is not defined or (groups[item.role] is defined and groups[item.role]|length == 0)
+      with_items: "{{ blueprint_dynamic }}"
+
+    - name: Fail if Ranger prerequisites are not met
+      fail:
+        msg: "Ranger is part of the blueprint but the database is set to 'embedded'."
+      when: rangeradmin_hosts|length > 0 and database == 'embedded'
+
+    - name: Fail if Streamline prerequisites are not met
+      fail:
+        msg: "Streamline is part of the blueprint but the database is set to 'embedded'."
+      when: streamline_hosts|length > 0 and database == 'embedded'
+
+    - name: Fail if Registry prerequisites are not met
+      fail:
+        msg: "Registry is part of the blueprint but the database is set to 'embedded'."
+      when: registry_hosts|length > 0 and database == 'embedded'
+
+    - name: Fail if the selected components should not be part of an HDP 3 blueprint
+      fail:
+        msg: "When installing HDP 3 the component {{ item }} must not be part of the blueprint."
+      when: install_hdp and hdp_major_version == '3' and item in blueprint_all_clients | union(blueprint_all_services)
+      with_items:
+        - 'HCAT'
+        - 'SLIDER'
+        - 'WEBHCAT_SERVER'
+
+    - name: Fail if the selected components should not be part of an HDP 2 blueprint
+      fail:
+        msg: "When installing HDP 2 the component {{ item }} must not be part of the blueprint."
+      when: install_hdp and hdp_major_version == '2' and item in blueprint_all_clients | union(blueprint_all_services)
+      with_items:
+        - 'YARN_REGISTRY_DNS'
+        - 'TIMELINE_READER'
+
+    - name: Fail if the required HDFS components are not part of the blueprint
+      fail:
+        msg: "Some or all of the following components are missing from the blueprint: NAMENODE, DATANODE{{ (namenode_groups|length == 1) | ternary(', SECONDARY_NAMENODE',', ZKFC, JOURNALNODE') }}."
+      when: (namenode_groups|length == 1 and ['NAMENODE', 'DATANODE', 'SECONDARY_NAMENODE'] | difference(blueprint_all_services) | length > 0 ) or
+            (namenode_groups|length > 1 and ['NAMENODE', 'DATANODE', 'ZKFC', 'JOURNALNODE'] | difference(blueprint_all_services) | length > 0 )
+
+    - name: Fail if HA NameNode prerequisites are not met (3 JournalNodes)
+      fail:
+        msg: "HA NameNode has been requested but there are less than 3 JournalNodes defined in the blueprint."
+      when: namenode_groups|length > 1 and journalnode_groups|length < 3
+
+    - name: Fail if HA NameNode prerequisites are not met (ZKFC)
+      fail:
+        msg: "HA NameNode has been requested but the ZKFC component must be present in the nodes running the NAMENODE (only)."
+      when: namenode_groups|length > 1 and (zkfc_groups|length < 2 or namenode_groups | symmetric_difference(zkfc_groups) | length > 0 )
+
+    - name: Fail if SECONDARY_NAMENODE is present with multiple NAMENODE
+      fail:
+        msg: "HA NameNode has been requested but the SECONDARY_NAMENODE component is still present in the blueprint."
+      when: namenode_groups|length > 1 and 'SECONDARY_NAMENODE' in blueprint_all_services
+
+    - name: Fail if Zookeeper is not present when required
+      fail:
+        msg: "Zookeeper is required by the current blueprint configuration."
+      when: zookeeper_hosts|length == 0 and (namenode_groups|length > 1 or resourcemanager_groups|length > 1 or hiveserver_hosts|length > 1 or 'HBASE_MASTER' in blueprint_all_services or 'NIFI_MASTER' in blueprint_all_services or 'SOLR_SERVER' in blueprint_all_services)
+
+    - name: Fail if the required Yarn components are not part of the blueprint
+      fail:
+        msg: "Some or all of the following components are missing from the blueprint: NODEMANAGER, APP_TIMELINE_SERVER{{ (hdp_major_version == '3') | ternary(', YARN_REGISTRY_DNS, TIMELINE_READER','') }}."
+      when: resourcemanager_groups|length > 0 and
+              ((hdp_major_version == '3' and ['NODEMANAGER', 'APP_TIMELINE_SERVER', 'YARN_REGISTRY_DNS', 'TIMELINE_READER'] | difference(blueprint_all_services) | length > 0 )
+              or
+              (hdp_major_version == '2' and ['NODEMANAGER', 'APP_TIMELINE_SERVER'] | difference(blueprint_all_services) | length > 0 ))
+
+    - name: Fail if the required Hive components are not part of the blueprint
+      fail:
+        msg: "Some or all of the following components are missing from the blueprint: HIVE_SERVER, HIVE_METASTORE{{ (hdp_major_version == '2') | ternary(', WEBHCAT_SERVER','') }}."
+      when: hiveserver_hosts|length > 0 and
+              ((hdp_major_version == '3' and ['HIVE_SERVER', 'HIVE_METASTORE'] | difference(blueprint_all_services) | length > 0 )
+              or
+              (hdp_major_version == '2' and ['HIVE_SERVER', 'HIVE_METASTORE', 'WEBHCAT_SERVER'] | difference(blueprint_all_services) | length > 0 ))

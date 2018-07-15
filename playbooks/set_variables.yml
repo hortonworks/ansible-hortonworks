@@ -38,6 +38,7 @@
     - name: Initialize the control variables
       set_fact:
         namenode_groups: []
+        zkfc_groups: []
         resourcemanager_groups: []
         journalnode_groups: []
         zookeeper_groups: []
@@ -50,6 +51,8 @@
         registry_hosts: []
         hdf_hosts: []
         solr_hosts: []
+        blueprint_all_services: []
+        blueprint_all_clients: []
         install_hdp: False
         install_hdf: False
         install_hdpsearch: False
@@ -60,6 +63,13 @@
           set_fact:
             namenode_groups: "{{ namenode_groups }} + [ '{{ item.role }}' ]"
           when: groups[item.role] is defined and groups[item.role]|length > 0 and 'NAMENODE' in item.services
+          with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+          no_log: True
+
+        - name: Populate the ZKFailoverController groups list
+          set_fact:
+            zkfc_groups: "{{ zkfc_groups }} + [ '{{ item.role }}' ]"
+          when: groups[item.role] is defined and groups[item.role]|length > 0 and 'ZKFC' in item.services
           with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
           no_log: True
 
@@ -144,6 +154,14 @@
           set_fact:
             solr_hosts: "{{ solr_hosts }} + {{ groups[item.role] }}"
           when: groups[item.role] is defined and groups[item.role]|length > 0 and ('SOLR_SERVER' in item.services)
+          with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+          no_log: True
+
+        - name: Populate the all services and clients lists
+          set_fact:
+            blueprint_all_services: "{{ blueprint_all_services | union(item.services) }}"
+            blueprint_all_clients: "{{ blueprint_all_clients | union(item.clients) }}"
+          when: groups[item.role] is defined and groups[item.role]|length > 0
           with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
           no_log: True
 
