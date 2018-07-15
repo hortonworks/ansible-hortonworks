@@ -476,6 +476,9 @@
         "hadoop.http.authentication.kerberos.principal" : "HTTP/_HOST@{{ security_options.realm }}",
         "hadoop.http.filter.initializers" : "org.apache.hadoop.security.AuthenticationFilterInitializer",
         "hadoop.http.authentication.cookie.domain" : "{{ security_options.realm|lower }}",
+{% else %}
+        "hadoop.http.authentication.simple.anonymous.allowed" : "true",
+        "hadoop.http.authentication.type" : "simple",
 {% endif %}
         "fs.trash.interval" : "360"
       }
