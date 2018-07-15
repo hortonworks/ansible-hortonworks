@@ -142,7 +142,7 @@
 
         - name: Populate the solr hosts list
           set_fact:
-            solr_hosts: "{{ hdf_hosts }} + {{ groups[item.role] }}"
+            solr_hosts: "{{ solr_hosts }} + {{ groups[item.role] }}"
           when: groups[item.role] is defined and groups[item.role]|length > 0 and ('SOLR_SERVER' in item.services)
           with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
           no_log: True
@@ -187,4 +187,9 @@
           set_fact:
             install_hdf: True
           when: blueprint_content | string | search("NIFI_MASTER") or blueprint_content | string | search("STREAMLINE_SERVER") or blueprint_content | string | search("REGISTRY_SERVER")
+
+        - name: Set the install_hdpsearch variable
+          set_fact:
+            install_hdpsearch: True
+          when: blueprint_content | string | search("SOLR_SERVER")
       when: hostvars[inventory_hostname]['blueprint_file'] != 'blueprint_dynamic.j2'
