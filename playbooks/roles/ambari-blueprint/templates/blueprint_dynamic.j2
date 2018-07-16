@@ -228,6 +228,11 @@
         "admin_password" : "{{ ranger_options.ranger_admin_password }}",
         "ranger_admin_username" : "amb_ranger_admin",
         "ranger_admin_password" : "{{ ranger_options.ranger_admin_password }}",
+{% if hdp_major_version|int >= 3 -%}
+        "rangerusersync_user_password" : "{{ ranger_options.ranger_admin_password }}",
+        "rangertagsync_user_password" : "{{ ranger_options.ranger_admin_password }}",
+        "keyadmin_user_password" : "{{ ranger_options.ranger_admin_password }}",
+{% endif %}
         "xasecure.audit.destination.db" : "false",
 {% if namenode_groups|length > 0 %}
         "xasecure.audit.destination.hdfs" : "true",
