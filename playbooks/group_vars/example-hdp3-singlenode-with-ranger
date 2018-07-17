@@ -10,7 +10,7 @@ blueprint_name: '{{ cluster_name }}_blueprint'                  # the name of th
 blueprint_file: 'blueprint_dynamic.j2'                          # the blueprint JSON file - 'blueprint_dynamic.j2' is a Jinja2 template that generates the required JSON
 blueprint_dynamic:                                              # properties for the dynamic blueprint - these are only used by the 'blueprint_dynamic.j2' template to generate the JSON
   - role: "hdp-singlenode"
-    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT']
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT']
     services:
       - ZOOKEEPER_SERVER
       - NAMENODE
@@ -19,10 +19,11 @@ blueprint_dynamic:                                              # properties for
       - RESOURCEMANAGER
       - NODEMANAGER
       - APP_TIMELINE_SERVER
+      - YARN_REGISTRY_DNS
+      - TIMELINE_READER
       - HISTORYSERVER
       - HIVE_SERVER
       - HIVE_METASTORE
-      - WEBHCAT_SERVER
       - OOZIE_SERVER
       - HBASE_MASTER
       - HBASE_REGIONSERVER
@@ -38,3 +39,4 @@ blueprint_dynamic:                                              # properties for
       - METRICS_COLLECTOR
       - METRICS_GRAFANA
       - METRICS_MONITOR
+

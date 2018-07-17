@@ -260,6 +260,7 @@ Modify the file at `~/ansible-hortonworks/playbooks/group_vars/ambari-server` to
 | .hive_db_name,_username,_password        | The name of the database that Hive should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |
 | .oozie_db_name,_username,_password       | The name of the database that Oozie should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |
 | .rangeradmin_db_name,_username,_password | The name of the database that Ranger Admin should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |
+| .rangerkms_db_name,_username,_password   | The name of the database that Ranger KMS should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |
 | .registry_db_name,_username,_password    | The name of the database that Schema Registry should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |
 | .streamline_db_name,_username,_password  | The name of the database that SAM should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |
 
@@ -269,6 +270,8 @@ Modify the file at `~/ansible-hortonworks/playbooks/group_vars/ambari-server` to
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
 | ranger_options                 | These options are only relevant if `RANGER_ADMIN` is a component of the dynamic Blueprint stack.           |
 | .ranger_admin_password         | The password for the Ranger admin users (both admin and amb_ranger_admin).                                 |
+| .ranger_keyadmin_password      | The password for the Ranger keyadmin user. This only has effect in HDP3, with HDP2 the password will remain to the default of `keyadmin` and must be changed manually. |
+| .kms_master_key_password       | The password used for encrypting the Master Key.                                                           |
 | .enable_plugins                | If set to `yes` the plugins for all of the available services will be enabled. With `no` Ranger would be installed but not functional. |
 
 ### blueprint configuration

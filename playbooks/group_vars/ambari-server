@@ -30,6 +30,9 @@ database_options:
   rangeradmin_db_name: 'ranger'
   rangeradmin_db_username: 'ranger'
   rangeradmin_db_password: 'ranger'
+  rangerkms_db_name: 'rangerkms'
+  rangerkms_db_username: 'rangerkms'
+  rangerkms_db_password: 'rangerkms'
   registry_db_name: 'registry'
   registry_db_username: 'registry'
   registry_db_password: 'registry'
@@ -43,6 +46,8 @@ database_options:
 
 ranger_options:                                                 # only used if RANGER_ADMIN is part of the blueprint stack
   ranger_admin_password: 'AsdQwe123'                            # the password for the Ranger admin users (both admin and amb_ranger_admin)
+  ranger_keyadmin_password: 'AsdQwe123'                         # the password for the Ranger keyadmin user (will only be set in HDP3, in HDP2 it will remain the default keyadmin)
+  kms_master_key_password: "{{ default_password }}"             # password used for encrypting the Master Key
   enable_plugins: yes                                           # set to 'yes' if the plugins should be enabled for all of the installed services
 
 

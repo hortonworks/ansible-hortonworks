@@ -47,6 +47,7 @@
         oozie_hosts: []
         rangeradmin_groups: []
         rangeradmin_hosts: []
+        rangerkms_hosts: []
         streamline_hosts: []
         registry_hosts: []
         hdf_hosts: []
@@ -126,6 +127,13 @@
           set_fact:
             rangeradmin_hosts: "{{ rangeradmin_hosts }} + {{ groups[item.role] }}"
           when: groups[item.role] is defined and groups[item.role]|length > 0 and ('RANGER_ADMIN' in item.services)
+          with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+          no_log: True
+
+        - name: Populate the rangerkms hosts list
+          set_fact:
+            rangerkms_hosts: "{{ rangerkms_hosts }} + {{ groups[item.role] }}"
+          when: groups[item.role] is defined and groups[item.role]|length > 0 and ('RANGER_KMS_SERVER' in item.services)
           with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
           no_log: True
 

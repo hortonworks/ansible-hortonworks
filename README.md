@@ -3,6 +3,8 @@ ansible-hortonworks
 
 These Ansible playbooks will build a Hortonworks cluster (Hortonworks Data Platform and / or Hortonworks DataFlow) using Ambari Blueprints. For a full list of supported features check [below](#features).
 
+- Tested with: HDP 3.0, HDP 2.4 -> 2.6.5, HDP Search 3.0.0.0, HDF 2.0 -> 3.1.
+
 - This includes building the cloud infrastructure and taking care of the prerequisites.
 
 - The aim is to first build the nodes in a Cloud environment, prepare them (OS settings, database, KDC, etc) and then install Ambari and create the cluster using Ambari Blueprints.
@@ -135,6 +137,7 @@ Currently, these playbooks are divided into the following parts:
 - [x] Secure clusters with MIT KDC (Ambari managed)
 - [x] Secure clusters with Microsoft AD (Ambari managed)
 - [x] Install Ranger and enable plugins
+- [x] Ranger KMS (including HA)
 - [ ] Ranger AD integration
 - [ ] Hadoop SSL
 - [ ] Hadoop AD integration

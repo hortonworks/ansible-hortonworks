@@ -52,6 +52,7 @@ blueprint_dynamic:                                              # properties for
       - SPARK2_JOBHISTORYSERVER
       - RANGER_ADMIN
       - RANGER_USERSYNC
+      - RANGER_KMS_SERVER
       - HST_SERVER
       - HST_AGENT
       - METRICS_COLLECTOR

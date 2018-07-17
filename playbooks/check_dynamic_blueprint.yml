@@ -12,7 +12,12 @@
     - name: Fail if Ranger prerequisites are not met
       fail:
         msg: "Ranger is part of the blueprint but the database is set to 'embedded'."
-      when: rangeradmin_hosts|length > 0 and database == 'embedded'
+      when: (rangeradmin_hosts|length > 0 or rangerkms_hosts|length > 0) and database == 'embedded'
+
+    - name: Fail if Ranger KMS prerequisites are not met
+      fail:
+        msg: "Ranger KMS requires Ranger Admin."
+      when: rangerkms_hosts|length > 0 and rangeradmin_hosts|length < 1
 
     - name: Fail if Streamline prerequisites are not met
       fail:
