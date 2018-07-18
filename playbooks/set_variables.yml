@@ -207,15 +207,15 @@
         - name: Set the install_hdp variable
           set_fact:
             install_hdp: True
-          when: blueprint_content | string | search("NAMENODE")
+          when: blueprint_content | string is search("NAMENODE")
 
         - name: Set the install_hdf variable
           set_fact:
             install_hdf: True
-          when: blueprint_content | string | search("NIFI_MASTER") or blueprint_content | string | search("STREAMLINE_SERVER") or blueprint_content | string | search("REGISTRY_SERVER")
+          when: blueprint_content | string is search("NIFI_MASTER") or blueprint_content | string is search("STREAMLINE_SERVER") or blueprint_content | string is search("REGISTRY_SERVER")
 
         - name: Set the install_hdpsearch variable
           set_fact:
             install_hdpsearch: True
-          when: blueprint_content | string | search("SOLR_SERVER")
+          when: blueprint_content | string is search("SOLR_SERVER")
       when: hostvars[inventory_hostname]['blueprint_file'] != 'blueprint_dynamic.j2'
