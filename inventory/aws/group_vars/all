@@ -34,7 +34,6 @@ nodes:
       ebs: true                                                    # non-EBS root volumes are not supported at the moment
       type: gp2
       size: 15
-    ambari_server: true
 
   - host_group: "hdp-slave"
     count: 3

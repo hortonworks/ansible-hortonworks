@@ -30,7 +30,6 @@ nodes:
     root_disk:
       type: pd-ssd
       size: 15
-    ambari_server: true
 
   - host_group: "hdp-slave"
     count: 2

@@ -13,7 +13,6 @@ nodes:
     image: CentOS 7.4
     flavor: m3.xlarge
     public_ip: false
-    ambari_server: true
 
   - host_group: "hdp-slave"
     count: 2

@@ -13,16 +13,3 @@
     loop_var: local_loop
   when: outer_loop.count > 0
   with_items: "{{ groups[('tag_Group_'~cluster_name~'-'~outer_loop.host_group)|replace('-','_')] }}"
-
-- name: Add node to ambari-server group
-  add_host:
-    name: "{{ hostvars[local_loop].ec2_dns_name }}"
-    ansible_host: "{{ (outer_loop.public_ip|default(false)== true) | ternary(hostvars[local_loop].ec2_ip_address,hostvars[local_loop].ec2_private_ip_address) }}"
-    ansible_user: "{{ cloud_config.admin_username|default('root') }}"
-    ansible_ssh_private_key_file: "{{ cloud_config.ssh.privatekey }}"
-    ansible_become_user: root
-    groups: ambari-server
-  loop_control:
-    loop_var: local_loop
-  when: outer_loop.count > 0 and outer_loop.ambari_server is defined and outer_loop.ambari_server
-  with_items: "{{ groups[('tag_Group_'~cluster_name~'-'~outer_loop.host_group)|replace('-','_')] }}"

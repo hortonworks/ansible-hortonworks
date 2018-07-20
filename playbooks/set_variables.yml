@@ -8,6 +8,63 @@
       include_tasks: "clouds/add_nodes_{{ cloud_name }}.yml"
       with_items: "{{ nodes|default(omit) }}"
 
+    - name: Initialize the ambari groups list
+      set_fact:
+        ambari_groups: []
+
+    - block:
+        - name: Populate the ambari groups list (dynamic blueprint)
+          set_fact:
+            ambari_groups: "{{ ambari_groups }} + [ '{{ item.host_group }}' ]"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and 'AMBARI_SERVER' in item.services
+          with_items: "{{ blueprint_dynamic }}"
+          no_log: True
+      when: blueprint_file == 'blueprint_dynamic.j2'
+
+    - block:
+        - name: Set the blueprint path (relative to ambari-blueprint role)
+          set_fact:
+            blueprint_file_path: "{{ 'roles/ambari-blueprint/templates/' + blueprint_file }}"
+          when: blueprint_file|list|first != '/' and blueprint_file|list|first != '~'
+
+        - name: Set the blueprint path (absolute)
+          set_fact:
+            blueprint_file_path: "{{ blueprint_file }}"
+          when: blueprint_file|list|first == '/' or blueprint_file|list|first == '~'
+
+        - name: Read the static blueprint content
+          set_fact:
+            blueprint_static: "{{ lookup('template', blueprint_file_path) }}"
+
+        - name: Fail if the static blueprint is not a valid JSON
+          fail:
+            msg: "The blueprint {{ blueprint_file }} is not a valid JSON or it doesn't have a 'host_groups' element."
+          when: blueprint_static['host_groups'] is not defined
+
+        - name: Populate the ambari groups list (static blueprint)
+          set_fact:
+            ambari_groups: "{{ ambari_groups }} + [ '{{ item.name }}' ]"
+          when: item | string is search("AMBARI_SERVER")
+          with_items: "{{ blueprint_static['host_groups'] }}"
+          no_log: True
+      when: hostvars[inventory_hostname]['blueprint_file'] != 'blueprint_dynamic.j2'
+
+    - name: Fail if the ambari groups list is empty
+      fail:
+        msg: "The ambari_groups list is empty. This usually means there is no 'AMBARI_SERVER' component defined in the blueprint or there is no Ansible inventory group corresponding with the name of the blueprint's host_group."
+      when: ambari_groups|length == 0
+
+    - name: Fail if there is no Ansible inventory group matching the blueprint's host_vars
+      fail:
+        msg: "The {{ item }} host_group is defined in the blueprint but there is no matching Ansible inventory group called {{ item }} or there are no hosts in this group."
+      when: groups[item] is not defined or groups[item]|length == 0
+      with_items: "{{ ambari_groups }}"
+
+    - name: Add nodes to the ambari-server group
+      add_host:
+        name: "{{ groups[ambari_groups|first]|first }}"
+        groups: "ambari-server"
+
 - name: Create the Ansible helper variables for all nodes
   hosts: hadoop-cluster
   gather_facts: False
@@ -209,13 +266,6 @@
           fail:
             msg: "The blueprint {{ blueprint_file }} is not a valid JSON or it doesn't have a 'host_groups' element."
           when: blueprint_static['host_groups'] is not defined
-
-        - name: Populate the ambari groups list
-          set_fact:
-            ambari_groups: "{{ ambari_groups }} + [ '{{ item.name }}' ]"
-          when: groups[item.name] is defined and groups[item.name]|length > 0 and blueprint_static['host_groups'] | string is search("AMBARI_SERVER")
-          with_items: "{{ blueprint_static['host_groups'] }}"
-          no_log: True
 
         - name: Set the install_hdp variable
           set_fact:

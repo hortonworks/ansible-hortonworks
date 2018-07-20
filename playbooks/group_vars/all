@@ -1,4 +1,8 @@
 ---
+###########################
+## cluster configuration ##
+###########################
+
 cluster_name: 'mytestcluster'
 
 ambari_version: '2.6.2.2'                                 # must be the 4-part full version number
@@ -8,6 +12,19 @@ hdpsearch_version: '3.0.0-100'
 
 repo_base_url: 'http://public-repo-1.hortonworks.com'     # change this if using a Local Repository
 
+
+###########################
+## general configuration ##
+###########################
+
+external_dns: yes                                         # set to yes to use the existing DNS (when no, it will update the /etc/hosts file - must be set to 'no' when using Azure)
+disable_firewall: no                                      # set to yes to disable the existing local firewall service (iptables, firewalld, ufw)
+
+
+########################
+## java configuration ##
+########################
+
 java: 'embedded'                                          # can be set to 'embedded', 'openjdk' or 'oraclejdk'
 oraclejdk_options:                                        # only used when java is set to 'oraclejdk'
   base_folder: '/usr/java'                                # the folder where the Java package should be unpacked to
@@ -15,9 +32,36 @@ oraclejdk_options:                                        # only used when java 
   jce_location: '/tmp/jce_policy-8.zip'                   # the location of the JCE package on the remote system or on the Ansible controller
   remote_files: no                                        # set to yes to indicate the files are already on the remote systems, otherwise they will be copied by Ansible from the Ansible controller
 
-external_dns: yes                                         # set to yes to use the existing DNS (when no, it will update the /etc/hosts file - must be set to 'no' when using Azure)
-disable_firewall: no                                      # set to yes to disable the existing local firewall service (iptables, firewalld, ufw)
-accept_gpl: yes                                           # set to yes to allow Ambari to install GPL licensed libraries
+
+############################
+## database configuration ##
+############################
+
+database: 'embedded'                                      # can be set to 'embedded', 'postgres', 'mysql' or 'mariadb'
+database_options:
+  external_hostname: ''                                   # if this is empty, Ansible will install and prepare the databases on the ambari-node
+  ambari_db_name: 'ambari'
+  ambari_db_username: 'ambari'
+  ambari_db_password: 'bigdata'
+  hive_db_name: 'hive'
+  hive_db_username: 'hive'
+  hive_db_password: 'hive'
+  oozie_db_name: 'oozie'
+  oozie_db_username: 'oozie'
+  oozie_db_password: 'oozie'
+  rangeradmin_db_name: 'ranger'
+  rangeradmin_db_username: 'ranger'
+  rangeradmin_db_password: 'ranger'
+  rangerkms_db_name: 'rangerkms'
+  rangerkms_db_username: 'rangerkms'
+  rangerkms_db_password: 'rangerkms'
+  registry_db_name: 'registry'
+  registry_db_username: 'registry'
+  registry_db_password: 'registry'
+  streamline_db_name: 'streamline'
+  streamline_db_username: 'streamline'
+  streamline_db_password: 'streamline'
+
 
 ############################
 ## security configuration ##                              # only useful if blueprint is dynamic
@@ -35,8 +79,75 @@ security_options:
   http_authentication: yes                                # set to yes to enable HTTP authentication (SPNEGO)
 
 
+##########################
+## ranger configuration ##                                # only useful if blueprint is dynamic
+##########################
+
+ranger_options:                                           # only used if RANGER_ADMIN is part of the blueprint stack
+  ranger_admin_password: 'AsdQwe123'                      # the password for the Ranger admin users (both admin and amb_ranger_admin)
+  ranger_keyadmin_password: 'AsdQwe123'                   # the password for the Ranger keyadmin user (will only be set in HDP3, in HDP2 it will remain the default keyadmin)
+  kms_master_key_password: "{{ default_password }}"       # password used for encrypting the Master Key
+  enable_plugins: yes                                     # set to 'yes' if the plugins should be enabled for all of the installed services
+
+
+##########################
+## ambari configuration ##
+##########################
+
+ambari_admin_user: 'admin'
+ambari_admin_password: 'admin'                            # the password for the above admin user
+ambari_admin_default_password: 'admin'                    # no need to change this (unless the Ambari default changes)
+default_password: 'AsdQwe123456'                          # a default password for all required passwords which are not specified in the blueprint
+config_recommendation_strategy: 'NEVER_APPLY'
+
+wait: true                                                # wait for the cluster to finish installing
+wait_timeout: 3600                                        # 60 minutes
+accept_gpl: yes                                           # set to yes to allow Ambari to install GPL licensed libraries
+
+cluster_template_file: 'cluster_template.j2'              # the cluster creation template file
+
+
+#############################
+## blueprint configuration ##
+#############################
+
+blueprint_name: '{{ cluster_name }}_blueprint'            # the name of the blueprint as it will be stored in Ambari
+blueprint_file: 'blueprint_dynamic.j2'                    # the blueprint JSON file - 'blueprint_dynamic.j2' is a Jinja2 template that generates the required JSON
+blueprint_dynamic:                                        # properties for the dynamic blueprint - these are only used by the 'blueprint_dynamic.j2' template to generate the JSON
+  - host_group: "hdp-master"
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT']
+    services:
+      - ZOOKEEPER_SERVER
+      - NAMENODE
+      - SECONDARY_NAMENODE
+      - RESOURCEMANAGER
+      - APP_TIMELINE_SERVER
+      - HISTORYSERVER
+      - SPARK2_JOBHISTORYSERVER
+      - HIVE_SERVER
+      - HIVE_METASTORE
+      - WEBHCAT_SERVER
+      - OOZIE_SERVER
+      - AMBARI_SERVER
+      - INFRA_SOLR
+      - METRICS_COLLECTOR
+      - METRICS_GRAFANA
+      - METRICS_MONITOR
+      - HST_SERVER
+      - HST_AGENT
+  - host_group: "hdp-slave"
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT']
+    services:
+      - DATANODE
+      - NODEMANAGER
+      - METRICS_MONITOR
+      - HST_AGENT
+
+
+
+
 ############################
-## helper variables       ##                              # don't change these unless there is a reason
+## helper variables ##                                    # don't change these unless there is a good reason
 ############################
 
 hdp_minor_version: "{{ hdp_version | regex_replace('.[0-9]+.[0-9]+[0-9_-]*$','') }}"

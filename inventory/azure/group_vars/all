@@ -31,7 +31,6 @@ nodes:
     flavor: Standard_D3_v2
     public_ip: true
     security_group: ssh_access
-    ambari_server: true
 
   - host_group: "hdp-slave"
     count: 2

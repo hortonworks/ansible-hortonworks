@@ -1,14 +1,14 @@
 ######################################################
 ##
-## The static inventory puts the hosts in different groups as described here: http://docs.ansible.com/ansible/intro_inventory.html#hosts-and-groups
-## Variables would be defined directly for each host, including the ambari_server.
+## The static inventory puts the hosts in different groups as described here: https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#hosts-and-groups
+## Variables would be defined directly for each host, including the ansible_user, the login user with sudoers permissions.
 ## For authentication, either the password or the SSH Private Key can be used.
 ##
 ######################################################
 
 [hdp-master]
-master01 ansible_host=192.168.0.2 ansible_user=root ansible_ssh_pass=changeme ambari_server=true
+master01 ansible_host=192.168.0.2 ansible_user=root ansible_ssh_private_key_file="~/.ssh/id_rsa"
 
 [hdp-slave]
 slave01 ansible_host=192.168.0.3 ansible_user=root ansible_ssh_private_key_file="~/.ssh/id_rsa"
-#slave02 ansible_host=192.168.0.4 ansible_user=root ansible_ssh_private_key_file="~/.ssh/id_rsa"
+#slave02 ansible_host=192.168.0.4 ansible_user=root ansible_ssh_pass=changeme

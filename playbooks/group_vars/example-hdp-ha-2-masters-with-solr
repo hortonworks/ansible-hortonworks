@@ -48,6 +48,7 @@ blueprint_dynamic:                                              # properties for
     clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT']
     services:
       - ZOOKEEPER_SERVER
+      - JOURNALNODE
       - DATANODE
       - NODEMANAGER
       - HBASE_REGIONSERVER
