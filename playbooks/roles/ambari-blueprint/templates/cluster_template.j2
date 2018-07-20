@@ -24,36 +24,17 @@
   },
 {% endif %}
 {#
-  The following checks if the inventory being used is static or a dynamic cloud inventory.
-  The 'nodes' variable would only exist in a cloud specific inventory.
+  The following attempts to find out the Ansible groups that map on the blueprint's host_groups.
+  When using a dynamic blueprint this should work fine as it knows the host_groups from the 'blueprint_dynamic' variable.
+  When using a static blueprint, this might sometimes fail, as it simply does the regex check in the blueprint's content.
 #}
-{% if nodes is defined %}
   "host_groups" :[
-    {% for node_group in nodes if node_group.count > 0 -%}
+    {% for group in groups|sort if group not in ['all', 'ambari-server', 'hadoop-cluster', 'ungrouped'] and groups[group]|length > 0 and (blueprint_file == 'blueprint_dynamic.j2' and group in blueprint_dynamic|map(attribute='host_group')|list) or (blueprint_file != 'blueprint_dynamic.j2' and blueprint_static['host_groups'] | string is search(group)) %}
 
     {
-      "name" : "{{ node_group.role }}",
+      "name" : "{{ group }}",
       "hosts" : [
-        {% for node in groups[node_group.role]|sort -%}
-
-        { "fqdn" : "{{ hostvars[node]['ansible_fqdn'] | lower }}" }{% if not loop.last %},{% endif %}
-
-        {% endfor %}
-
-      ]
-    }{% if not loop.last and node_group.count > 0 %},{% endif %}
-
-    {% endfor %}
-
-  ]
-{% else %}
-  "host_groups" :[
-    {% for node_group in groups if node_group not in ['all', 'ambari-server', 'hadoop-cluster', 'ungrouped'] and groups[node_group]|length > 0 -%}
-
-    {
-      "name" : "{{ node_group }}",
-      "hosts" : [
-        {% for node in groups[node_group]|sort -%}
+        {% for node in groups[group]|sort -%}
 
         { "fqdn" : "{{ hostvars[node]['ansible_fqdn'] | lower }}" }{% if not loop.last %},{% endif %}
 
@@ -61,9 +42,7 @@
 
       ]
     }{% if not loop.last %},{% endif %}
-
     {% endfor %}
 
   ]
-{% endif %}
 }

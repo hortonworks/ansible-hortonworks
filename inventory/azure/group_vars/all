@@ -21,7 +21,7 @@ cloud_config:
       port: 22
 
 nodes:
-  - role: "hdp-master"
+  - host_group: "hdp-master"
     count: 1
     image:
       offer: CentOS
@@ -33,7 +33,7 @@ nodes:
     security_group: ssh_access
     ambari_server: true
 
-  - role: "hdp-slave"
+  - host_group: "hdp-slave"
     count: 2
     image:
       offer: CentOS
@@ -44,7 +44,7 @@ nodes:
     public_ip: true
     security_group: ssh_access
 
-  - role: "hdp-edge"
+  - host_group: "hdp-edge"
     count: 0
     image:
       offer: CentOS

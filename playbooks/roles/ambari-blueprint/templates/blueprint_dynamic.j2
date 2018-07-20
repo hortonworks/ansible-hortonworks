@@ -579,26 +579,26 @@
 
   "host_groups" : [
     {% set ns = namespace(hivedb_embedded_defined=false) %}
-    {% for node_group in blueprint_dynamic if groups[node_group.role] is defined and groups[node_group.role]|length > 0 -%}
+    {% for blueprint_item in blueprint_dynamic if groups[blueprint_item.host_group] is defined and groups[blueprint_item.host_group]|length > 0 -%}
 
     {
-      "name" : "{{ node_group.role }}",
+      "name" : "{{ blueprint_item.host_group }}",
       "configurations" : [ ],
       "components" : [
-        {% for client in node_group.clients -%}
+        {% for client in blueprint_item.clients -%}
         { "name" : "{{ client }}" },
         {% endfor %}
 {% if security|lower == "mit-kdc" or security|lower == "active-directory" -%}
         { "name" : "KERBEROS_CLIENT" },
 {% endif %}
 
-        {% for service in node_group.services -%}
+        {% for service in blueprint_item.services -%}
         { "name" : "{{ service }}" }{% if service == "HIVE_METASTORE" and database == "embedded" and not ns.hivedb_embedded_defined %},{ "name" : "MYSQL_SERVER" }{% set ns.hivedb_embedded_defined=true %}{% endif %}{% if not loop.last %},{% endif %}
 
         {% endfor %}
 
       ]
-    }{% if not loop.last and groups[node_group.role]|length > 0 %},{% endif %}
+    }{% if not loop.last and groups[blueprint_item.host_group]|length > 0 %},{% endif %}
 
     {% endfor %}
 

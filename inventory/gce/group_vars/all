@@ -22,7 +22,7 @@ firewall_rules:
     src_range: '0.0.0.0/0'
 
 nodes:
-  - role: "hdp-master"
+  - host_group: "hdp-master"
     count: 1
     image: centos-7
     type: n1-highmem-4
@@ -32,7 +32,7 @@ nodes:
       size: 15
     ambari_server: true
 
-  - role: "hdp-slave"
+  - host_group: "hdp-slave"
     count: 2
     image: centos-7
     type: n1-standard-2
@@ -41,7 +41,7 @@ nodes:
       type: pd-ssd
       size: 15
 
-  - role: "hdp-edge"
+  - host_group: "hdp-edge"
     count: 0
     image: centos-7
     type: n1-standard-1

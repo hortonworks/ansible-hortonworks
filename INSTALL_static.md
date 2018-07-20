@@ -167,7 +167,9 @@ Modify the file at `~/ansible-hortonworks/inventory/static` to set the static in
 
 The static inventory puts the nodes in different groups as described in the [Ansible Documentation](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#hosts-and-groups).
 
-Each group defines a specific node role, for example master, slave, edge.
+Each group defines a specific node role, for example master, slave, edge, but the names of the groups should be the same as the host_groups in the [Ambari Blueprint](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-BlueprintFieldDescriptions).
+
+There can be any number of Ansible groups / Ambari host_groups and the groups / host_groups can have any names and any number of nodes but they should correspond with the host_groups in the Ambari Blueprint and respect the Blueprint spec (for example, there shouldn't be more than 1 node in the host_group which contains the `AMBARI_SERVER` component, but there can be 100+ nodes in the slave / worker host_group).
 
 The following variables can be set for each node:
 
@@ -280,7 +282,7 @@ Modify the file at `~/ansible-hortonworks/playbooks/group_vars/ambari-server` to
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
 | blueprint_name                 | The name of the blueprint as it will be stored in Ambari.                                                  |
 | blueprint_file                 | The path to the blueprint file that will be uploaded to Ambari. It can be an absolute path or relative to the `roles/ambari-blueprint/templates` folder. The blueprint file can also contain [Jinja2 Template](http://jinja.pocoo.org/docs/dev/templates/) variables. |
-| blueprint_dynamic              | Settings for the dynamic blueprint template - only used if `blueprint_file` is set to `blueprint_dynamic.j2`. The role names must match the groups from the inventory setting file `~/ansible-hortonworks/inventory/static/group_vars/all`. The chosen components are split into two lists: clients and services. The chosen Component layout must respect Ambari Blueprint restrictions - for example if a single `NAMENODE` is configured, there must also be a `SECONDARY_NAMENODE` component. |
+| blueprint_dynamic              | Settings for the dynamic blueprint template - only used if `blueprint_file` is set to `blueprint_dynamic.j2`. The `host_group` names must match the names from the inventory setting file `~/ansible-hortonworks/inventory/static/group_vars/all` (this is based on the `host_groups` [Ambari Blueprint concept](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-BlueprintFieldDescriptions)). The chosen components are split into two lists: clients and services. The chosen Component layout must respect Ambari Blueprint restrictions - for example if a single `NAMENODE` is configured, there must also be a `SECONDARY_NAMENODE` component. |
 
 
 # Install the cluster

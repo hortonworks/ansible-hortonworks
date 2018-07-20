@@ -24,7 +24,7 @@ cloud_config:
       description: "SSH and inter-nodes access - {{ cluster_name }}"
 
 nodes:
-  - role: "hdp-master"
+  - host_group: "hdp-master"
     count: 1
     image: ami-2a7d75c0                                            # Ubuntu 16.04 AMI in eu-west-1 only (change this ID if using a different region)
     type: r4.xlarge
@@ -36,7 +36,7 @@ nodes:
       size: 15
     ambari_server: true
 
-  - role: "hdp-slave"
+  - host_group: "hdp-slave"
     count: 3
     image: ami-2a7d75c0                                            # Ubuntu 16.04 AMI in eu-west-1 only (change this ID if using a different region)
     type: m5.xlarge
@@ -47,7 +47,7 @@ nodes:
       type: gp2
       size: 15
 
-  - role: "hdp-edge"
+  - host_group: "hdp-edge"
     count: 0
     image: ami-2a7d75c0                                            # Ubuntu 16.04 AMI in eu-west-1 only (change this ID if using a different region)
     type: m4.large

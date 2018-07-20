@@ -12,7 +12,7 @@
     msg: "The AMI {{ outer_loop.image }} does not exist in region {{ cloud_config.region }} or it does not provide any information."
   when: current_ami['images'] | length == 0
 
-- name: Create {{ outer_loop.role }} node(s) (EBS root volume)
+- name: Create {{ outer_loop.host_group }} node(s) (EBS root volume)
   ec2:
     region: "{{ cloud_config.region }}"
     zone: "{{ cloud_config.zone }}"
@@ -53,11 +53,11 @@
       - { device_name: /dev/xvdx, ephemeral: ephemeral22 }
       - { device_name: /dev/xvdy, ephemeral: ephemeral23 }
     count_tag:
-      Group: "{{ cluster_name }}-{{ outer_loop.role }}"
+      Group: "{{ cluster_name }}-{{ outer_loop.host_group }}"
     instance_tags:
       Cluster: "{{ cluster_name }}"
-      Role: "{{ outer_loop.role }}"
-      Group: "{{ cluster_name }}-{{ outer_loop.role }}"
+      Role: "{{ outer_loop.host_group }}"
+      Group: "{{ cluster_name }}-{{ outer_loop.host_group }}"
     wait: yes
     wait_timeout: 600
   register: current_ec2

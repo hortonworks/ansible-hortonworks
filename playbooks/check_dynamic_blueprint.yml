@@ -5,8 +5,8 @@
   tasks:
     - name: Fail if some of the blueprint roles do not have inventory hosts assigned
       fail:
-        msg: "The blueprint role '{{ item.role }}' does not have a corresponding Ansible inventory group or this group is empty."
-      when: groups[item.role] is not defined or (groups[item.role] is defined and groups[item.role]|length == 0)
+        msg: "The blueprint host_group '{{ item.host_group }}' does not have a corresponding Ansible inventory group or this group is empty (has no nodes)."
+      when: groups[item.host_group] is not defined or (groups[item.host_group] is defined and groups[item.host_group]|length == 0)
       with_items: "{{ blueprint_dynamic }}"
 
     - name: Fail if Ranger prerequisites are not met

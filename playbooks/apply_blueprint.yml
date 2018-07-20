@@ -2,7 +2,7 @@
 - import_playbook: "set_variables.yml"
 
 - import_playbook: "check_dynamic_blueprint.yml"
-  when: hostvars[inventory_hostname]['blueprint_file'] == 'blueprint_dynamic.j2'
+  when: blueprint_file == 'blueprint_dynamic.j2'
 
 - name: Gather facts from all nodes
   hosts: hadoop-cluster

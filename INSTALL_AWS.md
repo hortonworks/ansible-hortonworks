@@ -182,16 +182,16 @@ This section contains variables that are cluster specific and are used by all no
 
 This section contains variables that are node specific.
 
-Nodes are separated by groups, each group defining a specific node role, for example master, slave, edge.
+Nodes are separated by host_groups, which is an [Ambari Blueprint concept](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-BlueprintFieldDescriptions). Each group is defining a specific cluster role, for example master, slave, edge.
 
-There can be any number of roles so other roles can be added to correspond with the required architecture.
+There can be any number of host_groups (as long as they correspond to the Blueprint), therefore other host_groups can be added to correspond with the required architecture / blueprint.
 
-And roles can have any names and any number of nodes but they should correspond with the host groups in the Ambari Blueprint.
+And host_groups can have any names and any number of nodes but they should correspond with the host_groups in the Ambari Blueprint and respect the Blueprint spec (for example, there shouldn't be more than 1 node in the host_group which contains the `AMBARI_SERVER` component, but there can be 100+ nodes in the slave / worker host_group).
 
 | Variable        | Description                                                               |
 | --------------- | ------------------------------------------------------------------------- |
-| role            | The name of the role. This will be appended to the cluster name in order to form a unique group in the AWS VPC. Other roles can be added to correspond with the required architecture. |
-| count           | The number of nodes to be built with this role. |
+| host_group      | The name of the host_group used by the [Ambari Blueprint](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-BlueprintFieldDescriptions). This will be appended to the cluster name in order to form a unique group in the AWS VPC. Other roles can be added to correspond with the required architecture. |
+| count           | The number of nodes to be built under this host_group. |
 | image           | The AMI ID of the OS image to be used. More details [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html). The easiest way to find out the ID is by using the EC2 console and clicking on the `Launch Instance` button. |
 | type            | The instance-type / size of the node. A list of all the instance-types can be found [here](https://aws.amazon.com/ec2/instance-types/) and the pricing [here](https://aws.amazon.com/ec2/pricing/). |
 | public_ip       | If the VM should have a Public IP assigned to it. Required if the build node does not have access to the private IP range of the cluster nodes. |
@@ -285,7 +285,7 @@ Modify the file at `~/ansible-hortonworks/playbooks/group_vars/ambari-server` to
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
 | blueprint_name                 | The name of the blueprint as it will be stored in Ambari.                                                  |
 | blueprint_file                 | The path to the blueprint file that will be uploaded to Ambari. It can be an absolute path or relative to the `roles/ambari-blueprint/templates` folder. The blueprint file can also contain [Jinja2 Template](http://jinja.pocoo.org/docs/dev/templates/) variables. |
-| blueprint_dynamic              | Settings for the dynamic blueprint template - only used if `blueprint_file` is set to `blueprint_dynamic.j2`. The role names must match the roles from the inventory setting file `~/ansible-hortonworks/inventory/aws/group_vars/all`. The chosen components are split into two lists: clients and services. The chosen Component layout must respect Ambari Blueprint restrictions - for example if a single `NAMENODE` is configured, there must also be a `SECONDARY_NAMENODE` component. |
+| blueprint_dynamic              | Settings for the dynamic blueprint template - only used if `blueprint_file` is set to `blueprint_dynamic.j2`. The `host_group` names must match the names from the inventory setting file `~/ansible-hortonworks/inventory/aws/group_vars/all` (this is based on the `host_groups` [Ambari Blueprint concept](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-BlueprintFieldDescriptions)). The chosen components are split into two lists: clients and services. The chosen Component layout must respect Ambari Blueprint restrictions - for example if a single `NAMENODE` is configured, there must also be a `SECONDARY_NAMENODE` component. |
 
 
 # Build the Cloud environment

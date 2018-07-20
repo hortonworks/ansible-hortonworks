@@ -57,120 +57,121 @@
         install_hdp: False
         install_hdf: False
         install_hdpsearch: False
+        blueprint_static: ""
       no_log: True
 
     - block:
         - name: Populate the namenode groups list
           set_fact:
-            namenode_groups: "{{ namenode_groups }} + [ '{{ item.role }}' ]"
-          when: groups[item.role] is defined and groups[item.role]|length > 0 and 'NAMENODE' in item.services
-          with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+            namenode_groups: "{{ namenode_groups }} + [ '{{ item.host_group }}' ]"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and 'NAMENODE' in item.services
+          with_items: "{{ blueprint_dynamic }}"
           no_log: True
 
         - name: Populate the ZKFailoverController groups list
           set_fact:
-            zkfc_groups: "{{ zkfc_groups }} + [ '{{ item.role }}' ]"
-          when: groups[item.role] is defined and groups[item.role]|length > 0 and 'ZKFC' in item.services
-          with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+            zkfc_groups: "{{ zkfc_groups }} + [ '{{ item.host_group }}' ]"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and 'ZKFC' in item.services
+          with_items: "{{ blueprint_dynamic }}"
           no_log: True
 
         - name: Populate the resourcemanager groups list
           set_fact:
-            resourcemanager_groups: "{{ resourcemanager_groups }} + [ '{{ item.role }}' ]"
-          when: groups[item.role] is defined and groups[item.role]|length > 0 and 'RESOURCEMANAGER' in item.services
-          with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+            resourcemanager_groups: "{{ resourcemanager_groups }} + [ '{{ item.host_group }}' ]"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and 'RESOURCEMANAGER' in item.services
+          with_items: "{{ blueprint_dynamic }}"
           no_log: True
 
         - name: Populate the journalnode groups list
           set_fact:
-            journalnode_groups: "{{ journalnode_groups }} + [ '{{ item.role }}' ]"
-          when: groups[item.role] is defined and groups[item.role]|length > 0 and 'JOURNALNODE' in item.services
-          with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+            journalnode_groups: "{{ journalnode_groups }} + [ '{{ item.host_group }}' ]"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and 'JOURNALNODE' in item.services
+          with_items: "{{ blueprint_dynamic }}"
           no_log: True
 
         - name: Populate the zookeeper groups list
           set_fact:
-            zookeeper_groups: "{{ zookeeper_groups }} + [ '{{ item.role }}' ]"
-          when: groups[item.role] is defined and groups[item.role]|length > 0 and 'ZOOKEEPER_SERVER' in item.services
-          with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+            zookeeper_groups: "{{ zookeeper_groups }} + [ '{{ item.host_group }}' ]"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and 'ZOOKEEPER_SERVER' in item.services
+          with_items: "{{ blueprint_dynamic }}"
           no_log: True
 
         - name: Populate the zookeeper hosts list
           set_fact:
-            zookeeper_hosts: "{{ zookeeper_hosts }} + {{ groups[item.role] }}"
-          when: groups[item.role] is defined and groups[item.role]|length > 0 and 'ZOOKEEPER_SERVER' in item.services
-          with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+            zookeeper_hosts: "{{ zookeeper_hosts }} + {{ groups[item.host_group] }}"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and 'ZOOKEEPER_SERVER' in item.services
+          with_items: "{{ blueprint_dynamic }}"
           no_log: True
 
         - name: Populate the hiveserver hosts list
           set_fact:
-            hiveserver_hosts: "{{ hiveserver_hosts }} + {{ groups[item.role] }}"
-          when: groups[item.role] is defined and groups[item.role]|length > 0 and ('HIVE_SERVER' in item.services or 'HIVE_METASTORE' in item.services)
-          with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+            hiveserver_hosts: "{{ hiveserver_hosts }} + {{ groups[item.host_group] }}"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and ('HIVE_SERVER' in item.services or 'HIVE_METASTORE' in item.services)
+          with_items: "{{ blueprint_dynamic }}"
           no_log: True
 
         - name: Populate the oozie hosts list
           set_fact:
-            oozie_hosts: "{{ oozie_hosts }} + {{ groups[item.role] }}"
-          when: groups[item.role] is defined and groups[item.role]|length > 0 and ('OOZIE_SERVER' in item.services)
-          with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+            oozie_hosts: "{{ oozie_hosts }} + {{ groups[item.host_group] }}"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and ('OOZIE_SERVER' in item.services)
+          with_items: "{{ blueprint_dynamic }}"
           no_log: True
 
         - name: Populate the rangeradmin groups list
           set_fact:
-            rangeradmin_groups: "{{ rangeradmin_groups }} + [ '{{ item.role }}' ]"
-          when: groups[item.role] is defined and groups[item.role]|length > 0 and ('RANGER_ADMIN' in item.services)
-          with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+            rangeradmin_groups: "{{ rangeradmin_groups }} + [ '{{ item.host_group }}' ]"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and ('RANGER_ADMIN' in item.services)
+          with_items: "{{ blueprint_dynamic }}"
           no_log: True
 
         - name: Populate the rangeradmin hosts list
           set_fact:
-            rangeradmin_hosts: "{{ rangeradmin_hosts }} + {{ groups[item.role] }}"
-          when: groups[item.role] is defined and groups[item.role]|length > 0 and ('RANGER_ADMIN' in item.services)
-          with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+            rangeradmin_hosts: "{{ rangeradmin_hosts }} + {{ groups[item.host_group] }}"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and ('RANGER_ADMIN' in item.services)
+          with_items: "{{ blueprint_dynamic }}"
           no_log: True
 
         - name: Populate the rangerkms hosts list
           set_fact:
-            rangerkms_hosts: "{{ rangerkms_hosts }} + {{ groups[item.role] }}"
-          when: groups[item.role] is defined and groups[item.role]|length > 0 and ('RANGER_KMS_SERVER' in item.services)
-          with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+            rangerkms_hosts: "{{ rangerkms_hosts }} + {{ groups[item.host_group] }}"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and ('RANGER_KMS_SERVER' in item.services)
+          with_items: "{{ blueprint_dynamic }}"
           no_log: True
 
         - name: Populate the streamline hosts list
           set_fact:
-            streamline_hosts: "{{ streamline_hosts }} + {{ groups[item.role] }}"
-          when: groups[item.role] is defined and groups[item.role]|length > 0 and ('STREAMLINE_SERVER' in item.services)
-          with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+            streamline_hosts: "{{ streamline_hosts }} + {{ groups[item.host_group] }}"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and ('STREAMLINE_SERVER' in item.services)
+          with_items: "{{ blueprint_dynamic }}"
           no_log: True
 
         - name: Populate the registry hosts list
           set_fact:
-            registry_hosts: "{{ registry_hosts }} + {{ groups[item.role] }}"
-          when: groups[item.role] is defined and groups[item.role]|length > 0 and ('REGISTRY_SERVER' in item.services)
-          with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+            registry_hosts: "{{ registry_hosts }} + {{ groups[item.host_group] }}"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and ('REGISTRY_SERVER' in item.services)
+          with_items: "{{ blueprint_dynamic }}"
           no_log: True
 
         - name: Populate the hdf hosts list
           set_fact:
-            hdf_hosts: "{{ hdf_hosts }} + {{ groups[item.role] }}"
-          when: groups[item.role] is defined and groups[item.role]|length > 0 and ('NIFI_MASTER' in item.services or 'STREAMLINE_SERVER' in item.services or 'REGISTRY_SERVER' in item.services)
-          with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+            hdf_hosts: "{{ hdf_hosts }} + {{ groups[item.host_group] }}"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and ('NIFI_MASTER' in item.services or 'STREAMLINE_SERVER' in item.services or 'REGISTRY_SERVER' in item.services)
+          with_items: "{{ blueprint_dynamic }}"
           no_log: True
 
         - name: Populate the solr hosts list
           set_fact:
-            solr_hosts: "{{ solr_hosts }} + {{ groups[item.role] }}"
-          when: groups[item.role] is defined and groups[item.role]|length > 0 and ('SOLR_SERVER' in item.services)
-          with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+            solr_hosts: "{{ solr_hosts }} + {{ groups[item.host_group] }}"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and ('SOLR_SERVER' in item.services)
+          with_items: "{{ blueprint_dynamic }}"
           no_log: True
 
         - name: Populate the all services and clients lists
           set_fact:
             blueprint_all_services: "{{ blueprint_all_services | union(item.services) }}"
             blueprint_all_clients: "{{ blueprint_all_clients | union(item.clients) }}"
-          when: groups[item.role] is defined and groups[item.role]|length > 0
-          with_items: "{{ hostvars[groups['ambari-server']|sort|list|first]['blueprint_dynamic'] }}"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0
+          with_items: "{{ blueprint_dynamic }}"
           no_log: True
 
         - name: Set the install_hdp variable
@@ -187,7 +188,7 @@
           set_fact:
             install_hdpsearch: True
           when: solr_hosts|length > 0
-      when: hostvars[inventory_hostname]['blueprint_file'] == 'blueprint_dynamic.j2'
+      when: blueprint_file == 'blueprint_dynamic.j2'
 
     - block:
         - name: Set the blueprint path (relative to ambari-blueprint role)
@@ -200,22 +201,39 @@
             blueprint_file_path: "{{ blueprint_file }}"
           when: blueprint_file|list|first == '/' or blueprint_file|list|first == '~'
 
-        - name: Read the blueprint content
+        - name: Read the static blueprint content
           set_fact:
-            blueprint_content: "{{ lookup('file', blueprint_file_path) }}"
+            blueprint_static: "{{ lookup('template', blueprint_file_path) }}"
+
+        - name: Fail if the the static blueprint is not a valid JSON
+          fail:
+            msg: "The blueprint {{ blueprint_file }} is not a valid JSON or it doesn't have a 'host_groups' element."
+          when: blueprint_static['host_groups'] is not defined
+
+        - name: Populate the ambari groups list
+          set_fact:
+            ambari_groups: "{{ ambari_groups }} + [ '{{ item.name }}' ]"
+          when: groups[item.name] is defined and groups[item.name]|length > 0 and blueprint_static['host_groups'] | string is search("AMBARI_SERVER")
+          with_items: "{{ blueprint_static['host_groups'] }}"
+          no_log: True
 
         - name: Set the install_hdp variable
           set_fact:
             install_hdp: True
-          when: blueprint_content | string is search("NAMENODE")
+          when: blueprint_static['host_groups'] | string is search("NAMENODE")
+
+        - name: Populate the hiveserver hosts list
+          set_fact:
+            hiveserver_hosts: "{{ hiveserver_hosts }} + {{ 'localhost' }}"
+          when: blueprint_static['host_groups'] | string is search("HIVE_SERVER") or blueprint_static['host_groups'] | string is search("HIVE_METASTORE")
 
         - name: Set the install_hdf variable
           set_fact:
             install_hdf: True
-          when: blueprint_content | string is search("NIFI_MASTER") or blueprint_content | string is search("STREAMLINE_SERVER") or blueprint_content | string is search("REGISTRY_SERVER")
+          when: blueprint_static['host_groups'] | string is search("NIFI_MASTER") or blueprint_static['host_groups'] | string is search("STREAMLINE_SERVER") or blueprint_static['host_groups'] | string is search("REGISTRY_SERVER")
 
         - name: Set the install_hdpsearch variable
           set_fact:
             install_hdpsearch: True
-          when: blueprint_content | string is search("SOLR_SERVER")
-      when: hostvars[inventory_hostname]['blueprint_file'] != 'blueprint_dynamic.j2'
+          when: blueprint_static['host_groups'] | string is search("SOLR_SERVER")
+      when: blueprint_file != 'blueprint_dynamic.j2'
