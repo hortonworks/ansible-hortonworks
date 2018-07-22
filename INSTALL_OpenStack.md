@@ -39,14 +39,14 @@ As OpenStack environments are usually private, you might need to build such a no
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade
-   pip install ansible shade python-openstackclient==3.12.0 os-client-config==1.28.0
+   pip install ansible openstacksdk
    ```
 
 
 4. Turn off SSL validation (required if your OpenStack endpoints don't use trusted certs)
 
    ```
-   defaults_json_path=~/ansible/lib/python2.7/site-packages/os_client_config/defaults.json; grep -q verify $defaults_json_path || sed -i'' -e '/{$/ a\
+   defaults_json_path=~/ansible/lib/python2.7/site-packages/openstack/config/defaults.json; grep -q verify $defaults_json_path || sed -i'' -e '/{$/ a\
    "verify": false,\
    ' $defaults_json_path
    ```
@@ -85,14 +85,14 @@ As OpenStack environments are usually private, you might need to build such a no
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade   
-   pip install ansible shade python-openstackclient==3.12.0 os-client-config==1.28.0
+   pip install ansible openstacksdk
    ```
 
 
 4. Turn off SSL validation (required if your OpenStack endpoints don't use trusted certs)
   
    ```
-   defaults_json_path=~/ansible/lib64/python2.7/site-packages/os_client_config/defaults.json; grep -q verify $defaults_json_path || sed -i '/{$/a "verify": false,' $defaults_json_path
+   defaults_json_path=~/ansible/lib/python2.7/site-packages/openstack/config/defaults.json; grep -q verify $defaults_json_path || sed -i '/{$/a "verify": false,' $defaults_json_path
    ```
 
 
@@ -129,14 +129,14 @@ As OpenStack environments are usually private, you might need to build such a no
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade
-   pip install ansible shade python-openstackclient==3.12.0 os-client-config==1.28.0
+   pip install ansible openstacksdk
    ```
 
 
 4. Turn off SSL validation (required if your OpenStack endpoints don't use trusted certs)
   
    ```
-   defaults_json_path=~/ansible/local/lib/python2.7/site-packages/os_client_config/defaults.json; grep -q verify $defaults_json_path || sed -i '/{$/a "verify": false,' $defaults_json_path
+   defaults_json_path=~/ansible/lib/python2.7/site-packages/openstack/config/defaults.json; grep -q verify $defaults_json_path || sed -i '/{$/a "verify": false,' $defaults_json_path
    ```
 
 5. Install the SSH private key
