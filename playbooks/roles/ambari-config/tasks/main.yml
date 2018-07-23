@@ -37,7 +37,7 @@
 - block:
     - name: Set the HDP Search mpack filename
       set_fact:
-        mpack_filename: "solr-service-mpack-{{ hdpsearch_version.split('-').0 }}.tar.gz"
+        mpack_filename: "solr-service-mpack-{{ hdpsearch_version }}.tar.gz"
 
     - name: "Install the HDP Search Management Pack"
       shell: "echo yes | ambari-server install-mpack --mpack={{ repo_base_url }}/HDP-SOLR/hdp-solr-ambari-mp/{{ mpack_filename }}"
@@ -47,16 +47,18 @@
   when: install_hdpsearch is defined and install_hdpsearch
 
 - block:
-    - name: Attempt to read the HDF repo build.id file
-      uri:
-        url: "{{ hdf_main_repo_url }}/build.id"
-        method: GET
-        return_content: yes
-      register: hdf_repo_build_id
+    - block:
+        - name: Attempt to read the HDF repo build.id file
+          uri:
+            url: "{{ hdf_main_repo_url }}/build.id"
+            method: GET
+            return_content: yes
+          register: hdf_repo_build_id
 
-    - name: Set the HDF build number
-      set_fact:
-        hdf_build_number: "{{ (hdf_repo_build_id.content|from_yaml).BUILD_NUMBER }}"
+        - name: Set the HDF build number
+          set_fact:
+            hdf_build_number: "{{ (hdf_repo_build_id.content|from_yaml).BUILD_NUMBER }}"
+      when: hdf_build_number == 'auto'
 
     - name: Set the HDF mpack filename
       set_fact:
@@ -138,16 +140,18 @@
       when: ambari_version is version_compare('2.6', '<')
 
     - block:
-        - name: Attempt to read the HDP repo build.id file (Ambari >= 2.6)
-          uri:
-            url: "{{ hdp_main_repo_url }}/build.id"
-            method: GET
-            return_content: yes
-          register: hdp_repo_build_id
+        - block:
+            - name: Attempt to read the HDP repo build.id file (Ambari >= 2.6)
+              uri:
+                url: "{{ hdp_main_repo_url }}/build.id"
+                method: GET
+                return_content: yes
+              register: hdp_repo_build_id
 
-        - name: Set the HDP build number (Ambari >= 2.6)
-          set_fact:
-            hdp_build_number: "{{ (hdp_repo_build_id.content|from_yaml).BUILD_NUMBER }}"
+            - name: Set the HDP build number (Ambari >= 2.6)
+              set_fact:
+                hdp_build_number: "{{ (hdp_repo_build_id.content|from_yaml).BUILD_NUMBER }}"
+          when: hdp_build_number == 'auto'
 
         - name: Upload the HDP Version Definition file (Ambari >= 2.6)
           template:

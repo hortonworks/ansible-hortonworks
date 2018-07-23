@@ -17,7 +17,7 @@
 {% if install_hdpsearch|default(false) %}
       <repo>
         <baseurl>{{ hdpsearch_main_repo_url }}</baseurl>
-        <repoid>HDP-SOLR-{{ hdpsearch_version }}</repoid>
+        <repoid>HDP-SOLR-{{ hdpsearch_version }}-{{ hdpsearch_build_number }}</repoid>
         <reponame>HDP-SOLR</reponame>
         <unique>true</unique>
       </repo>

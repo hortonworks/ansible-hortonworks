@@ -168,6 +168,7 @@ Modify the file at `~/ansible-hortonworks/inventory/azure/group_vars/all` to set
 
 
 ## cloud_config
+
 This section contains variables that are cluster specific and are used by all nodes:
 
 | Variable        | Description                                                                                                |
@@ -215,8 +216,11 @@ Modify the file at `~/ansible-hortonworks/playbooks/group_vars/all` to set the c
 | cluster_name               | The name of the cluster. This is also used by default in the cloud components that require uniqueness, such as the name of the nodes or tags. |
 | ambari_version             | The Ambari version, in the full, 4-number form, for example: `2.6.2.2`.                                     |
 | hdp_version                | The HDP version, in the full, 4-number form, for example: `2.6.5.0`.                                        |
-| hdf_version                | The HDF version, in the full, 4-number form, for example: `3.1.2.0`.                                       |
+| hdp_build_number           | The HDP build number for the HDP version above, which can be found on the Stack Repositories page from [docs.hortonworks.com](https://docs.hortonworks.com). If left to `auto`, Ansible will try to get it from the repository [build.id file](https://github.com/hortonworks/ansible-hortonworks/blob/master/playbooks/roles/ambari-config/tasks/main.yml#L141) so this variable only needs changing if there is no build.id file in the local repository that is being used. |
+| hdf_version                | The HDF version, in the full, 4-number form, for example: `3.1.2.0`.                                        |
+| hdf_build_number           | The HDF build number for the HDF version above, which can be found on the Stack Repositories page from [docs.hortonworks.com](https://docs.hortonworks.com). If left to `auto`, Ansible will try to get it from the repository [build.id file](https://github.com/hortonworks/ansible-hortonworks/blob/master/playbooks/roles/ambari-config/tasks/main.yml#L52) so this variable only needs changing if there is no build.id file in the local repository that is being used. |
 | hdpsearch_version          | The HDP Search version as shown on the [docs repository details](https://docs.hortonworks.com/HDPDocuments/HDP2/HDP-2.6.5/bk_solr-search-installation/content/hdp-search30-public-repos.html). |
+| hdpsearch_build_number     | The HDP Search build number as shown on the [docs repository details](https://docs.hortonworks.com/HDPDocuments/HDP2/HDP-2.6.5/bk_solr-search-installation/content/hdp-search30-public-repos.html). This is usually `100` as the HDP Search build number never changed from `100` and there is no build.id file in the HDP Search repo. |
 | repo_base_url              | The base URL for the repositories. Change this to the local web server url if using a Local Repository. `/HDP/<OS>/2.x/updates/<latest.version>` (or `/HDF/..`) will be appended to this value to set it accordingly if there are additional URL paths. |
 
 ### general configuration
@@ -277,7 +281,7 @@ Modify the file at `~/ansible-hortonworks/playbooks/group_vars/all` to set the c
 | .kms_master_key_password       | The password used for encrypting the Master Key.                                                           |
 | .enable_plugins                | If set to `yes` the plugins for all of the available services will be enabled. With `no` Ranger would be installed but not functional. |
 
-## ambari configuration
+### ambari configuration
 
 | Variable                       | Description                                                                                                |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
