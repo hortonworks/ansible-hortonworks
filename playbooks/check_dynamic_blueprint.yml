@@ -3,7 +3,7 @@
   hosts: ambari-server
   gather_facts: False
   tasks:
-    - name: Fail if there is no Ansible inventory group matching the blueprint's host_vars
+    - name: Fail if there is no Ansible inventory group matching the blueprint's host_groups
       fail:
         msg: "The {{ item.host_group }} host_group is defined in the blueprint but there is no matching Ansible inventory group called {{ item.host_group }} or there are no hosts in this group."
       when: groups[item.host_group] is not defined or (groups[item.host_group] is defined and groups[item.host_group]|length == 0)

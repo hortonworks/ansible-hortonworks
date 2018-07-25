@@ -10,7 +10,7 @@
   lineinfile:
     path: /etc/ambari-agent/conf/ambari-agent.ini
     regexp: "^hostname="
-    line: "hostname={{ hostvars[groups['ambari-server']|sort|list|first]['ansible_fqdn'] }}"
+    line: "hostname={{ hostvars[groups['ambari-server']|first]['ansible_fqdn'] }}"
     state: present
   notify: Restart ambari-agent
 

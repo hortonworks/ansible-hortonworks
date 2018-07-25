@@ -6,4 +6,4 @@
         owner: hdfs
         group: hadoop
         mode: 0440
-  when: security != "none" and security_options.http_authentication|default(false)
+  when: security != "none" and security_options.http_authentication|default(false) and install_hdp is defined and install_hdp

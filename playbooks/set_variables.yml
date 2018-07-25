@@ -4,16 +4,16 @@
   connection: local
   gather_facts: False
   tasks:
-    - name: Add the nodes to hadoop-cluster and role specific groups
+    - name: Add nodes to the hadoop-cluster group and groups representing the host_groups
       include_tasks: "clouds/add_nodes_{{ cloud_name }}.yml"
       with_items: "{{ nodes|default(omit) }}"
 
-    - name: Initialize the ambari groups list
+    - name: Initialize the ambari_groups list
       set_fact:
         ambari_groups: []
 
     - block:
-        - name: Populate the ambari groups list (dynamic blueprint)
+        - name: Populate the ambari_groups list (dynamic blueprint)
           set_fact:
             ambari_groups: "{{ ambari_groups }} + [ '{{ item.host_group }}' ]"
           when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and 'AMBARI_SERVER' in item.services
@@ -41,20 +41,20 @@
             msg: "The blueprint {{ blueprint_file }} is not a valid JSON or it doesn't have a 'host_groups' element."
           when: blueprint_static['host_groups'] is not defined
 
-        - name: Populate the ambari groups list (static blueprint)
+        - name: Populate the ambari_groups list (static blueprint)
           set_fact:
             ambari_groups: "{{ ambari_groups }} + [ '{{ item.name }}' ]"
           when: item | string is search("AMBARI_SERVER")
           with_items: "{{ blueprint_static['host_groups'] }}"
           no_log: True
-      when: hostvars[inventory_hostname]['blueprint_file'] != 'blueprint_dynamic.j2'
+      when: blueprint_file != 'blueprint_dynamic.j2'
 
-    - name: Fail if the ambari groups list is empty
+    - name: Fail if the ambari_groups list is empty
       fail:
         msg: "The ambari_groups list is empty. This usually means there is no 'AMBARI_SERVER' component defined in the blueprint or there is no Ansible inventory group corresponding with the name of the blueprint's host_group."
       when: ambari_groups|length == 0
 
-    - name: Fail if there is no Ansible inventory group matching the blueprint's host_vars
+    - name: Fail if there is no Ansible inventory group matching the blueprint's host_groups
       fail:
         msg: "The {{ item }} host_group is defined in the blueprint but there is no matching Ansible inventory group called {{ item }} or there are no hosts in this group."
       when: groups[item] is not defined or groups[item]|length == 0
@@ -64,29 +64,6 @@
       add_host:
         name: "{{ groups[ambari_groups|first]|first }}"
         groups: "ambari-server"
-
-- name: Create the Ansible helper variables for all nodes
-  hosts: hadoop-cluster
-  gather_facts: False
-  tasks:
-    - name: Check if /usr/bin/python exists
-      raw: bash -c "test -e /usr/bin/python && echo -n exists || echo -n"
-      register: default_python2_path
-
-    - name: Check if /usr/bin/python3 exists
-      raw: bash -c "test -e /usr/bin/python3 && echo -n exists || echo -n"
-      register: default_python3_path
-      when: default_python2_path.stdout == ""
-
-    - name: Fail if no standard python path could be found
-      fail:
-        msg: "Python could not be found at /usr/bin/python or /usr/bin/python3. If using a custom python path, set the 'ansible_python_interpreter' inventory variable to the valid path for your environment."
-      when: default_python2_path.stdout == "" and default_python3_path.stdout != "exists"
-
-    - name: Set the ansible_python_interpreter to /usr/bin/python3
-      set_fact:
-        ansible_python_interpreter: "/usr/bin/python3"
-      when: default_python3_path.stdout is defined and default_python3_path.stdout == "exists"
 
 - name: Create the Ansible helper variables for the ambari-server
   hosts: ambari-server
@@ -287,3 +264,38 @@
             install_hdpsearch: True
           when: blueprint_static['host_groups'] | string is search("SOLR_SERVER")
       when: blueprint_file != 'blueprint_dynamic.j2'
+
+- name: Create the Ansible helper variables for all nodes
+  hosts: hadoop-cluster
+  gather_facts: False
+  tasks:
+    - name: Check if /usr/bin/python exists
+      raw: bash -c "test -e /usr/bin/python && echo -n exists || echo -n"
+      register: default_python2_path
+
+    - name: Check if /usr/bin/python3 exists
+      raw: bash -c "test -e /usr/bin/python3 && echo -n exists || echo -n"
+      register: default_python3_path
+      when: default_python2_path.stdout == ""
+
+    - name: Fail if no standard python path could be found
+      fail:
+        msg: "Python could not be found at /usr/bin/python or /usr/bin/python3. If using a custom python path, set the 'ansible_python_interpreter' inventory variable to the valid path for your environment."
+      when: default_python2_path.stdout == "" and default_python3_path.stdout != "exists"
+
+    - name: Set the ansible_python_interpreter to /usr/bin/python3
+      set_fact:
+        ansible_python_interpreter: "/usr/bin/python3"
+      when: default_python3_path.stdout is defined and default_python3_path.stdout == "exists"
+
+    - name: Set the install_hdp variable to all nodes
+      set_fact:
+        install_hdp: "{{ hostvars[groups['ambari-server']|first]['install_hdp'] }}"
+
+    - name: Set the install_hdf variable to all nodes
+      set_fact:
+        install_hdf: "{{ hostvars[groups['ambari-server']|first]['install_hdf'] }}"
+
+    - name: Set the install_hdpsearch variable to all nodes
+      set_fact:
+        install_hdpsearch: "{{ hostvars[groups['ambari-server']|first]['install_hdpsearch'] }}"

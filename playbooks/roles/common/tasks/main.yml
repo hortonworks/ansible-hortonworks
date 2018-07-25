@@ -116,7 +116,7 @@
         dest: /tmp/hadoop_http_secret
         flat: yes
         fail_on_missing: no
-      delegate_to: "{{ groups['ambari-server']|sort|list|first }}"
+      delegate_to: "{{ groups['ambari-server']|first }}"
       run_once: true
       register: fetch_results
 
@@ -139,4 +139,4 @@
       local_action: file path="/tmp/hadoop_http_secret" state="absent"
       run_once: true
       become: false
-  when: security != "none" and security_options.http_authentication|default(false)
+  when: security != "none" and security_options.http_authentication|default(false) and install_hdp is defined and install_hdp

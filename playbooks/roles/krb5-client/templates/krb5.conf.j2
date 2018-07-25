@@ -3,8 +3,8 @@
     default_ccache_name = /tmp/krb5cc_%{uid}
 [realms]
     {{ security_options.realm | upper }} = {
-        kdc = {{ security_options.external_hostname|default(hostvars[groups['ambari-server']|sort|list|first]['ansible_fqdn'],true) }}
-        admin_server = {{ security_options.external_hostname|default(hostvars[groups['ambari-server']|sort|list|first]['ansible_fqdn'],true) }}
+        kdc = {{ security_options.external_hostname|default(hostvars[groups['ambari-server']|first]['ansible_fqdn'],true) }}
+        admin_server = {{ security_options.external_hostname|default(hostvars[groups['ambari-server']|first]['ansible_fqdn'],true) }}
     }
 [logging]
     default = FILE:/var/log/krb5kdc.log
