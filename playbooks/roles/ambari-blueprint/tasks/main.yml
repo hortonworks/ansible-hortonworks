@@ -50,23 +50,12 @@
     - src: "{{ cluster_template_file }}"
       dest: "/tmp/cluster_template"
 
-- name: Delete any existing blueprint called {{ blueprint_name }}
-  uri:
-    url: "http://{{ ansible_fqdn }}:8080/api/v1/blueprints/{{ blueprint_name }}"
-    method: DELETE
-    force_basic_auth: yes
-    user: "{{ ambari_admin_user }}"
-    password: "{{ ambari_admin_password }}"
-    headers: '{"X-Requested-By":"ambari"}'
-    status_code: 200,201,202,404
-    return_content: no
-
 - name: Slurp the blueprint
   slurp:
     src: "/tmp/{{ blueprint_name }}"
   register: cluster_blueprint
 
-- name: Upload the blueprint to the Ambari server
+- name: Upload the blueprint {{ blueprint_name }} to the Ambari server
   uri:
     url: "http://{{ ansible_fqdn }}:8080/api/v1/blueprints/{{ blueprint_name }}"
     method: POST
@@ -76,9 +65,15 @@
     headers: '{"X-Requested-By":"ambari"}'
     body: " {{ cluster_blueprint.content | b64decode }}"
     body_format: raw
-    status_code: 200,201,202,404
+    status_code: 200,201,202,409
     timeout: 60
     return_content: no
+  register: blueprint_status
+
+- name: Warn if the blueprint already exists.
+  debug:
+    msg: A blueprint called {{ blueprint_name }} already exists and its content was not changed by the previous upload.
+  when: blueprint_status.status|int == 409
 
 - name: Check if a cluster {{ cluster_name }} already exists
   uri:
