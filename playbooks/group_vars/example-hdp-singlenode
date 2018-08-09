@@ -28,6 +28,8 @@ blueprint_dynamic:                                              # properties for
       - SPARK2_JOBHISTORYSERVER
       - ZEPPELIN_MASTER
       - HST_SERVER
+      - ACTIVITY_ANALYZER
+      - ACTIVITY_EXPLORER
       - HST_AGENT
       - AMBARI_SERVER
       - INFRA_SOLR

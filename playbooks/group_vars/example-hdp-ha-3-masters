@@ -22,6 +22,7 @@ blueprint_dynamic:                                              # properties for
       - HIVE_SERVER
       - HIVE_METASTORE
       - WEBHCAT_SERVER
+      - ACTIVITY_ANALYZER
       - HST_AGENT
       - METRICS_MONITOR
   - host_group: "hdp-masternode-02"
@@ -35,6 +36,7 @@ blueprint_dynamic:                                              # properties for
       - HBASE_MASTER
       - HIVE_SERVER
       - HIVE_METASTORE
+      - ACTIVITY_ANALYZER
       - HST_AGENT
       - METRICS_MONITOR
   - host_group: "hdp-management"
@@ -50,6 +52,8 @@ blueprint_dynamic:                                              # properties for
       - HISTORYSERVER
       - SPARK2_JOBHISTORYSERVER
       - HST_SERVER
+      - ACTIVITY_ANALYZER
+      - ACTIVITY_EXPLORER
       - HST_AGENT
       - METRICS_COLLECTOR
       - METRICS_GRAFANA

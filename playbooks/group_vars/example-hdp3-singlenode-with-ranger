@@ -33,6 +33,8 @@ blueprint_dynamic:                                              # properties for
       - RANGER_USERSYNC
       - RANGER_KMS_SERVER
       - HST_SERVER
+      - ACTIVITY_ANALYZER
+      - ACTIVITY_EXPLORER
       - HST_AGENT
       - AMBARI_SERVER
       - INFRA_SOLR

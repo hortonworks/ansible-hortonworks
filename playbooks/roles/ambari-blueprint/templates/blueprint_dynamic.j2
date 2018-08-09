@@ -571,6 +571,19 @@
       }
     },
     {
+      "hst-server-conf" : {
+        "customer.smartsense.id" : "{{ smartsense.id | default('unspecified', true) }}",
+        "customer.account.name" : "{{ smartsense.account_name | default('unspecified', true) }}",
+        "customer.notification.email" : "{{ smartsense.customer_email | default('unspecified', true) }}",
+        "client.threadpool.size.max" : "40"
+      }
+    },
+    {
+    "activity-zeppelin-shiro": {
+        "users.admin": "{{ smartsense.admin_password }}"
+      }
+    },
+    {
       "zoo.cfg": {
         "clientPort" : "2181"
       }

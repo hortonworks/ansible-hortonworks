@@ -106,6 +106,12 @@ ambari_admin_default_password: 'admin'                    # no need to change th
 default_password: 'AsdQwe123456'                          # a default password for all required passwords which are not specified in the blueprint
 config_recommendation_strategy: 'NEVER_APPLY'
 
+smartsense:                                               # Hortonworks subscription details (can be left empty if there is no subscription)
+  id: ''
+  account_name: ''
+  customer_email: ''
+  admin_password: "{{ default_password }}"                # password for the Activity Explorer's Zeppelin admin user
+
 wait: true                                                # wait for the cluster to finish installing
 wait_timeout: 3600                                        # 60 minutes
 accept_gpl: yes                                           # set to yes to allow Ambari to install GPL licensed libraries
@@ -140,6 +146,8 @@ blueprint_dynamic:                                        # properties for the d
       - METRICS_GRAFANA
       - METRICS_MONITOR
       - HST_SERVER
+      - ACTIVITY_ANALYZER
+      - ACTIVITY_EXPLORER
       - HST_AGENT
   - host_group: "hdp-slave"
     clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT']
