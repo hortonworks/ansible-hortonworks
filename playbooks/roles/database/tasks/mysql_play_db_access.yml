@@ -11,4 +11,4 @@
   loop_control:
     loop_var: local_loop
   with_items: "{{ hostvars[outer_loop]['ansible_interfaces'] }}"
-  when: local_loop != 'lo'
+  when: local_loop != 'lo' and 'ipv4' in hostvars[outer_loop]['ansible_'~local_loop]
