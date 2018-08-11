@@ -12,4 +12,4 @@ aws|azure|gce|openstack)
   ;;
 esac
 
-ansible-playbook --connection=local "playbooks/clouds/build_${cloud_to_use}.yml"
+ansible-playbook --connection=local "playbooks/clouds/build_${cloud_to_use}.yml" "$@"
