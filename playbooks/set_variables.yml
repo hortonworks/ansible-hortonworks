@@ -79,6 +79,8 @@
         zookeeper_hosts: []
         hiveserver_hosts: []
         oozie_hosts: []
+        druid_hosts: []
+        kafka_hosts: []
         rangeradmin_groups: []
         rangeradmin_hosts: []
         rangerkms_hosts: []
@@ -148,6 +150,20 @@
           set_fact:
             oozie_hosts: "{{ oozie_hosts }} + {{ groups[item.host_group] }}"
           when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and ('OOZIE_SERVER' in item.services)
+          with_items: "{{ blueprint_dynamic }}"
+          no_log: True
+
+        - name: Populate the druid hosts list
+          set_fact:
+            druid_hosts: "{{ druid_hosts }} + {{ groups[item.host_group] }}"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and ('DRUID_BROKER' in item.services or 'DRUID_COORDINATOR' in item.services or 'DRUID_ROUTER' in item.services or 'DRUID_MIDDLEMANAGER' in item.services or 'DRUID_HISTORICAL' in item.services or 'DRUID_OVERLORD' in item.services)
+          with_items: "{{ blueprint_dynamic }}"
+          no_log: True
+
+        - name: Populate the kafka hosts list
+          set_fact:
+            kafka_hosts: "{{ kafka_hosts }} + {{ groups[item.host_group] }}"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and ('KAFKA_BROKER' in item.services)
           with_items: "{{ blueprint_dynamic }}"
           no_log: True
 

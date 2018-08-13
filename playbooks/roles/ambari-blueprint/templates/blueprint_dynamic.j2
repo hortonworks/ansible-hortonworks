@@ -481,6 +481,62 @@
       }
     },
     {
+      "druid-common" : {
+        {% if database != "embedded" -%}
+        {% if database == "mysql" or database == "mariadb" -%}
+        "druid.metadata.storage.type": "mysql",
+        "druid.metadata.storage.connector.port": "{{ mysql_port }}",
+        "druid.metadata.storage.connector.connectURI": "jdbc:mysql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ mysql_port }}/{{ database_options.druid_db_name }}",
+{% if kafka_hosts|length > 0 %}
+        "druid.extensions.loadList": "[\"druid-datasketches\", \"druid-hdfs-storage\", \"ambari-metrics-emitter\", \"mysql-metadata-storage\", \"druid-kafka-indexing-service\"]",
+{% else %}
+        "druid.extensions.loadList": "[\"druid-datasketches\", \"druid-hdfs-storage\", \"ambari-metrics-emitter\", \"mysql-metadata-storage\"]",
+{% endif %}
+        {% endif -%}
+        {% if database == "postgres" -%}
+        "druid.metadata.storage.type": "postgresql",
+        "druid.metadata.storage.connector.port": "{{ postgres_port }}",
+        "druid.metadata.storage.connector.connectURI": "jdbc:postgresql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ postgres_port }}/{{ database_options.druid_db_name }}",
+{% if kafka_hosts|length > 0 %}
+        "druid.extensions.loadList": "[\"druid-datasketches\", \"druid-hdfs-storage\", \"ambari-metrics-emitter\", \"postgresql-metadata-storage\", \"druid-kafka-indexing-service\"]",
+{% else %}
+        "druid.extensions.loadList": "[\"druid-datasketches\", \"druid-hdfs-storage\", \"ambari-metrics-emitter\", \"postgresql-metadata-storage\"]",
+{% endif %}
+        {% endif -%}
+        "metastore_hostname": "{{ database_options.external_hostname|default(ansible_fqdn,true) }}",
+        "database_name": "{{ database_options.druid_db_name }}",
+        "druid.metadata.storage.connector.user": "{{ database_options.druid_db_username }}",
+        "druid.metadata.storage.connector.password": "{{ database_options.druid_db_password }}",
+        {% else -%}
+        "druid.metadata.storage.type": "derby",
+        "druid.metadata.storage.connector.connectURI": "jdbc:derby://localhost:1527/druid;create=true",
+{% if kafka_hosts|length > 0 %}
+        "druid.extensions.loadList": "[\"druid-datasketches\", \"druid-hdfs-storage\", \"ambari-metrics-emitter\", \"druid-kafka-indexing-service\"]",
+{% else %}
+        "druid.extensions.loadList": "[\"druid-datasketches\", \"druid-hdfs-storage\", \"ambari-metrics-emitter\"]",
+{% endif %}
+        {% endif -%}
+        "druid.storage.type": "hdfs",
+        "druid.storage.storageDirectory": "/apps/druid/warehouse",
+        "druid.indexer.logs.type": "hdfs",
+        "druid.indexer.logs.directory": "/user/druid/logs"
+      }
+    },
+    {
+      "druid-historical" : {
+        "druid.processing.numThreads": "2",
+        "druid.server.http.numThreads": "40",
+        "druid.processing.buffer.sizeBytes": "536870912"
+      }
+    },
+    {
+      "druid-broker" : {
+        "druid.processing.numThreads": "2",
+        "druid.server.http.numThreads": "40",
+        "druid.processing.buffer.sizeBytes": "536870912"
+      }
+    },
+    {
       "oozie-site" : {
         {% if database != "embedded" -%}
         {% if database == "mysql" or database == "mariadb" -%}

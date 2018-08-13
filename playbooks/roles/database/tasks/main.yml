@@ -155,6 +155,16 @@
     db_client_hosts: "{{ oozie_hosts }}"
   when: oozie_hosts is defined and oozie_hosts|length > 0
 
+- name: Prepare the druid database
+  include_tasks: "{{ database | regex_replace('mariadb', 'mysql') }}_play.yml"
+  vars:
+    db_name: "{{ database_options.druid_db_name }}"
+    db_username: "{{ database_options.druid_db_username }}"
+    db_password: "{{ database_options.druid_db_password }}"
+    db_client_hosts: "{{ druid_hosts }}"
+    db_encoding: 'utf8'
+  when: druid_hosts is defined and druid_hosts|length > 0
+
 - name: Prepare the ranger database
   include_tasks: "{{ database | regex_replace('mariadb', 'mysql') }}_play.yml"
   vars:
