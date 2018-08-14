@@ -28,6 +28,7 @@ blueprint_dynamic:                                              # properties for
       - HBASE_REGIONSERVER
       - SPARK2_JOBHISTORYSERVER
       - ZEPPELIN_MASTER
+      - KNOX_GATEWAY
       - HST_SERVER
       - ACTIVITY_ANALYZER
       - ACTIVITY_EXPLORER

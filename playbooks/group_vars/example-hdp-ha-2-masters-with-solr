@@ -43,6 +43,7 @@ blueprint_dynamic:                                              # properties for
       - HIVE_METASTORE
       - OOZIE_SERVER
       - ACTIVITY_ANALYZER
+      - KNOX_GATEWAY
       - HST_AGENT
       - METRICS_COLLECTOR
       - METRICS_GRAFANA

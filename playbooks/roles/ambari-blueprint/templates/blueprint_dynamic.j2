@@ -182,6 +182,32 @@
       }
     },
 {% endif %}
+{% if 'KNOX_GATEWAY' in blueprint_all_services %}
+    {
+      "ranger-knox-plugin-properties" : {
+        "ranger-knox-plugin-enabled" : "Yes"
+      }
+    },
+    {
+      "ranger-knox-security" : {
+        "ranger.plugin.knox.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_fqdn'] }}:6080",
+        "ranger.plugin.knox.policy.pollIntervalMs" : "30000"
+      }
+    },
+    {
+      "ranger-knox-audit" : {
+        "xasecure.audit.destination.db" : "false",
+{% if namenode_groups|length > 0 %}
+        "xasecure.audit.destination.hdfs" : "true",
+        "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ hdfs_ha_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_fqdn'] }}:8020{% endif %}/ranger/audit",
+{% else %}
+        "xasecure.audit.destination.hdfs" : "false",
+{% endif %}
+        "xasecure.audit.destination.solr" : "true",
+        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_fqdn'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
+      }
+    },
+{% endif %}
     {
       "ranger-kafka-plugin-properties" : {
         "ranger-kafka-plugin-enabled" : "Yes"
@@ -215,6 +241,7 @@
         "ranger-hive-plugin-enabled" : "Yes",
         "ranger-yarn-plugin-enabled" : "Yes",
         "ranger-hbase-plugin-enabled" : "Yes",
+        "ranger-knox-plugin-enabled" : "Yes",
 {% endif %}
 {% if hdf_hosts|length > 0 %}
         "ranger-nifi-plugin-enabled" : "Yes",
@@ -607,6 +634,15 @@
         "hadoop.proxyuser.kms.groups" : "*",
 {% endif %}
         "fs.trash.interval" : "360"
+      }
+    },
+{% endif %}
+{% if 'KNOX_GATEWAY' in blueprint_all_services %}
+    {
+      "knox-env" : {
+        "knox_master_secret": "{{ knox_security_options.master_secret }}",
+        "knox_user": "knox",
+        "knox_group": "knox"
       }
     },
 {% endif %}

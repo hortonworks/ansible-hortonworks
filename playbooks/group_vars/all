@@ -109,6 +109,9 @@ ambari_admin_default_password: 'admin'                    # no need to change th
 default_password: 'AsdQwe123456'                          # a default password for all required passwords which are not specified in the blueprint
 config_recommendation_strategy: 'NEVER_APPLY'
 
+knox_security_options:
+  master_secret: "{{ default_password }}"                 # Knox Master Secret
+
 smartsense:                                               # Hortonworks subscription details (can be left empty if there is no subscription)
   id: ''
   account_name: ''
@@ -143,6 +146,7 @@ blueprint_dynamic:                                        # properties for the d
       - HIVE_METASTORE
       - WEBHCAT_SERVER
       - OOZIE_SERVER
+      - KNOX_GATEWAY
       - AMBARI_SERVER
       - INFRA_SOLR
       - METRICS_COLLECTOR

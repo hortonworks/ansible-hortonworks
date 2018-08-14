@@ -1,7 +1,7 @@
 ###########
 #
 # These variables would be used by the 'blueprint_dynamic.j2' Jinja2 template to generate the blueprint JSON.
-# This blueprint will build an HDP cluster with 3 master services nodes and 1 or more slave nodes.
+# This blueprint will build an HDP cluster with 3 master services nodes and 1 or more worker nodes.
 # One of the master services nodes is running Ambari and other utility services - here called the management node.
 # The other two master services are running the main HA Hadoop services.
 #
@@ -51,6 +51,7 @@ blueprint_dynamic:                                              # properties for
       - APP_TIMELINE_SERVER
       - HISTORYSERVER
       - SPARK2_JOBHISTORYSERVER
+      - KNOX_GATEWAY
       - HST_SERVER
       - ACTIVITY_ANALYZER
       - ACTIVITY_EXPLORER
