@@ -349,19 +349,16 @@
     {
       "streamline-common" : {
         {% if database == "mysql" or database == "mariadb" -%}
-        "database_name" : "{{ database_options.streamline_db_name }}",
         "streamline.storage.type": "mysql",
-        "streamline.storage.connector.user": "{{ database_options.streamline_db_username }}",
-        "streamline.storage.connector.password": "{{ database_options.streamline_db_password }}",
         "streamline.storage.connector.connectURI": "jdbc:mysql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ mysql_port }}/{{ database_options.streamline_db_name }}",
         {% endif -%}
         {% if database == "postgres" -%}
-        "database_name" : "{{ database_options.streamline_db_name }}",
         "streamline.storage.type": "postgresql",
-        "streamline.storage.connector.user": "{{ database_options.streamline_db_username }}",
-        "streamline.storage.connector.password": "{{ database_options.streamline_db_password }}",
         "streamline.storage.connector.connectURI": "jdbc:postgresql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ postgres_port }}/{{ database_options.streamline_db_name }}",
         {% endif -%}
+        "database_name" : "{{ database_options.streamline_db_name }}",
+        "streamline.storage.connector.user": "{{ database_options.streamline_db_username }}",
+        "streamline.storage.connector.password": "{{ database_options.streamline_db_password }}",
         "jar.storage.type" : "local",
         "streamline.storage.query.timeout" : "30"
       }
@@ -371,19 +368,16 @@
     {
       "registry-common" : {
         {% if database == "mysql" or database == "mariadb" -%}
-        "database_name" : "{{ database_options.registry_db_name }}",
         "registry.storage.type": "mysql",
-        "registry.storage.connector.user": "{{ database_options.registry_db_username }}",
-        "registry.storage.connector.password": "{{ database_options.registry_db_password }}",
         "registry.storage.connector.connectURI": "jdbc:mysql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ mysql_port }}/{{ database_options.registry_db_name }}",
         {% endif -%}
         {% if database == "postgres" -%}
-        "database_name" : "{{ database_options.registry_db_name }}",
         "registry.storage.type": "postgresql",
-        "registry.storage.connector.user": "{{ database_options.registry_db_username }}",
-        "registry.storage.connector.password": "{{ database_options.registry_db_password }}",
         "registry.storage.connector.connectURI": "jdbc:postgresql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ postgres_port }}/{{ database_options.registry_db_name }}",
         {% endif -%}
+        "database_name" : "{{ database_options.registry_db_name }}",
+        "registry.storage.connector.user": "{{ database_options.registry_db_username }}",
+        "registry.storage.connector.password": "{{ database_options.registry_db_password }}",
         "jar.storage.type" : "local",
         "registry.storage.query.timeout" : "30"
       }
@@ -507,6 +501,7 @@
         "hive_user" : "hive"
       }
     },
+{% if druid_hosts|length > 0 %}
     {
       "druid-common" : {
         {% if database != "embedded" -%}
@@ -563,6 +558,7 @@
         "druid.processing.buffer.sizeBytes": "536870912"
       }
     },
+{% endif %}
     {
       "oozie-site" : {
         {% if database != "embedded" -%}
@@ -636,6 +632,19 @@
         "fs.trash.interval" : "360"
       }
     },
+    {
+      "hst-server-conf" : {
+        "customer.smartsense.id" : "{{ smartsense.id | default('unspecified', true) }}",
+        "customer.account.name" : "{{ smartsense.account_name | default('unspecified', true) }}",
+        "customer.notification.email" : "{{ smartsense.customer_email | default('unspecified', true) }}",
+        "client.threadpool.size.max" : "40"
+      }
+    },
+    {
+    "activity-zeppelin-shiro": {
+        "users.admin": "{{ smartsense.admin_password }}"
+      }
+    },
 {% endif %}
 {% if 'KNOX_GATEWAY' in blueprint_all_services %}
     {
@@ -660,19 +669,6 @@
         "authorizer.class.name" : "org.apache.ranger.authorization.kafka.authorizer.RangerKafkaAuthorizer",
 {% endif %}
         "zookeeper.session.timeout.ms" : "30000"
-      }
-    },
-    {
-      "hst-server-conf" : {
-        "customer.smartsense.id" : "{{ smartsense.id | default('unspecified', true) }}",
-        "customer.account.name" : "{{ smartsense.account_name | default('unspecified', true) }}",
-        "customer.notification.email" : "{{ smartsense.customer_email | default('unspecified', true) }}",
-        "client.threadpool.size.max" : "40"
-      }
-    },
-    {
-    "activity-zeppelin-shiro": {
-        "users.admin": "{{ smartsense.admin_password }}"
       }
     },
     {
