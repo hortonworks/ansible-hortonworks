@@ -345,6 +345,21 @@
         "nifi_user" : "nifi"
       }
     },
+{% if 'NIFI_REGISTRY_MASTER' in blueprint_all_services %}
+    {
+      "nifi-registry-ambari-config": {
+        "nifi.registry.security.encrypt.configuration.password": "{{ default_password }}"
+      }
+    },
+    {
+      "nifi-registry-properties": {
+{% if hdf_minor_version is version_compare('3.2', '>=') %}
+        "nifi.registry.db.password": "{{ default_password }}",
+{% endif %}
+        "nifi.registry.web.jetty.threads" : "200"
+      }
+    },
+{% endif %}
 {% if streamline_hosts|length > 0 %}
     {
       "streamline-common" : {

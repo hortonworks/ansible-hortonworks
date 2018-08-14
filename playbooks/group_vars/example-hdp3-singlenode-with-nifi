@@ -1,33 +1,39 @@
 ###########
 #
 # These variables would be used by the 'blueprint_dynamic.j2' Jinja2 template to generate the blueprint JSON.
-# This blueprint will build an HDF cluster with 1 management node and 1 or more worker nodes running NiFi, Kafka and Storm Supervisors.
-# It will also install Ranger (both Admin and UserSync) on the management node.
+# This blueprint will build a single node HDP instance with Ambari and some of the more common HDP services plus NiFi.
 #
 ###########
 
 blueprint_name: '{{ cluster_name }}_blueprint'                  # the name of the blueprint as it will be stored in Ambari
 blueprint_file: 'blueprint_dynamic.j2'                          # the blueprint JSON file - 'blueprint_dynamic.j2' is a Jinja2 template that generates the required JSON
 blueprint_dynamic:                                              # properties for the dynamic blueprint - these are only used by the 'blueprint_dynamic.j2' template to generate the JSON
-  - host_group: "hdf-management"
-    clients: ['ZOOKEEPER_CLIENT', 'INFRA_SOLR_CLIENT']
+  - host_group: "hdp-singlenode"
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT']
     services:
+      - ZOOKEEPER_SERVER
+      - NAMENODE
+      - SECONDARY_NAMENODE
+      - DATANODE
+      - RESOURCEMANAGER
+      - NODEMANAGER
+      - APP_TIMELINE_SERVER
+      - YARN_REGISTRY_DNS
+      - TIMELINE_READER
+      - HISTORYSERVER
+      - HIVE_SERVER
+      - HIVE_METASTORE
+      - SPARK2_JOBHISTORYSERVER
+      - ZEPPELIN_MASTER
+      - HST_SERVER
+      - ACTIVITY_ANALYZER
+      - ACTIVITY_EXPLORER
+      - HST_AGENT
       - AMBARI_SERVER
       - INFRA_SOLR
-      - NIFI_REGISTRY_MASTER
-      - NIMBUS
-      - DRPC_SERVER
-      - STORM_UI_SERVER
-      - RANGER_ADMIN
-      - RANGER_USERSYNC
       - METRICS_COLLECTOR
       - METRICS_GRAFANA
       - METRICS_MONITOR
-  - host_group: "hdf-worker"
-    clients: ['ZOOKEEPER_CLIENT', 'INFRA_SOLR_CLIENT']
-    services:
-      - ZOOKEEPER_SERVER
       - NIFI_MASTER
+      - NIFI_REGISTRY_MASTER
       - KAFKA_BROKER
-      - SUPERVISOR
-      - METRICS_MONITOR
