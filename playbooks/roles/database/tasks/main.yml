@@ -101,16 +101,35 @@
         regexp: '^#?listen_addresses\s+='
         state: present
       notify: Restart postgres
+
+    - name: Set postgres max_connections
+      lineinfile:
+        path: "{{ postgres_config_file }}"
+        line: "max_connections = {{ max_connections }}"
+        regexp: '^#?max_connections\s+='
+        state: present
+      notify: Restart postgres
   when: database == "postgres"
 
 - block:
-    - name: Configure {{ database }} to listen on all interfaces
+    - name: Configure mysql to listen on all interfaces
       ini_file:
         path: "{{ (database == 'mariadb') | ternary(mariadb_config_file, mysql_config_file) }}"
         create: no
         section: "mysqld"
         option: "bind-address"
         value: "*"
+        no_extra_spaces: yes
+        state: present
+      notify: Restart {{ database }}
+
+    - name: Set mysql max_connections
+      ini_file:
+        path: "{{ (database == 'mariadb') | ternary(mariadb_config_file, mysql_config_file) }}"
+        create: no
+        section: "mysqld"
+        option: "max_connections"
+        value: "{{ max_connections }}"
         no_extra_spaces: yes
         state: present
       notify: Restart {{ database }}
