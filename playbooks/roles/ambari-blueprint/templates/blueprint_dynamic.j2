@@ -574,6 +574,40 @@
       }
     },
 {% endif %}
+{% if superset_hosts|length > 0 %}
+    {
+      "superset" : {
+        "SECRET_KEY": "{{ superset_security_options.secret_key }}",
+        {% if database != "embedded" -%}
+        {% if database == "mysql" or database == "mariadb" -%}
+        "SUPERSET_DATABASE_TYPE": "mysql",
+        "SUPERSET_DATABASE_PORT": "{{ mysql_port }}",
+        {% endif -%}
+        {% if database == "postgres" -%}
+        "SUPERSET_DATABASE_TYPE": "postgresql",
+        "SUPERSET_DATABASE_PORT": "{{ postgres_port }}",
+        {% endif -%}
+        "SUPERSET_DATABASE_HOSTNAME": "{{ database_options.external_hostname|default(ansible_fqdn,true) }}",
+        "SUPERSET_DATABASE_NAME": "{{ database_options.superset_db_name }}",
+        "SUPERSET_DATABASE_USER": "{{ database_options.superset_db_name }}",
+        "SUPERSET_DATABASE_PASSWORD": "{{ database_options.superset_db_name }}",
+        {% else -%}
+        "SUPERSET_DATABASE_TYPE": "sqlite",
+        "SUPERSET_DATABASE_HOSTNAME": "localhost",
+        {% endif -%}
+        "SUPERSET_TIMEOUT": "60"
+      }
+    },
+    {
+      "superset-env" : {
+        "superset_admin_user": "admin",
+        "superset_admin_password": "{{ superset_security_options.admin_password }}",
+        "superset_admin_email" : "unspecified",
+        "superset_admin_firstname" : "unspecified",
+        "superset_admin_lastname": "unspecified"
+      }
+    },
+{% endif %}
     {
       "oozie-site" : {
         {% if database != "embedded" -%}

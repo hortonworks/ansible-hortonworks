@@ -58,6 +58,9 @@ database_options:
   druid_db_name: 'druid'
   druid_db_username: 'druid'
   druid_db_password: 'druid'
+  superset_db_name: 'superset'
+  superset_db_username: 'superset'
+  superset_db_password: 'superset'
   rangeradmin_db_name: 'ranger'
   rangeradmin_db_username: 'ranger'
   rangeradmin_db_password: 'ranger'
@@ -114,6 +117,10 @@ knox_security_options:
 nifi_security_options:
   encrypt_password: "{{ default_password }}"              # the password used to encrypt raw configuration values
   sensitive_props_key: "{{ default_password }}"           # the password used to encrypt any sensitive property values that are configured in processors
+
+superset_security_options:
+  secret_key: "{{ default_password }}"
+  admin_password: "{{ default_password }}"                # the password for the Superset admin user
 
 smartsense_security_options:
   admin_password: "{{ default_password }}"                # password for the Activity Explorer's Zeppelin admin user

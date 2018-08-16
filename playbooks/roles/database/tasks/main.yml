@@ -184,6 +184,16 @@
     db_encoding: 'utf8'
   when: druid_hosts is defined and druid_hosts|length > 0
 
+- name: Prepare the superset database
+  include_tasks: "{{ database | regex_replace('mariadb', 'mysql') }}_play.yml"
+  vars:
+    db_name: "{{ database_options.superset_db_name }}"
+    db_username: "{{ database_options.superset_db_username }}"
+    db_password: "{{ database_options.superset_db_password }}"
+    db_client_hosts: "{{ superset_hosts }}"
+    db_encoding: 'utf8'
+  when: superset_hosts is defined and superset_hosts|length > 0
+
 - name: Prepare the ranger database
   include_tasks: "{{ database | regex_replace('mariadb', 'mysql') }}_play.yml"
   vars:

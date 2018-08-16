@@ -4,7 +4,7 @@
 # This blueprint will build an HDP cluster with 3 master services nodes and 1 or more hdp worker nodes and 1 or more streaming nodes (kafka, nifi).
 # One of the master services nodes is running Ambari and other utility services - here called the management node.
 # The other two master services are running the main HA Hadoop services.
-# It will also install Druid services.
+# It will also install Druid services and Superset.
 #
 ###########
 
@@ -50,6 +50,7 @@ blueprint_dynamic:                                              # properties for
       - DRUID_COORDINATOR
       - DRUID_OVERLORD
       - DRUID_ROUTER
+      - SUPERSET
       - AMBARI_SERVER
       - INFRA_SOLR
       - ZEPPELIN_MASTER
@@ -72,7 +73,7 @@ blueprint_dynamic:                                              # properties for
       - DRUID_HISTORICAL
       - HST_AGENT
       - METRICS_MONITOR
-  - host_group: "hdf-worker"
+  - host_group: "hdp-stream"
     clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT']
     services:
       - KAFKA_BROKER

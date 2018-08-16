@@ -4,7 +4,7 @@
 # This blueprint will build an HDP cluster with 3 master services nodes and 1 or more worker nodes.
 # One of the master services nodes is running Ambari and other utility services - here called the management node.
 # The other two master services are running the main HA Hadoop services.
-# It will also install Druid services.
+# It will also install Druid services and Superset.
 #
 ###########
 
@@ -55,6 +55,7 @@ blueprint_dynamic:                                              # properties for
       - DRUID_COORDINATOR
       - DRUID_OVERLORD
       - DRUID_ROUTER
+      - SUPERSET
       - AMBARI_SERVER
       - INFRA_SOLR
       - ZEPPELIN_MASTER
