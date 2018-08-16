@@ -9,6 +9,11 @@
       when: groups[item.host_group] is not defined or (groups[item.host_group] is defined and groups[item.host_group]|length == 0)
       with_items: "{{ blueprint_dynamic }}"
 
+    - name: Fail if Zookeeper is not present
+      fail:
+        msg: "The 'ZOOKEEPER_SERVER' component is required by all installations."
+      when: zookeeper_hosts|length == 0
+
     - name: Fail if Ranger prerequisites are not met
       fail:
         msg: "Ranger is part of the blueprint but the database is set to 'embedded'."
@@ -71,11 +76,6 @@
       fail:
         msg: "HA NameNode has been requested but the SECONDARY_NAMENODE component is still present in the blueprint."
       when: namenode_groups|length > 1 and 'SECONDARY_NAMENODE' in blueprint_all_services
-
-    - name: Fail if Zookeeper is not present when required
-      fail:
-        msg: "Zookeeper is required by the current blueprint configuration."
-      when: zookeeper_hosts|length == 0 and (namenode_groups|length > 1 or resourcemanager_groups|length > 1 or hiveserver_hosts|length > 1 or 'HBASE_MASTER' in blueprint_all_services or 'NIFI_MASTER' in blueprint_all_services or 'SOLR_SERVER' in blueprint_all_services)
 
     - name: Fail if the required Yarn components are not part of the blueprint
       fail:
