@@ -252,13 +252,13 @@
         "ranger-kafka-plugin-enabled" : "Yes",
 {% endif %}
         "admin_username" : "admin",
-        "admin_password" : "{{ ranger_options.ranger_admin_password }}",
+        "admin_password" : "{{ ranger_security_options.ranger_admin_password }}",
         "ranger_admin_username" : "amb_ranger_admin",
-        "ranger_admin_password" : "{{ ranger_options.ranger_admin_password }}",
+        "ranger_admin_password" : "{{ ranger_security_options.ranger_admin_password }}",
 {% if hdp_major_version|int >= 3 -%}
-        "rangerusersync_user_password" : "{{ ranger_options.ranger_admin_password }}",
-        "rangertagsync_user_password" : "{{ ranger_options.ranger_admin_password }}",
-        "keyadmin_user_password" : "{{ ranger_options.ranger_keyadmin_password }}",
+        "rangerusersync_user_password" : "{{ ranger_security_options.ranger_admin_password }}",
+        "rangertagsync_user_password" : "{{ ranger_security_options.ranger_admin_password }}",
+        "keyadmin_user_password" : "{{ ranger_security_options.ranger_keyadmin_password }}",
 {% endif %}
         "xasecure.audit.destination.db" : "false",
 {% if namenode_groups|length > 0 %}
@@ -277,7 +277,7 @@
       "kms-properties" : {
         "DB_FLAVOR" : "{{ database|regex_replace('mariadb', 'mysql')|upper }}",
         "SQL_CONNECTOR_JAR" : "{{ hostvars[inventory_hostname][database + '_jdbc_location'] }}",
-        "KMS_MASTER_KEY_PASSWD" : "{{ ranger_options.kms_master_key_password }}",
+        "KMS_MASTER_KEY_PASSWD" : "{{ ranger_security_options.kms_master_key_password }}",
         "db_host" : "{{ database_options.external_hostname|default(ansible_fqdn,true) }}",
         "db_name" : "{{ database_options.rangerkms_db_name }}",
         "db_user" : "{{ database_options.rangerkms_db_username }}",
@@ -335,8 +335,8 @@
       "nifi-ambari-config" : {
         "nifi.node.ssl.port": "9091",
         "nifi.node.port": "9090",
-        "nifi.security.encrypt.configuration.password": "{{ default_password }}",
-        "nifi.sensitive.props.key": "{{ default_password }}"
+        "nifi.security.encrypt.configuration.password": "{{ nifi_security_options.encrypt_password }}",
+        "nifi.sensitive.props.key": "{{ nifi_security_options.sensitive_props_key }}"
       }
     },
     {
@@ -348,13 +348,13 @@
 {% if 'NIFI_REGISTRY_MASTER' in blueprint_all_services %}
     {
       "nifi-registry-ambari-config": {
-        "nifi.registry.security.encrypt.configuration.password": "{{ default_password }}"
+        "nifi.registry.security.encrypt.configuration.password": "{{ nifi_security_options.encrypt_password }}"
       }
     },
     {
       "nifi-registry-properties": {
 {% if hdf_minor_version is version_compare('3.2', '>=') %}
-        "nifi.registry.db.password": "{{ default_password }}",
+        "nifi.registry.db.password": "{{ nifi_security_options.encrypt_password }}",
 {% endif %}
         "nifi.registry.web.jetty.threads" : "200"
       }
@@ -657,7 +657,7 @@
     },
     {
     "activity-zeppelin-shiro": {
-        "users.admin": "{{ smartsense.admin_password }}"
+        "users.admin": "{{ smartsense_security_options.admin_password }}"
       }
     },
 {% endif %}
