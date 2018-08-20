@@ -46,14 +46,14 @@ It sets a number of variables that are required by the main playbooks.
 
 These variables are calculated based on the blueprint, be it a dynamic blueprint or a static one.
 
-When using a dynamic blueprint it [checks](set_variables.yml#L102) the [`blueprint_dynamic` variable](group_vars/all#L122).
+When using a dynamic blueprint it [checks](set_variables.yml#L102) the [`blueprint_dynamic` variable](group_vars/all#L161).
 
 When using a static blueprint it simply does a [string search](set_variables.yml#L250) on the contents of the blueprint file.
 
 ### check_dynamic_blueprint.yml
 This is a playbook that is imported by the `configure_ambari` and `apply_blueprint` playbooks [only when the blueprint is dynamic](apply_blueprint.yml#L5).
 
-It checks the [`blueprint_dynamic` variable](group_vars/all#L122) for the most probable mistakes, invalid components and dependencies in an Ambari blueprint definition.
+It checks the [`blueprint_dynamic` variable](group_vars/all#L161) for the most probable mistakes, invalid components and dependencies in an Ambari blueprint definition.
 
 It does not check all possible issues, if the `blueprint_dynamic` is not correct, errors might still happen when uploading the blueprint to Ambari or when launching the Ambari build.
 
