@@ -43,7 +43,7 @@
       shell: "echo yes | ambari-server install-mpack --mpack={{ repo_base_url }}/HDP-SOLR/hdp-solr-ambari-mp/{{ mpack_filename }}"
       notify: Restart ambari-server
       args:
-        creates: "/var/lib/ambari-server/resources/mpacks/{{ mpack_filename | regex_replace('.tar.gz$','') }}"
+        creates: "/var/lib/ambari-server/resources/mpacks/solr-ambari-mpack-{{ hdpsearch_version }}"
   when: install_hdpsearch is defined and install_hdpsearch
 
 - block:
