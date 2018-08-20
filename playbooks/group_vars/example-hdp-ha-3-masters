@@ -25,6 +25,7 @@ blueprint_dynamic:                                              # properties for
       - ACTIVITY_ANALYZER
       - HST_AGENT
       - METRICS_MONITOR
+      - LOGSEARCH_LOGFEEDER
   - host_group: "hdp-masternode-02"
     clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT']
     services:
@@ -39,6 +40,7 @@ blueprint_dynamic:                                              # properties for
       - ACTIVITY_ANALYZER
       - HST_AGENT
       - METRICS_MONITOR
+      - LOGSEARCH_LOGFEEDER
   - host_group: "hdp-management"
     clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT']
     services:
@@ -47,6 +49,7 @@ blueprint_dynamic:                                              # properties for
       - OOZIE_SERVER
       - AMBARI_SERVER
       - INFRA_SOLR
+      - LOGSEARCH_SERVER
       - ZEPPELIN_MASTER
       - APP_TIMELINE_SERVER
       - HISTORYSERVER
@@ -59,6 +62,7 @@ blueprint_dynamic:                                              # properties for
       - METRICS_COLLECTOR
       - METRICS_GRAFANA
       - METRICS_MONITOR
+      - LOGSEARCH_LOGFEEDER
   - host_group: "hdp-worker"
     clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT']
     services:
@@ -67,3 +71,4 @@ blueprint_dynamic:                                              # properties for
       - HBASE_REGIONSERVER
       - HST_AGENT
       - METRICS_MONITOR
+      - LOGSEARCH_LOGFEEDER

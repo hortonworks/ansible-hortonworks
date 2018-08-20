@@ -695,6 +695,14 @@
       }
     },
 {% endif %}
+{% if 'LOGSEARCH_SERVER' in blueprint_all_services %}
+    {
+      "logsearch-admin-json" : {
+        "logsearch_admin_password": "{{ logsearch_security_options.admin_password }}",
+        "logsearch_admin_username": "admin"
+      }
+    },
+{% endif %}
 {% if 'KNOX_GATEWAY' in blueprint_all_services %}
     {
       "knox-env" : {

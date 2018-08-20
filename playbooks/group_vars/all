@@ -125,6 +125,9 @@ superset_security_options:
 smartsense_security_options:
   admin_password: "{{ default_password }}"                # password for the Activity Explorer's Zeppelin admin user
 
+logsearch_security_options:
+  admin_password: "{{ default_password }}"                # the password for the Logsearch admin user
+
 
 ##########################
 ## ambari configuration ##
