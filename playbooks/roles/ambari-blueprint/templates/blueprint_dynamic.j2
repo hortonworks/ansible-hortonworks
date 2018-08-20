@@ -468,6 +468,11 @@
       }
     },
     {
+      "tez-site" : {
+        "tez.tez-ui.history-url.base": "http://{{ ansible_fqdn }}:8080/#/main/view/TEZ/tez_cluster_instance"
+      }
+    },
+    {
       "hive-site" : {
         {% if database != "embedded" -%}
         {% if database == "mysql" or database == "mariadb" -%}
