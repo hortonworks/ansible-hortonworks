@@ -111,8 +111,11 @@ ranger_security_options:                                  # only used if RANGER_
 ambari_admin_password: 'admin'                            # the password for the Ambari admin user
 default_password: 'AsdQwe123456'                          # a default password for all required passwords which are not specified in the blueprint
 
+atlas_security_options:
+  admin_password: "{{ default_password }}"                # the password for the Atlas admin user
+
 knox_security_options:
-  master_secret: "{{ default_password }}0"                # Knox Master Secret
+  master_secret: "{{ default_password }}"                 # Knox Master Secret
 
 nifi_security_options:
   encrypt_password: "{{ default_password }}"              # the password used to encrypt raw configuration values

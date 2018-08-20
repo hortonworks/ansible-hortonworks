@@ -290,7 +290,8 @@ Modify the file at `~/ansible-hortonworks/playbooks/group_vars/all` to set the c
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
 | ambari_admin_password          | The Ambari password of the `ambari_admin_user` user previously set. If the username is `admin` and this password is different than the default `admin`, the `ambari-config` role will change the default password with the one set here. |
 | default_password               | A default password for all required passwords which are not specified in the blueprint. |
-| knox_security_options`.master_secret` | The Knox Master Secret as explained in the [documentation](https://docs.hortonworks.com/HDPDocuments/HDP2/HDP-2.6.5/bk_security/content/manage_master_secret.html). |
+| atlas_security_options`.admin_password`  | The password for the Atlas admin user.                                        |
+| knox_security_options`.master_secret`    | The Knox Master Secret as explained in the [documentation](https://docs.hortonworks.com/HDPDocuments/HDP2/HDP-2.6.5/bk_security/content/manage_master_secret.html). |
 | nifi_security_options          | Security related options for NiFi (such as passwords).                                  |
 | `.encrypt_password`            | The value for the `nifi.security.encrypt.configuration.password` property - used to encrypt raw configuration values as explained in the [documentation](https://docs.hortonworks.com/HDPDocuments/HDF3/HDF-3.1.2/bk_administration/content/encrypted-passwords-in-configuration-files.html). |
 | `.sensitive_props_key`         | The value for the `nifi.sensitive.props.key` property - the password used to encrypt any sensitive property values that are configured in processors as explained in the [documentation](https://docs.hortonworks.com/HDPDocuments/HDF3/HDF-3.1.2/bk_administration/content/security-properties.html). |
@@ -298,6 +299,7 @@ Modify the file at `~/ansible-hortonworks/playbooks/group_vars/all` to set the c
 | `.secret_key`                  | The value for the `SECRET_KEY` property (used to encrypt user passwords).               |
 | `.admin_password`              | The password for the Superset admin user.                                               |
 | smartsense_security_options`.admin_password` | The password for the Activity Explorer's Zeppelin admin user.             |
+| logsearch_security_options`.admin_password`  | The password for the Log Search admin user.                               |
 
 ### ambari configuration
 

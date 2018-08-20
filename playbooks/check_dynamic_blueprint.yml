@@ -9,7 +9,7 @@
       when: groups[item.host_group] is not defined or (groups[item.host_group] is defined and groups[item.host_group]|length == 0)
       with_items: "{{ blueprint_dynamic }}"
 
-    - name: Fail if Zookeeper is not present
+    - name: Fail if ZooKeeper is not present
       fail:
         msg: "The 'ZOOKEEPER_SERVER' component is required by all installations."
       when: zookeeper_hosts|length == 0
@@ -23,6 +23,11 @@
       fail:
         msg: "Ranger KMS requires Ranger Admin."
       when: rangerkms_hosts|length > 0 and rangeradmin_hosts|length < 1
+
+    - name: Fail if Atlas prerequisites are not met
+      fail:
+        msg: "Atlas requires all of the following components to be present in the blueprint: INFRA_SOLR, HBASE_MASTER, HBASE_REGIONSERVER, KAFKA_BROKER."
+      when: "'ATLAS_SERVER' in blueprint_all_services and ('INFRA_SOLR' not in blueprint_all_services or 'HBASE_MASTER' not in blueprint_all_services or 'HBASE_REGIONSERVER' not in blueprint_all_services or 'KAFKA_BROKER' not in blueprint_all_services)"
 
     - name: Fail if Streamline prerequisites are not met
       fail:
