@@ -101,16 +101,35 @@
         regexp: '^#?listen_addresses\s+='
         state: present
       notify: Restart postgres
+
+    - name: Set postgres max_connections
+      lineinfile:
+        path: "{{ postgres_config_file }}"
+        line: "max_connections = {{ max_connections }}"
+        regexp: '^#?max_connections\s+='
+        state: present
+      notify: Restart postgres
   when: database == "postgres"
 
 - block:
-    - name: Configure {{ database }} to listen on all interfaces
+    - name: Configure mysql to listen on all interfaces
       ini_file:
         path: "{{ (database == 'mariadb') | ternary(mariadb_config_file, mysql_config_file) }}"
         create: no
         section: "mysqld"
         option: "bind-address"
         value: "*"
+        no_extra_spaces: yes
+        state: present
+      notify: Restart {{ database }}
+
+    - name: Set mysql max_connections
+      ini_file:
+        path: "{{ (database == 'mariadb') | ternary(mariadb_config_file, mysql_config_file) }}"
+        create: no
+        section: "mysqld"
+        option: "max_connections"
+        value: "{{ max_connections }}"
         no_extra_spaces: yes
         state: present
       notify: Restart {{ database }}
@@ -154,6 +173,26 @@
     db_password: "{{ database_options.oozie_db_password }}"
     db_client_hosts: "{{ oozie_hosts }}"
   when: oozie_hosts is defined and oozie_hosts|length > 0
+
+- name: Prepare the druid database
+  include_tasks: "{{ database | regex_replace('mariadb', 'mysql') }}_play.yml"
+  vars:
+    db_name: "{{ database_options.druid_db_name }}"
+    db_username: "{{ database_options.druid_db_username }}"
+    db_password: "{{ database_options.druid_db_password }}"
+    db_client_hosts: "{{ druid_hosts }}"
+    db_encoding: 'utf8'
+  when: druid_hosts is defined and druid_hosts|length > 0
+
+- name: Prepare the superset database
+  include_tasks: "{{ database | regex_replace('mariadb', 'mysql') }}_play.yml"
+  vars:
+    db_name: "{{ database_options.superset_db_name }}"
+    db_username: "{{ database_options.superset_db_username }}"
+    db_password: "{{ database_options.superset_db_password }}"
+    db_client_hosts: "{{ superset_hosts }}"
+    db_encoding: 'utf8'
+  when: superset_hosts is defined and superset_hosts|length > 0
 
 - name: Prepare the ranger database
   include_tasks: "{{ database | regex_replace('mariadb', 'mysql') }}_play.yml"

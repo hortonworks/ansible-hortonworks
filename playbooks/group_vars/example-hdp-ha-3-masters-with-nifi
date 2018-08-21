@@ -1,10 +1,9 @@
 ###########
 #
 # These variables would be used by the 'blueprint_dynamic.j2' Jinja2 template to generate the blueprint JSON.
-# This blueprint will build an HDP cluster with 3 master services nodes and 1 or more slave nodes.
+# This blueprint will build an HDP cluster with 3 master services nodes and 1 or more hdp worker nodes and 1 or more streaming nodes (kafka, nifi).
 # One of the master services nodes is running Ambari and other utility services - here called the management node.
 # The other two master services are running the main HA Hadoop services.
-# It will also install Storm and Kafka services.
 #
 ###########
 
@@ -23,6 +22,7 @@ blueprint_dynamic:                                              # properties for
       - HIVE_SERVER
       - HIVE_METASTORE
       - WEBHCAT_SERVER
+      - ACTIVITY_ANALYZER
       - HST_AGENT
       - METRICS_MONITOR
   - host_group: "hdp-masternode-02"
@@ -37,6 +37,7 @@ blueprint_dynamic:                                              # properties for
       - HIVE_SERVER
       - HIVE_METASTORE
       - OOZIE_SERVER
+      - ACTIVITY_ANALYZER
       - HST_AGENT
       - METRICS_MONITOR
   - host_group: "hdp-management"
@@ -51,10 +52,13 @@ blueprint_dynamic:                                              # properties for
       - HISTORYSERVER
       - SPARK2_JOBHISTORYSERVER
       - HST_SERVER
+      - ACTIVITY_ANALYZER
+      - ACTIVITY_EXPLORER
       - HST_AGENT
       - METRICS_COLLECTOR
       - METRICS_GRAFANA
       - METRICS_MONITOR
+      - NIFI_REGISTRY_MASTER
   - host_group: "hdp-worker"
     clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT']
     services:

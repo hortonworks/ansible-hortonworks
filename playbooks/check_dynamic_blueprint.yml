@@ -9,6 +9,11 @@
       when: groups[item.host_group] is not defined or (groups[item.host_group] is defined and groups[item.host_group]|length == 0)
       with_items: "{{ blueprint_dynamic }}"
 
+    - name: Fail if ZooKeeper is not present
+      fail:
+        msg: "The 'ZOOKEEPER_SERVER' component is required by all installations."
+      when: zookeeper_hosts|length == 0
+
     - name: Fail if Ranger prerequisites are not met
       fail:
         msg: "Ranger is part of the blueprint but the database is set to 'embedded'."
@@ -19,6 +24,11 @@
         msg: "Ranger KMS requires Ranger Admin."
       when: rangerkms_hosts|length > 0 and rangeradmin_hosts|length < 1
 
+    - name: Fail if Atlas prerequisites are not met
+      fail:
+        msg: "Atlas requires all of the following components to be present in the blueprint: INFRA_SOLR, HBASE_MASTER, HBASE_REGIONSERVER, KAFKA_BROKER."
+      when: "'ATLAS_SERVER' in blueprint_all_services and ('INFRA_SOLR' not in blueprint_all_services or 'HBASE_MASTER' not in blueprint_all_services or 'HBASE_REGIONSERVER' not in blueprint_all_services or 'KAFKA_BROKER' not in blueprint_all_services)"
+
     - name: Fail if Streamline prerequisites are not met
       fail:
         msg: "Streamline is part of the blueprint but the database is set to 'embedded'."
@@ -28,6 +38,11 @@
       fail:
         msg: "Registry is part of the blueprint but the database is set to 'embedded'."
       when: registry_hosts|length > 0 and database == 'embedded'
+
+    - name: Fail if Druid HA prerequisites are not met
+      fail:
+        msg: "Multiple nodes are configured to run Druid components but the database is set to 'embedded'."
+      when: druid_hosts|length > 1 and database == 'embedded'
 
     - name: Fail if the selected components should not be part of an HDP 3 blueprint
       fail:
@@ -67,11 +82,6 @@
         msg: "HA NameNode has been requested but the SECONDARY_NAMENODE component is still present in the blueprint."
       when: namenode_groups|length > 1 and 'SECONDARY_NAMENODE' in blueprint_all_services
 
-    - name: Fail if Zookeeper is not present when required
-      fail:
-        msg: "Zookeeper is required by the current blueprint configuration."
-      when: zookeeper_hosts|length == 0 and (namenode_groups|length > 1 or resourcemanager_groups|length > 1 or hiveserver_hosts|length > 1 or 'HBASE_MASTER' in blueprint_all_services or 'NIFI_MASTER' in blueprint_all_services or 'SOLR_SERVER' in blueprint_all_services)
-
     - name: Fail if the required Yarn components are not part of the blueprint
       fail:
         msg: "Some or all of the following components are missing from the blueprint: NODEMANAGER, APP_TIMELINE_SERVER{{ (hdp_major_version == '3') | ternary(', YARN_REGISTRY_DNS, TIMELINE_READER','') }}."
@@ -87,3 +97,9 @@
               ((hdp_major_version == '3' and ['HIVE_SERVER', 'HIVE_METASTORE'] | difference(blueprint_all_services) | length > 0 )
               or
               (hdp_major_version == '2' and ['HIVE_SERVER', 'HIVE_METASTORE', 'WEBHCAT_SERVER'] | difference(blueprint_all_services) | length > 0 ))
+
+    - name: Fail if the required Druid components are not part of the blueprint
+      fail:
+        msg: "One or more of the following components are missing from the blueprint: DRUID_BROKER, DRUID_COORDINATOR, DRUID_ROUTER, DRUID_MIDDLEMANAGER, DRUID_HISTORICAL, DRUID_OVERLORD."
+      when: druid_hosts|length > 0 and
+           ['DRUID_BROKER', 'DRUID_COORDINATOR', 'DRUID_ROUTER', 'DRUID_MIDDLEMANAGER', 'DRUID_HISTORICAL', 'DRUID_OVERLORD'] | difference(blueprint_all_services) | length > 0

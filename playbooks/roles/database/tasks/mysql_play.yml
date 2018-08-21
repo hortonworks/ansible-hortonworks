@@ -2,6 +2,7 @@
 - name: Create the {{ db_name }} database ({{ database }})
   mysql_db:
     name: "{{ db_name }}"
+    encoding: "{{ db_encoding | default(omit) }}"
     state: present
 
 - name: Create the {{ db_username }} database user and host based access ({{ database }})

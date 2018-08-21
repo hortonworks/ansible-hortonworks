@@ -12,7 +12,9 @@ blueprint_dynamic:                                              # properties for
     clients: ['ZOOKEEPER_CLIENT', 'INFRA_SOLR_CLIENT']
     services:
       - ZOOKEEPER_SERVER
+      - KAFKA_BROKER
       - NIFI_MASTER
+      - NIFI_REGISTRY_MASTER
       - AMBARI_SERVER
       - INFRA_SOLR
       - METRICS_COLLECTOR

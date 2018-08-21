@@ -26,6 +26,8 @@ blueprint_dynamic:                                              # properties for
       - WEBHCAT_SERVER
       - HBASE_MASTER
       - HST_SERVER
+      - ACTIVITY_ANALYZER
+      - ACTIVITY_EXPLORER
       - HST_AGENT
       - METRICS_MONITOR
   - host_group: "hdp-master2"
@@ -40,6 +42,8 @@ blueprint_dynamic:                                              # properties for
       - HIVE_SERVER
       - HIVE_METASTORE
       - OOZIE_SERVER
+      - ACTIVITY_ANALYZER
+      - KNOX_GATEWAY
       - HST_AGENT
       - METRICS_COLLECTOR
       - METRICS_GRAFANA
@@ -52,6 +56,7 @@ blueprint_dynamic:                                              # properties for
       - DATANODE
       - NODEMANAGER
       - HBASE_REGIONSERVER
+      - ACTIVITY_ANALYZER
       - HST_AGENT
       - METRICS_MONITOR
       - SOLR_SERVER

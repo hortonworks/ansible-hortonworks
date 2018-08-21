@@ -3,17 +3,16 @@ ansible-hortonworks
 
 These Ansible playbooks will build a Hortonworks cluster (Hortonworks Data Platform and / or Hortonworks DataFlow) using Ambari Blueprints. For a full list of supported features check [below](#features).
 
-- Tested with: HDP 3.0, HDP 2.4 -> 2.6.5, HDP Search 3.0.0.0, HDF 2.0 -> 3.1, Ambari 2.4 -> 2.7.
+- Tested with: HDP 3.0, HDP 2.4 -> 2.6.5, HDP Search 3.0.0.0, HDF 2.0 -> 3.2, Ambari 2.4 -> 2.7.
 
 - This includes building the Cloud infrastructure (optional) and taking care of the prerequisites.
 
 - The aim is to first build the nodes in a Cloud environment, prepare them (OS settings, database, KDC, etc) and then install Ambari and create the cluster using Ambari Blueprints.
+  - If the infrastructure is already built (Terraform, bare-metal, etc.), it can also use a [static inventory](inventory/static).
 
-- If the infrastructure already exists, it can also use a [static inventory](inventory/static).
-
-- It can use a static blueprint or a [dynamically generated](playbooks/roles/ambari-blueprint/templates/blueprint_dynamic.j2) blueprint based on the components selected in the Ansible [variables file](playbooks/group_vars/all#L122).
-  - The dynamic blueprint gives complete freedom to distribute components for a chosen topology but this topology must still respect Ambari Blueprint restrictions - for example, if a single `NAMENODE` is configured, there must also be a `SECONDARY_NAMENODE` component.
-  - Another advantage of the dynamic blueprint is that it generates the correct blueprint for when using [HA services](playbooks/roles/ambari-blueprint/templates/blueprint_dynamic.j2#L377), or [external databases](playbooks/roles/ambari-blueprint/templates/blueprint_dynamic.j2#L437) or [Kerberos](playbooks/roles/ambari-blueprint/templates/blueprint_dynamic.j2#L3).
+- It can use a static blueprint or a [dynamically generated](playbooks/ro1les/ambari-blueprint/templates/blueprint_dynamic.j2) one based on the components from the Ansible [variables file](playbooks/group_vars/all#L161).
+  - The dynamic blueprint gives the freedom to distribute components for a chosen topology but this topology must respect Ambari Blueprint restrictions (e.g. if a single `NAMENODE` is set, there must also be a `SECONDARY_NAMENODE`).
+  - Another advantage of the dynamic blueprint is that it generates the correct blueprint for when using [HA services](playbooks/roles/ambari-blueprint/templates/blueprint_dynamic.j2#L440), or [external databases](playbooks/roles/ambari-blueprint/templates/blueprint_dynamic.j2#L504) or [Kerberos](playbooks/roles/ambari-blueprint/templates/blueprint_dynamic.j2#L3).
 
 ## [Installation Instructions](id:instructions)
 
@@ -36,16 +35,16 @@ These Ansible playbooks will build a Hortonworks cluster (Hortonworks Data Platf
 The core concept of these playbooks is the `host_groups` field in the [Ambari Blueprint](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-BlueprintFieldDescriptions).
 This is an essential piece of Ambari Blueprints that maps the topology components to the actual servers.
 
-The [`host_groups` field](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-BlueprintFieldDescriptions) in the Ambari Blueprint logically groups the components, while the [`host_groups` field](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-ClusterCreationTemplateStructure) in the Cluster Creation Template maps these logical groups to the actual servers that will run the components.
+The `host_groups` field in the [Ambari Blueprint](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-BlueprintFieldDescriptions) logically groups the components, while the `host_groups` field in the [Cluster Creation Template](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-ClusterCreationTemplateStructure) maps these logical groups to the actual servers that will run the components.
 
 Therefore, these Ansible playbooks try to take advantage of Blueprint's `host_groups` and map the Ansible inventory groups to the `host_groups` using a Jinja2 template: [cluster_template.j2](playbooks/roles/ambari-blueprint/templates/cluster_template.j2#L32).
 
 <p align="center">
-  <img src=".image1_concept.png">
+  <img src="https://user-images.githubusercontent.com/5119993/43648111-699606a6-9731-11e8-8dcb-71c0c47f482a.png">
 </p>
 
-- If the blueprint is dynamic, these `host_groups` are defined in the [variable file](playbooks/group_vars/all#L123) and they need to match the Ansible inventory that should run those components.
-- If the blueprint is static, these `host_groups` are defined in the [blueprint itself](playbooks/roles/ambari-blueprint/templates/blueprint_hdfs_only.j2#L29) and they need to match the Ansible inventory that should run those components.
+- If the blueprint is dynamic, these `host_groups` are defined in the [variable file](playbooks/group_vars/all#L162) and they need to match the Ansible inventory groups that will run those components.
+- If the blueprint is static, these `host_groups` are defined in the [blueprint itself](playbooks/roles/ambari-blueprint/templates/blueprint_hdfs_only.j2#L29) and they need to match the Ansible inventory groups that will run those components.
 
 
 ### Cloud inventory
@@ -74,7 +73,7 @@ Currently, these playbooks are divided into the following parts:
    Run the `install_cluster.sh` script that will install the HDP and / or HDF cluster using Blueprints while taking care of the necessary prerequisites.
 
 
-...or, alternatively, run each step separately:
+...or, alternatively, run each step separately (also useful for replaying a specific part in case of failure):
 
 1. **(Optional) Build the Cloud nodes**
 
@@ -160,15 +159,15 @@ Currently, these playbooks are divided into the following parts:
 - [x] Wait for the cluster to be built
 
 ### Dynamic blueprint supported features
-- [x] HA NameNode
-- [x] HA ResourceManager
-- [x] HA Hive
-- [x] HA HBase Master
-- [ ] HA Oozie
+> The components that will be installed are only those defined in the `blueprint_dynamic` [variable](playbooks/group_vars/all#L161).
+> - Supported in this case means all prerequites (databases, passwords, required configs) are taken care of and the component is deployed successfully on the chosen `host_group`.
+- [x] HDP Services: `HDFS`, `YARN + MapReduce2`, `Hive`, `HBase`, `Oozie`, `ZooKeeper`, `Storm`, `Atlas`, `Kafka`, `Knox`, `Log Search`, `Ranger`, `Ranger KMS`, `SmartSense`, `Spark2`, `Zeppelin`, `Druid`, `Superset`
+- [x] HDF Services: `NiFi`, `NiFi Registry`, `Schema Registry`, `Streaming Analytics Manager`, `ZooKeeper`, `Storm`, `Kafka`, `Knox`, `Ranger`, `Log Search`
+- [x] HA Configuration: NameNode, ResourceManager, Hive, HBase, Ranger KMS, Druid
 - [x] Secure clusters with MIT KDC (Ambari managed)
 - [x] Secure clusters with Microsoft AD (Ambari managed)
 - [x] Install Ranger and enable all plugins
-- [x] Ranger KMS (including HA)
+- [x] Ranger KMS
 - [ ] Ranger AD integration
 - [ ] Hadoop SSL
 - [ ] Hadoop AD integration

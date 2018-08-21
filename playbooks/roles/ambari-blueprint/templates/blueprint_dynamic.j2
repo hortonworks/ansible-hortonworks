@@ -182,6 +182,58 @@
       }
     },
 {% endif %}
+{% if 'KNOX_GATEWAY' in blueprint_all_services %}
+    {
+      "ranger-knox-plugin-properties" : {
+        "ranger-knox-plugin-enabled" : "Yes"
+      }
+    },
+    {
+      "ranger-knox-security" : {
+        "ranger.plugin.knox.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_fqdn'] }}:6080",
+        "ranger.plugin.knox.policy.pollIntervalMs" : "30000"
+      }
+    },
+    {
+      "ranger-knox-audit" : {
+        "xasecure.audit.destination.db" : "false",
+{% if namenode_groups|length > 0 %}
+        "xasecure.audit.destination.hdfs" : "true",
+        "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ hdfs_ha_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_fqdn'] }}:8020{% endif %}/ranger/audit",
+{% else %}
+        "xasecure.audit.destination.hdfs" : "false",
+{% endif %}
+        "xasecure.audit.destination.solr" : "true",
+        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_fqdn'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
+      }
+    },
+{% endif %}
+{% if 'ATLAS_SERVER' in blueprint_all_services %}
+    {
+      "ranger-atlas-plugin-properties" : {
+        "ranger-atlas-plugin-enabled" : "Yes"
+      }
+    },
+    {
+      "ranger-atlas-security" : {
+        "ranger.plugin.atlas.policy.rest.url" : "http://{{ hostvars[rangeradmin_hosts|sort|list|first]['ansible_fqdn'] }}:6080",
+        "ranger.plugin.atlas.policy.pollIntervalMs" : "30000"
+      }
+    },
+    {
+      "ranger-atlas-audit" : {
+        "xasecure.audit.destination.db" : "false",
+{% if namenode_groups|length > 0 %}
+        "xasecure.audit.destination.hdfs" : "true",
+        "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ hdfs_ha_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_fqdn'] }}:8020{% endif %}/ranger/audit",
+{% else %}
+        "xasecure.audit.destination.hdfs" : "false",
+{% endif %}
+        "xasecure.audit.destination.solr" : "true",
+        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_fqdn'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
+      }
+    },
+{% endif %}
     {
       "ranger-kafka-plugin-properties" : {
         "ranger-kafka-plugin-enabled" : "Yes"
@@ -215,6 +267,8 @@
         "ranger-hive-plugin-enabled" : "Yes",
         "ranger-yarn-plugin-enabled" : "Yes",
         "ranger-hbase-plugin-enabled" : "Yes",
+        "ranger-knox-plugin-enabled" : "Yes",
+        "ranger-atlas-plugin-enabled" : "Yes",
 {% endif %}
 {% if hdf_hosts|length > 0 %}
         "ranger-nifi-plugin-enabled" : "Yes",
@@ -225,13 +279,13 @@
         "ranger-kafka-plugin-enabled" : "Yes",
 {% endif %}
         "admin_username" : "admin",
-        "admin_password" : "{{ ranger_options.ranger_admin_password }}",
+        "admin_password" : "{{ ranger_security_options.ranger_admin_password }}",
         "ranger_admin_username" : "amb_ranger_admin",
-        "ranger_admin_password" : "{{ ranger_options.ranger_admin_password }}",
+        "ranger_admin_password" : "{{ ranger_security_options.ranger_admin_password }}",
 {% if hdp_major_version|int >= 3 -%}
-        "rangerusersync_user_password" : "{{ ranger_options.ranger_admin_password }}",
-        "rangertagsync_user_password" : "{{ ranger_options.ranger_admin_password }}",
-        "keyadmin_user_password" : "{{ ranger_options.ranger_keyadmin_password }}",
+        "rangerusersync_user_password" : "{{ ranger_security_options.ranger_admin_password }}",
+        "rangertagsync_user_password" : "{{ ranger_security_options.ranger_admin_password }}",
+        "keyadmin_user_password" : "{{ ranger_security_options.ranger_keyadmin_password }}",
 {% endif %}
         "xasecure.audit.destination.db" : "false",
 {% if namenode_groups|length > 0 %}
@@ -250,7 +304,7 @@
       "kms-properties" : {
         "DB_FLAVOR" : "{{ database|regex_replace('mariadb', 'mysql')|upper }}",
         "SQL_CONNECTOR_JAR" : "{{ hostvars[inventory_hostname][database + '_jdbc_location'] }}",
-        "KMS_MASTER_KEY_PASSWD" : "{{ ranger_options.kms_master_key_password }}",
+        "KMS_MASTER_KEY_PASSWD" : "{{ ranger_security_options.kms_master_key_password }}",
         "db_host" : "{{ database_options.external_hostname|default(ansible_fqdn,true) }}",
         "db_name" : "{{ database_options.rangerkms_db_name }}",
         "db_user" : "{{ database_options.rangerkms_db_username }}",
@@ -308,8 +362,8 @@
       "nifi-ambari-config" : {
         "nifi.node.ssl.port": "9091",
         "nifi.node.port": "9090",
-        "nifi.security.encrypt.configuration.password": "{{ default_password }}",
-        "nifi.sensitive.props.key": "{{ default_password }}"
+        "nifi.security.encrypt.configuration.password": "{{ nifi_security_options.encrypt_password }}",
+        "nifi.sensitive.props.key": "{{ nifi_security_options.sensitive_props_key }}"
       }
     },
     {
@@ -318,23 +372,35 @@
         "nifi_user" : "nifi"
       }
     },
+{% if 'NIFI_REGISTRY_MASTER' in blueprint_all_services %}
+    {
+      "nifi-registry-ambari-config": {
+        "nifi.registry.security.encrypt.configuration.password": "{{ nifi_security_options.encrypt_password }}"
+      }
+    },
+    {
+      "nifi-registry-properties": {
+{% if hdf_minor_version is version_compare('3.2', '>=') %}
+        "nifi.registry.db.password": "{{ nifi_security_options.encrypt_password }}",
+{% endif %}
+        "nifi.registry.web.jetty.threads" : "200"
+      }
+    },
+{% endif %}
 {% if streamline_hosts|length > 0 %}
     {
       "streamline-common" : {
         {% if database == "mysql" or database == "mariadb" -%}
-        "database_name" : "{{ database_options.streamline_db_name }}",
         "streamline.storage.type": "mysql",
-        "streamline.storage.connector.user": "{{ database_options.streamline_db_username }}",
-        "streamline.storage.connector.password": "{{ database_options.streamline_db_password }}",
         "streamline.storage.connector.connectURI": "jdbc:mysql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ mysql_port }}/{{ database_options.streamline_db_name }}",
         {% endif -%}
         {% if database == "postgres" -%}
-        "database_name" : "{{ database_options.streamline_db_name }}",
         "streamline.storage.type": "postgresql",
-        "streamline.storage.connector.user": "{{ database_options.streamline_db_username }}",
-        "streamline.storage.connector.password": "{{ database_options.streamline_db_password }}",
         "streamline.storage.connector.connectURI": "jdbc:postgresql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ postgres_port }}/{{ database_options.streamline_db_name }}",
         {% endif -%}
+        "database_name" : "{{ database_options.streamline_db_name }}",
+        "streamline.storage.connector.user": "{{ database_options.streamline_db_username }}",
+        "streamline.storage.connector.password": "{{ database_options.streamline_db_password }}",
         "jar.storage.type" : "local",
         "streamline.storage.query.timeout" : "30"
       }
@@ -344,19 +410,16 @@
     {
       "registry-common" : {
         {% if database == "mysql" or database == "mariadb" -%}
-        "database_name" : "{{ database_options.registry_db_name }}",
         "registry.storage.type": "mysql",
-        "registry.storage.connector.user": "{{ database_options.registry_db_username }}",
-        "registry.storage.connector.password": "{{ database_options.registry_db_password }}",
         "registry.storage.connector.connectURI": "jdbc:mysql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ mysql_port }}/{{ database_options.registry_db_name }}",
         {% endif -%}
         {% if database == "postgres" -%}
-        "database_name" : "{{ database_options.registry_db_name }}",
         "registry.storage.type": "postgresql",
-        "registry.storage.connector.user": "{{ database_options.registry_db_username }}",
-        "registry.storage.connector.password": "{{ database_options.registry_db_password }}",
         "registry.storage.connector.connectURI": "jdbc:postgresql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ postgres_port }}/{{ database_options.registry_db_name }}",
         {% endif -%}
+        "database_name" : "{{ database_options.registry_db_name }}",
+        "registry.storage.connector.user": "{{ database_options.registry_db_username }}",
+        "registry.storage.connector.password": "{{ database_options.registry_db_password }}",
         "jar.storage.type" : "local",
         "registry.storage.query.timeout" : "30"
       }
@@ -432,6 +495,11 @@
       }
     },
     {
+      "tez-site" : {
+        "tez.tez-ui.history-url.base": "http://{{ ansible_fqdn }}:8080/#/main/view/TEZ/tez_cluster_instance"
+      }
+    },
+    {
       "hive-site" : {
         {% if database != "embedded" -%}
         {% if database == "mysql" or database == "mariadb" -%}
@@ -477,9 +545,112 @@
 {% if rangeradmin_hosts|length > 0 and ranger_options.enable_plugins|default(no) %}
         "hive_security_authorization" : "Ranger",
 {% endif %}
+{% if 'ATLAS_SERVER' in blueprint_all_services %}
+        "hive.atlas.hook": "true",
+{% endif %}
         "hive_user" : "hive"
       }
     },
+    {
+      "sqoop-env" : {
+{% if 'ATLAS_SERVER' in blueprint_all_services %}
+        "sqoop.atlas.hook" : "true",
+{% endif %}
+        "sqoop_user" : "sqoop"
+      }
+    },
+{% if druid_hosts|length > 0 %}
+    {
+      "druid-common" : {
+        {% if database != "embedded" -%}
+        {% if database == "mysql" or database == "mariadb" -%}
+        "druid.metadata.storage.type": "mysql",
+        "druid.metadata.storage.connector.port": "{{ mysql_port }}",
+        "druid.metadata.storage.connector.connectURI": "jdbc:mysql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ mysql_port }}/{{ database_options.druid_db_name }}",
+{% if kafka_hosts|length > 0 %}
+        "druid.extensions.loadList": "[\"druid-datasketches\", \"druid-hdfs-storage\", \"ambari-metrics-emitter\", \"mysql-metadata-storage\", \"druid-kafka-indexing-service\"]",
+{% else %}
+        "druid.extensions.loadList": "[\"druid-datasketches\", \"druid-hdfs-storage\", \"ambari-metrics-emitter\", \"mysql-metadata-storage\"]",
+{% endif %}
+        {% endif -%}
+        {% if database == "postgres" -%}
+        "druid.metadata.storage.type": "postgresql",
+        "druid.metadata.storage.connector.port": "{{ postgres_port }}",
+        "druid.metadata.storage.connector.connectURI": "jdbc:postgresql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ postgres_port }}/{{ database_options.druid_db_name }}",
+{% if kafka_hosts|length > 0 %}
+        "druid.extensions.loadList": "[\"druid-datasketches\", \"druid-hdfs-storage\", \"ambari-metrics-emitter\", \"postgresql-metadata-storage\", \"druid-kafka-indexing-service\"]",
+{% else %}
+        "druid.extensions.loadList": "[\"druid-datasketches\", \"druid-hdfs-storage\", \"ambari-metrics-emitter\", \"postgresql-metadata-storage\"]",
+{% endif %}
+        {% endif -%}
+        "metastore_hostname": "{{ database_options.external_hostname|default(ansible_fqdn,true) }}",
+        "database_name": "{{ database_options.druid_db_name }}",
+        "druid.metadata.storage.connector.user": "{{ database_options.druid_db_username }}",
+        "druid.metadata.storage.connector.password": "{{ database_options.druid_db_password }}",
+        {% else -%}
+        "druid.metadata.storage.type": "derby",
+        "druid.metadata.storage.connector.connectURI": "jdbc:derby://localhost:1527/druid;create=true",
+{% if kafka_hosts|length > 0 %}
+        "druid.extensions.loadList": "[\"druid-datasketches\", \"druid-hdfs-storage\", \"ambari-metrics-emitter\", \"druid-kafka-indexing-service\"]",
+{% else %}
+        "druid.extensions.loadList": "[\"druid-datasketches\", \"druid-hdfs-storage\", \"ambari-metrics-emitter\"]",
+{% endif %}
+        {% endif -%}
+        "druid.storage.type": "hdfs",
+        "druid.storage.storageDirectory": "/apps/druid/warehouse",
+        "druid.indexer.logs.type": "hdfs",
+        "druid.indexer.logs.directory": "/user/druid/logs"
+      }
+    },
+    {
+      "druid-historical" : {
+        "druid.processing.numThreads": "2",
+        "druid.server.http.numThreads": "40",
+        "druid.processing.buffer.sizeBytes": "536870912"
+      }
+    },
+    {
+      "druid-broker" : {
+        "druid.processing.numThreads": "2",
+        "druid.server.http.numThreads": "40",
+        "druid.processing.buffer.sizeBytes": "536870912"
+      }
+    },
+{% endif %}
+{% if superset_hosts|length > 0 %}
+    {
+      "superset" : {
+        "SECRET_KEY": "{{ superset_security_options.secret_key }}",
+        {% if database != "embedded" -%}
+        {% if database == "mysql" or database == "mariadb" -%}
+        "SUPERSET_DATABASE_TYPE": "mysql",
+        "SUPERSET_DATABASE_PORT": "{{ mysql_port }}",
+        {% endif -%}
+        {% if database == "postgres" -%}
+        "SUPERSET_DATABASE_TYPE": "postgresql",
+        "SUPERSET_DATABASE_PORT": "{{ postgres_port }}",
+        {% endif -%}
+        "SUPERSET_DATABASE_HOSTNAME": "{{ database_options.external_hostname|default(ansible_fqdn,true) }}",
+        "SUPERSET_DATABASE_NAME": "{{ database_options.superset_db_name }}",
+        "SUPERSET_DATABASE_USER": "{{ database_options.superset_db_name }}",
+        "SUPERSET_DATABASE_PASSWORD": "{{ database_options.superset_db_name }}",
+        {% else -%}
+        "SUPERSET_DATABASE_TYPE": "sqlite",
+        "SUPERSET_DATABASE_HOSTNAME": "localhost",
+        {% endif -%}
+        "SUPERSET_TIMEOUT": "60"
+      }
+    },
+    {
+      "superset-env" : {
+        "superset_admin_user": "admin",
+        "superset_admin_password": "{{ superset_security_options.admin_password }}",
+        "superset_admin_email" : "unspecified",
+        "superset_admin_firstname" : "unspecified",
+        "superset_admin_lastname": "unspecified"
+      }
+    },
+{% endif %}
     {
       "oozie-site" : {
         {% if database != "embedded" -%}
@@ -551,6 +722,55 @@
         "hadoop.proxyuser.kms.groups" : "*",
 {% endif %}
         "fs.trash.interval" : "360"
+      }
+    },
+{% if 'ATLAS_SERVER' in blueprint_all_services %}
+    {
+      "atlas-env" : {
+        "atlas.admin.password": "{{ atlas_security_options.admin_password }}",
+        "atlas.admin.username": "admin"
+      }
+    },
+    {
+      "application-properties" : {
+        "atlas.audit.hbase.zookeeper.quorum": "{% for zk in zookeeper_groups %}%HOSTGROUP::{{ zk }}%{% if not loop.last %},{% endif %}{% endfor %}",
+        "atlas.graph.index.search.solr.zookeeper-url": "{% for zk in zookeeper_groups %}%HOSTGROUP::{{ zk }}%:2181/infra-solr{% if not loop.last %},{% endif %}{% endfor %}",
+        "atlas.graph.storage.hostname": "{% for zk in zookeeper_groups %}%HOSTGROUP::{{ zk }}%{% if not loop.last %},{% endif %}{% endfor %}",
+        "atlas.kafka.zookeeper.connect": "{% for zk in zookeeper_groups %}%HOSTGROUP::{{ zk }}%:2181{% if not loop.last %},{% endif %}{% endfor %}",
+        "atlas.kafka.bootstrap.servers": "{% for k in kafka_groups %}%HOSTGROUP::{{ k }}%:6667{% if not loop.last %},{% endif %}{% endfor %}",
+        "atlas.rest.address": "{% for at in atlas_hosts %}http://{{ hostvars[at]['ansible_fqdn'] }}:21000{% if not loop.last %},{% endif %}{% endfor %}",
+        "atlas.proxyusers": "knox"
+      }
+    },
+{% endif %}
+    {
+      "hst-server-conf" : {
+        "customer.smartsense.id" : "{{ smartsense.id | default('unspecified', true) }}",
+        "customer.account.name" : "{{ smartsense.account_name | default('unspecified', true) }}",
+        "customer.notification.email" : "{{ smartsense.customer_email | default('unspecified', true) }}",
+        "client.threadpool.size.max" : "40"
+      }
+    },
+    {
+    "activity-zeppelin-shiro": {
+        "users.admin": "{{ smartsense_security_options.admin_password }}"
+      }
+    },
+{% endif %}
+{% if 'LOGSEARCH_SERVER' in blueprint_all_services %}
+    {
+      "logsearch-admin-json" : {
+        "logsearch_admin_password": "{{ logsearch_security_options.admin_password }}",
+        "logsearch_admin_username": "admin"
+      }
+    },
+{% endif %}
+{% if 'KNOX_GATEWAY' in blueprint_all_services %}
+    {
+      "knox-env" : {
+        "knox_master_secret": "{{ knox_security_options.master_secret }}",
+        "knox_user": "knox",
+        "knox_group": "knox"
       }
     },
 {% endif %}
