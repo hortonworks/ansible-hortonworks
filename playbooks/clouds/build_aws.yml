@@ -14,6 +14,7 @@
         name: "{{ cloud_config.vpc_name }}"
         state: present
       register: cluster_vpc
+      tags: always
 
     - name: Create the Subnet
       ec2_vpc_subnet:
@@ -56,6 +57,7 @@
         rules: "{{ item.rules }}"
       with_items: "{{ cloud_config.security_groups }}"
       register: cluster_security_groups
+      tags: security_groups
 
     - name: Upload the SSH Key
       ec2_key:
