@@ -5,12 +5,12 @@
 
 cluster_name: 'mytestcluster'
 
-ambari_version: '2.6.2.2'                                 # must be the 4-part full version number
+ambari_version: '2.7.1.0'                                 # must be the 4-part full version number
 
-hdp_version: '2.6.5.0'                                    # must be the 4-part full version number
+hdp_version: '3.0.1.0'                                    # must be the 4-part full version number
 hdp_build_number: 'auto'                                  # the HDP build number from docs.hortonworks.com (if set to 'auto', Ansible will try to get it from the repository)
 
-hdf_version: '3.1.2.0'                                    # must be the 4-part full version number
+hdf_version: '3.2.0.0'                                    # must be the 4-part full version number
 hdf_build_number: 'auto'                                  # the HDF build number from docs.hortonworks.com (if set to 'auto', Ansible will try to get it from the repository)
 
 hdpsearch_version: '3.0.0'                                # must be the full version number
@@ -34,7 +34,7 @@ disable_firewall: no                                      # set to yes to disabl
 java: 'embedded'                                          # can be set to 'embedded', 'openjdk' or 'oraclejdk'
 oraclejdk_options:                                        # only used when java is set to 'oraclejdk'
   base_folder: '/usr/java'                                # the folder where the Java package should be unpacked to
-  tarball_location: '/tmp/jdk-8u171-linux-x64.tar.gz'     # the location of the tarball on the remote system or on the Ansible controller
+  tarball_location: '/tmp/jdk-8u181-linux-x64.tar.gz'     # the location of the tarball on the remote system or on the Ansible controller
   jce_location: '/tmp/jce_policy-8.zip'                   # the location of the JCE package on the remote system or on the Ansible controller
   remote_files: no                                        # set to yes to indicate the files are already on the remote systems, otherwise they will be copied by Ansible from the Ansible controller
 
@@ -160,18 +160,19 @@ blueprint_name: '{{ cluster_name }}_blueprint'            # the name of the blue
 blueprint_file: 'blueprint_dynamic.j2'                    # the blueprint JSON file - 'blueprint_dynamic.j2' is a Jinja2 template that generates the required JSON
 blueprint_dynamic:                                        # properties for the dynamic blueprint - these are only used by the 'blueprint_dynamic.j2' template to generate the JSON
   - host_group: "hdp-master"
-    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT']
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT']
     services:
       - ZOOKEEPER_SERVER
       - NAMENODE
       - SECONDARY_NAMENODE
       - RESOURCEMANAGER
       - APP_TIMELINE_SERVER
+      - YARN_REGISTRY_DNS
+      - TIMELINE_READER
       - HISTORYSERVER
       - SPARK2_JOBHISTORYSERVER
       - HIVE_SERVER
       - HIVE_METASTORE
-      - WEBHCAT_SERVER
       - OOZIE_SERVER
       - KNOX_GATEWAY
       - AMBARI_SERVER
@@ -184,7 +185,7 @@ blueprint_dynamic:                                        # properties for the d
       - ACTIVITY_EXPLORER
       - HST_AGENT
   - host_group: "hdp-slave"
-    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'SLIDER', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'HCAT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT']
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT']
     services:
       - DATANODE
       - NODEMANAGER
