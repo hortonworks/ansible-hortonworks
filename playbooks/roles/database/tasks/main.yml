@@ -79,17 +79,32 @@
       when: ansible_os_family|lower == "suse"
   when: database == "mariadb" and database_options.add_repo
 
+- block:
+    - name: install the PostgreSQL repository (yum)
+      yum_repository:
+        name: "{{ postgres_repo_name }}"
+        description: "PostgreSQL"
+        baseurl: "{{ postgres_repo_url }}"
+        state: present
+        gpgcheck: yes
+        gpgkey: "{{ postgres_repo_key }}"
+      when: ansible_os_family|lower == "redhat"
+  when: database == "postgres" and (postgres_repo_url|default(''))!=''
+
 - name: Install {{ database }} database packages
   package:
     name: "{{ item }}"
     update_cache: yes
     state: present
+#    enablerepo: "{{ postgres_enablerepo | default(omit) }}"
   with_items: "{{ hostvars[inventory_hostname][database + '_packages'] | join(',') }}"
 
 - block:
     - name: Initiate postgres
       become: yes
-      shell: "{{ postgres_initdb_command }}"
+      #become_user: "postgres"
+      #Note: Setting the task attribute 'become_user' is pointless because 'ansible_become_user' is set when adding the hosts to the inventory
+      shell: "sudo -u postgres {{ postgres_initdb_command }}"
       args:
         creates: "{{ postgres_hba_file }}"
         warn: false
