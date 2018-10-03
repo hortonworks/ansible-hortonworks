@@ -58,6 +58,8 @@
       Cluster: "{{ cluster_name }}"
       Role: "{{ outer_loop.host_group }}"
       Group: "{{ cluster_name }}-{{ outer_loop.host_group }}"
+      Name: "{{ cluster_name }}-{{ outer_loop.host_group }}"
+      Owner: "{{ cluster_owner | default('omit') }}"
     wait: yes
     wait_timeout: 600
   register: current_ec2
