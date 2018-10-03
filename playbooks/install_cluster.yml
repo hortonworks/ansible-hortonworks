@@ -1,10 +1,15 @@
 ---
 - import_playbook: "prepare_nodes.yml"
+  tags: prepare_nodes
 
 - import_playbook: "install_ambari.yml"
+  tags: ambari
 
 - import_playbook: "configure_ambari.yml"
+  tags: ambari,blueprint
 
 - import_playbook: "apply_blueprint.yml"
+  tags: blueprint
 
 - import_playbook: "post_install.yml"
+  tags: post_install
