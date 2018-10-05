@@ -463,6 +463,14 @@
       }
     },
     {
+      "yarn-env" : {
+{% if 'YARN_REGISTRY_DNS' in blueprint_all_services %}
+        "registry.dns.bind-port": "{{ registry_dns_bind_port | default('53') }}",
+{% endif %}
+        "yarn_user" : "yarn"
+      }
+    },
+    {
       "yarn-site" : {
         {% if resourcemanager_groups|length > 1 -%}
         "hadoop.registry.zk.quorum": "{% for zk in zookeeper_groups %}%HOSTGROUP::{{ zk }}%:2181{% if not loop.last %},{% endif %}{% endfor %}",
@@ -490,6 +498,9 @@
 {% if rangeradmin_hosts|length > 0 and ranger_options.enable_plugins|default(no) %}
         "yarn.acl.enable" : "true",
         "yarn.authorization-provider": "org.apache.ranger.authorization.yarn.authorizer.RangerYarnAuthorizer",
+{% endif %}
+{% if 'YARN_REGISTRY_DNS' in blueprint_all_services %}
+        "hadoop.registry.dns.bind-port": "{{ registry_dns_bind_port | default('53') }}",
 {% endif %}
         "yarn.client.nodemanager-connect.retry-interval-ms" : "10000"
       }
