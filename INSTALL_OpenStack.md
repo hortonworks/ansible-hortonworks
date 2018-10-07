@@ -256,6 +256,21 @@ Modify the file at `~/ansible-hortonworks/playbooks/group_vars/all` to set the c
 | external_dns               | This controls the type of DNS to be used. If `yes` it will use whatever DNS is currently set up. If `no` it will populate the `/etc/hosts` file with all cluster nodes. |
 | disable_firewall           | This variable controls the local firewall service (iptables, firewalld, ufw). Sometimes, a local firewall service might run and block inter-node cluster communication. In these circumstances the local firewall service should be disabled as traffic rules should be provided by an external firewall such as Security Groups. Set to `yes` to disable the existing local firewall service if it blocks the inter-node cluster communication. |
 
+### path configuration (optional)
+
+You can override path configuration by setting those variables.
+More variables are available, please see `playbooks/roles/ambari-blueprint/defaults/main.yml`
+
+| Variable                   | Description                                                                                                 |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| base_log_dir               | Configure the base log path. |
+| base_metrics_dir           | Configure the base metrics path. |
+| base_tmp_dir               | Configure the base tmp path. |
+| hadoop_base_dir            | Configure the hadoop base data path. |
+| kafka_base_dir             | Configure the kafka base data path. |
+| nifi_base_dir              | Configure the nifi base data path. |
+| nifi_registry_base_dir     | Configure the nifi-registry base data path. |
+
 ### java configuration
 
 | Variable                   | Description                                                                                                 |

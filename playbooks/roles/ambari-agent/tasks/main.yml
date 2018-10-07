@@ -29,6 +29,16 @@
                                                                      (ansible_os_family|lower == "suse" and ansible_distribution_major_version|int >= 12) or
                                                                      (ansible_os_family|lower == "redhat" and ansible_distribution|lower == "amazon")))
 
+- name: Update ambari-agent log dir
+  ini_file:
+    path: /etc/ambari-agent/conf/ambari-agent.ini
+    create: no
+    section: "agent"
+    option: "logdir"
+    value: "{{ base_log_dir }}/ambari-agent"
+    state: present
+  notify: Restart ambari-agent
+
 - meta: flush_handlers
 
 - name: Make sure the ambari-agent service is started
