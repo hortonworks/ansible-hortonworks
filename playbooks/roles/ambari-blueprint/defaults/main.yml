@@ -31,5 +31,13 @@ hbase_bulkload_staging_dir: "/apps/hbase/staging"
 hbase_local_dir: "${hbase.tmp.dir}/local"
 #hbase_tmp_dir: "/tmp/hbase-${user.name}"
 
+## Kafka
+kafka_default_replication_factor: 1
+kafka_log_dirs: "/kafka-logs"
+kafka_log_retention_bytes: "-1"
+kafka_log_retention_hours: "168"
+kafka_num_partitions: 1
+kafka_offsets_topic_replication_factor: 3
+
 # Oozie
 oozie_data_dir: "/hadoop/oozie/data"
