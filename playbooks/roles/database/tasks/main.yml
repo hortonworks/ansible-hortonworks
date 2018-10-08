@@ -89,14 +89,13 @@
         gpgcheck: yes
         gpgkey: "{{ postgres_repo_key }}"
       when: ansible_os_family|lower == "redhat"
-  when: database == "postgres" and (postgres_repo_url|default(''))!=''
+  when: database == "postgres" and database_options.add_repo and (postgres_repo_url|default(''))!=''
 
 - name: Install {{ database }} database packages
   package:
     name: "{{ item }}"
     update_cache: yes
     state: present
-#    enablerepo: "{{ postgres_enablerepo | default(omit) }}"
   with_items: "{{ hostvars[inventory_hostname][database + '_packages'] | join(',') }}"
 
 - block:
