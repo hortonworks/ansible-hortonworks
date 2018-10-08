@@ -437,6 +437,9 @@
     },
     {
       "hdfs-site" : {
+        "dfs.namenode.checkpoint.dir" : "/hadoop/hdfs/namesecondary",
+        "dfs.namenode.name.dir" : "/hadoop/hdfs/namenode",
+        "dfs.journalnode.edits.dir" : "/hadoop/hdfs/journalnode",
         {% if namenode_groups|length > 1 -%}
         "dfs.client.failover.proxy.provider.{{ hdfs_ha_name }}" : "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider",
         "dfs.ha.automatic-failover.enabled" : "true",
@@ -457,9 +460,9 @@
 {% if rangerkms_hosts|length > 0 %}
         "dfs.encryption.key.provider.uri" : "kms://http@{% for kmshost in rangerkms_hosts %}{{ hostvars[kmshost]['ansible_fqdn'] }}{% if not loop.last %};{% endif %}{% endfor %}:9292/kms",
 {% endif %}
-        "dfs.datanode.data.dir" : "/hadoop/hdfs/data",
-        "dfs.datanode.failed.volumes.tolerated" : "0",
-        "dfs.replication" : "3"
+        "dfs.datanode.data.dir" : "{{ hdfs_datanode_data_dir }}",
+        "dfs.datanode.failed.volumes.tolerated" : "{{ hdfs_datanode_failed_volumes_tolerated }}",
+        "dfs.replication" : "{{ hdfs_replication }}"
       }
     },
     {
@@ -502,6 +505,10 @@
 {% if 'YARN_REGISTRY_DNS' in blueprint_all_services %}
         "hadoop.registry.dns.bind-port": "{{ registry_dns_bind_port | default('53') }}",
 {% endif %}
+        "yarn.nodemanager.local-dirs" : "/hadoop/yarn/local",
+        "yarn.nodemanager.log-dirs" : "/hadoop/yarn/log",
+        "yarn.timeline-service.leveldb-state-store.path" : "/hadoop/yarn/timeline",
+        "yarn.timeline-service.leveldb-timeline-store.path" : "/hadoop/yarn/timeline",
         "yarn.client.nodemanager-connect.retry-interval-ms" : "10000"
       }
     },
@@ -680,6 +687,7 @@
 {% if (security|lower == "mit-kdc" or security|lower == "active-directory") and security_options.http_authentication|default(no) %}
         "oozie.authentication.cookie.domain" : "{{ security_options.realm|lower }}",
 {% endif %}
+        "oozie_data_dir" : "/hadoop/oozie/data",
         "oozie.action.retry.interval" : "30"
       }
     },
@@ -698,6 +706,10 @@
     },
     {
       "hbase-site" : {
+        "hbase.rootdir" : "/apps/hbase/data",
+        "hbase.bulkload.staging.dir" : "/apps/hbase/staging",
+        "hbase.local.dir" : "${hbase.tmp.dir}/local",
+        "hbase.tmp.dir" : "/tmp/hbase-${user.name}",
         {% if namenode_groups|length > 1 -%}
         "hbase.rootdir": "hdfs://{{ hdfs_ha_name }}/apps/hbase/data",
         {% endif -%}
@@ -803,6 +815,7 @@
     },
     {
       "zoo.cfg": {
+        "dataDir" : "{{ zookeeper_dataDir }}",
         "clientPort" : "2181"
       }
     }
