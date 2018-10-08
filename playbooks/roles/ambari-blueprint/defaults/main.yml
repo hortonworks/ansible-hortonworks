@@ -40,3 +40,24 @@ kafka_offsets_topic_replication_factor: 3
 
 # Oozie
 oozie_data_dir: "/hadoop/oozie/data"
+
+## NIFI
+nifi_initial_mem: "512m"
+nifi_max_mem: "512m"
+nifi_content_repository_dir_default: "/var/lib/nifi/content_repository"
+nifi_database_dir: "/var/lib/nifi/database_repository"
+nifi_flowfile_repository_dir: "/var/lib/nifi/flowfile_repository"
+nifi_provenance_repository_dir_default: "/var/lib/nifi/provenance_repository"
+nifi_internal_dir: "/var/lib/nifi"
+nifi_state_dir: "{nifi_internal_dir}/state/local"
+nifi_flow_config_dir: "{nifi_internal_dir}/conf"
+#nifi_config_dir: "{nifi_install_dir}/conf"
+#Note: left out (in 1.try) because it uses ansible/jinja2 templating
+#nifi_database_directory: "{{nifi_database_dir}}"
+
+## NIFI-Registry
+nifi_registry_initial_mem: "512m"
+nifi_registry_max_mem: "512m"
+nifi_registry_internal_dir: "/var/lib/nifi-registry"
+nifi_registry_database_dir: "{nifi_registry_internal_dir}/database"
+nifi_registry_internal_config_dir: "{nifi_registry_internal_dir}/conf"

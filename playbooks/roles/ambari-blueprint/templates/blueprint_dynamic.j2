@@ -362,15 +362,15 @@
       "nifi-ambari-config" : {
         "nifi.node.ssl.port": "9091",
         "nifi.node.port": "9090",
-        "nifi.initial_mem": "512m",
-        "nifi.max_mem": "512m",
-        "nifi.content.repository.dir.default": "/var/lib/nifi/content_repository",
-        "nifi.database.dir": "/var/lib/nifi/database_repository",
-        "nifi.flowfile.repository.dir": "/var/lib/nifi/flowfile_repository",
-        "nifi.provenance.repository.dir.default": "/var/lib/nifi/provenance_repository",
-        "nifi.internal.dir": "/var/lib/nifi",
-        "nifi.state.dir": "{nifi_internal_dir}/state/local",
-        "nifi.flow.config.dir": "{nifi_internal_dir}/conf",
+        "nifi.initial_mem": "{{ nifi_initial_mem }}",
+        "nifi.max_mem": "{{ nifi_max_mem }}",
+        "nifi.content.repository.dir.default": "{{ nifi_content_repository_dir_default }}",
+        "nifi.database.dir": "{{ nifi_database_dir }}",
+        "nifi.flowfile.repository.dir": "{{ nifi_flowfile_repository_dir }}",
+        "nifi.provenance.repository.dir.default": "{{ nifi_provenance_repository_dir_default }}",
+        "nifi.internal.dir": "{{ nifi_internal_dir }}",
+        "nifi.state.dir": "{{ nifi_state_dir }}",
+        "nifi.flow.config.dir": "{{ nifi_flow_config_dir }}",
         "nifi.security.encrypt.configuration.password": "{{ nifi_security_options.encrypt_password }}",
         "nifi.sensitive.props.key": "{{ nifi_security_options.sensitive_props_key }}"
       }
@@ -392,11 +392,11 @@
 {% if hdf_minor_version is version_compare('3.2', '>=') %}
         "nifi.registry.db.password": "{{ nifi_security_options.encrypt_password }}",
 {% endif %}
-        "nifi.registry.initial_mem": "512m",
-        "nifi.registry.max_mem": "512m",
-        "nifi.registry.database.dir": "{nifi_registry_internal_dir}/database",
-        "nifi.registry.internal.config.dir": "{nifi_registry_internal_dir}/conf",
-        "nifi.registry.internal.dir": "/var/lib/nifi-registry",
+        "nifi.registry.initial_mem": "{{ nifi_registry_initial_mem }}",
+        "nifi.registry.max_mem": "{{ nifi_registry_max_mem }}",
+        "nifi.registry.internal.dir": "{{ nifi_registry_internal_dir }}",
+        "nifi.registry.database.dir": "{{ nifi_registry_database_dir }}",
+        "nifi.registry.internal.config.dir": "{{ nifi_registry_internal_config_dir }}",
         "nifi.registry.web.jetty.threads" : "200"
       }
     },
