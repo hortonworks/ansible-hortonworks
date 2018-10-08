@@ -6,3 +6,30 @@ mysql_port: 3306
 ## dynamic blueprint variables ##
 #################################
 registry_dns_bind_port: '53'
+
+## ZK  zoo.cfg:
+zookeeper_dataDir: "/hadoop/zookeeper"
+
+## HDFS
+dfs_namenode_checkpoint_dir: "/hadoop/hdfs/namesecondary"
+dfs_namenode_name_dir: "/hadoop/hdfs/namenode"
+dfs_datanode_data_dir: "/hadoop/hdfs/data"
+dfs_journalnode_edits_dir: "/hadoop/hdfs/journalnode"
+#nfs_file_dump_dir: "/tmp/.hdfs-nfs"
+hdfs_datanode_failed_volumes_tolerated: 0
+hdfs_replication: 3
+
+## Yarn
+yarn_nodemanager_local_dirs: "/hadoop/yarn/local"
+yarn_nodemanager_log_dirs: "/hadoop/yarn/log"
+yarn_timeline_service_leveldb_state_store_path: "/hadoop/yarn/timeline"
+yarn_timeline_service_leveldb_timeline_store_path: "/hadoop/yarn/timeline"
+
+## HBase
+hbase_rootdir: "/apps/hbase/data"
+hbase_bulkload_staging_dir: "/apps/hbase/staging"
+hbase_local_dir: "${hbase.tmp.dir}/local"
+#hbase_tmp_dir: "/tmp/hbase-${user.name}"
+
+# Oozie
+oozie_data_dir: "/hadoop/oozie/data"
