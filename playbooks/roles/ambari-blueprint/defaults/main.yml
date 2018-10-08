@@ -19,6 +19,11 @@ dfs_journalnode_edits_dir: "/hadoop/hdfs/journalnode"
 hdfs_datanode_failed_volumes_tolerated: 0
 hdfs_replication: 3
 
+hdfs_dtnode_heapsize: "1024m"
+hdfs_namenode_heapsize: "2048m"
+hdfs_namenode_opt_maxnewsize: "384m"
+hdfs_namenode_opt_newsize : "384m"
+
 ## Yarn
 yarn_nodemanager_local_dirs: "/hadoop/yarn/local"
 yarn_nodemanager_log_dirs: "/hadoop/yarn/log"

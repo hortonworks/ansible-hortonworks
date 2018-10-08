@@ -443,10 +443,10 @@
 {% if namenode_groups|length > 0 %}
     {
       "hadoop-env" : {
-        "dtnode_heapsize" : "1024m",
-        "namenode_heapsize" : "2048m",
-        "namenode_opt_maxnewsize" : "384m",
-        "namenode_opt_newsize" : "384m"
+        "dtnode_heapsize" : "{{ hdfs_dtnode_heapsize }}",
+        "namenode_heapsize" : "{{ hdfs_namenode_heapsize }}",
+        "namenode_opt_maxnewsize" : "{{ hdfs_namenode_opt_maxnewsize }}",
+        "namenode_opt_newsize" : "{{ hdfs_namenode_opt_newsize }}"
       }
     },
     {
