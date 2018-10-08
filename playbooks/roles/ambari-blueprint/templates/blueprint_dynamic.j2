@@ -720,10 +720,6 @@
     },
     {
       "hbase-site" : {
-        "hbase.rootdir" : "{{ hbase_rootdir }}",
-        "hbase.bulkload.staging.dir" : "{{ hbase_bulkload_staging_dir }}",
-        "hbase.local.dir" : "{{ hbase_local_dir }}",
-        "hbase.tmp.dir" : "/tmp/hbase-${user.name}",
         {% if namenode_groups|length > 1 -%}
         "hbase.rootdir": "hdfs://{{ hdfs_ha_name }}/apps/hbase/data",
         {% endif -%}

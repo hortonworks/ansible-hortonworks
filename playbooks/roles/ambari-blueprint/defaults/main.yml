@@ -25,12 +25,6 @@ yarn_nodemanager_log_dirs: "/hadoop/yarn/log"
 yarn_timeline_service_leveldb_state_store_path: "/hadoop/yarn/timeline"
 yarn_timeline_service_leveldb_timeline_store_path: "/hadoop/yarn/timeline"
 
-## HBase
-hbase_rootdir: "/apps/hbase/data"
-hbase_bulkload_staging_dir: "/apps/hbase/staging"
-hbase_local_dir: "${hbase.tmp.dir}/local"
-#hbase_tmp_dir: "/tmp/hbase-${user.name}"
-
 ## Kafka
 kafka_default_replication_factor: 1
 kafka_log_dirs: "/kafka-logs"
