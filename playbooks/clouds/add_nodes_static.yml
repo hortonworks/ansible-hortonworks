@@ -11,3 +11,5 @@
   loop_control:
     loop_var: local_loop
   with_items: "{{ groups['all'] }}"
+  when: groups['hadoop-cluster'] is not defined or groups['hadoop-cluster']|length == 0
+
