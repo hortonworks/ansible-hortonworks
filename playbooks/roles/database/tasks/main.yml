@@ -101,9 +101,7 @@
 - block:
     - name: Initiate postgres
       become: yes
-      #become_user: "postgres"
-      #Note: Setting the task attribute 'become_user' is pointless because 'ansible_become_user' is set when adding the hosts to the inventory
-      shell: "sudo -u postgres {{ postgres_initdb_command }}"
+      shell: "{{ postgres_initdb_command }}"
       args:
         creates: "{{ postgres_hba_file }}"
         warn: false
