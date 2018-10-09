@@ -179,6 +179,7 @@ The following variables can be set for each node:
 | ansible_user                  | The Linux user with sudo permissions that Ansible will use to connect to the host (doesn't have to be root. |                         |
 | ansible_ssh_pass              | (Optional) The SSH password to use when connecting to the host (this is the password of the `ansible_user`). Either this or `ansible_ssh_private_key_file` should be configured. |
 | ansible_ssh_private_key_file  | (Optional) Local path to the SSH private key that will be used to login into the host. Either this or `ansible_ssh_pass` should be configured. |
+| rack                          | (Optional) Rack info for the host. Defaults to `/default-rack`. |
 
 
 # Test the inventory
