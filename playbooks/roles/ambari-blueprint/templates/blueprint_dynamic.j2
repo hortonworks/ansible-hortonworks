@@ -25,7 +25,7 @@
     {
       "admin-properties" : {
         "DB_FLAVOR" : "{{ database|regex_replace('mariadb', 'mysql')|upper }}",
-        "SQL_CONNECTOR_JAR" : "{{ hostvars[inventory_hostname][database + '_jdbc_location'] }}",
+        "SQL_CONNECTOR_JAR" : "{{ lookup('vars', database + '_jdbc_location') }}",
         "db_host" : "{{ database_options.external_hostname|default(ansible_fqdn,true) }}",
         "db_name" : "{{ database_options.rangeradmin_db_name }}",
         "db_user" : "{{ database_options.rangeradmin_db_username }}",
@@ -303,7 +303,7 @@
     {
       "kms-properties" : {
         "DB_FLAVOR" : "{{ database|regex_replace('mariadb', 'mysql')|upper }}",
-        "SQL_CONNECTOR_JAR" : "{{ hostvars[inventory_hostname][database + '_jdbc_location'] }}",
+        "SQL_CONNECTOR_JAR" : "{{ lookup('vars', database + '_jdbc_location') }}",
         "KMS_MASTER_KEY_PASSWD" : "{{ ranger_security_options.kms_master_key_password }}",
         "db_host" : "{{ database_options.external_hostname|default(ansible_fqdn,true) }}",
         "db_name" : "{{ database_options.rangerkms_db_name }}",

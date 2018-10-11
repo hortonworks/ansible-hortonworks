@@ -1,5 +1,4 @@
 ---
-
 - name: Load variables
   include_vars: "{{ item }}"
   with_first_found:
