@@ -80,7 +80,7 @@
   when: database == "mariadb" and database_options.add_repo
 
 - block:
-    - name: install the PostgreSQL repository (yum)
+    - name: Add the postgres repository (yum)
       yum_repository:
         name: "{{ postgres_repo_name }}"
         description: "PostgreSQL"
@@ -89,6 +89,22 @@
         gpgcheck: yes
         gpgkey: "{{ postgres_repo_key }}"
       when: ansible_os_family|lower == "redhat"
+
+    - name: Add the postgres repository key (apt)
+      apt_key:
+        data: "{{ lookup('file', postgres_repo_keyfile) }}"
+        id: "{{ postgres_repo_key }}"
+      when: ansible_os_family|lower == "debian"
+
+    - name: Add the postgres repository (apt)
+      apt_repository:
+        filename: pgdg
+        repo: "{{ item }}"
+        state: present
+        update_cache: yes
+      with_items:
+        - "deb {{ postgres_repo_url }} {{ ansible_lsb.codename }}-pgdg main"
+      when: ansible_os_family|lower == "debian"
   when: database == "postgres" and database_options.add_repo and (postgres_repo_url|default(''))!=''
 
 - name: Install {{ database }} database packages
