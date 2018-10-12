@@ -63,12 +63,9 @@
 
     - name: Install snappy from HDP-UTILS repo (bug in SLES 12 HDP-UTILS repo)
       zypper:
-        name: "{{ item }}"
+        name: snappy-1.0.5-1,snappy-devel-1.0.5-1
         state: present
         oldpackage: yes
-      with_items:
-        - "snappy-1.0.5-1"
-        - "snappy-devel-1.0.5-1"
 
     - name: Remove the HDP-UTILS repository previously added (SLES 12)
       zypper_repository:
