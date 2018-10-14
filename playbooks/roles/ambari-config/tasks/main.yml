@@ -65,7 +65,7 @@
         mpack_filename: "hdf-ambari-mpack-{{ hdf_version }}-{{ hdf_build_number }}.tar.gz"
 
     - name: "Install the HDF Management Pack"
-      shell: "echo yes | ambari-server install-mpack --mpack={{ hdf_main_repo_url }}/tars/hdf_ambari_mp/{{ mpack_filename }}"
+      shell: "echo yes | ambari-server install-mpack --mpack={{ hdf_management_pack_file }}"
       notify: Restart ambari-server
       args:
         creates: "/var/lib/ambari-server/resources/mpacks/{{ mpack_filename | regex_replace('.tar.gz$','') }}"

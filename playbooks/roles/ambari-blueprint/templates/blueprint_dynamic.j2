@@ -798,7 +798,8 @@
 {% if rangeradmin_hosts|length > 0 and ranger_options.enable_plugins|default(no) %}
         "authorizer.class.name" : "org.apache.ranger.authorization.kafka.authorizer.RangerKafkaAuthorizer",
 {% endif %}
-        "zookeeper.session.timeout.ms" : "30000"
+        "zookeeper.session.timeout.ms" : "60000",
+        "zookeeper.connection.timeout.ms" : "180000"
       }
     },
     {

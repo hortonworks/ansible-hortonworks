@@ -11,17 +11,6 @@
       paths:
         - ../ambari-repo/vars
 
-- name: Add the Ambari repository (yum)
-  yum_repository:
-    name: "ambari-{{ ambari_version }}"
-    description: "ambari Version - ambari-{{ ambari_version }}"
-    baseurl: "{{ ambari_repo_url }}"
-    file: 'ambari'
-    state: present
-    gpgcheck: yes
-    gpgkey: "{{ ambari_repo_url }}/RPM-GPG-KEY/RPM-GPG-KEY-Jenkins"
-  when: ansible_os_family|lower == "redhat"
-
 - name: Add the Ambari repository (zypper)
   zypper_repository:
     name: "ambari-{{ ambari_version }}"
@@ -51,7 +40,7 @@
       zypper_repository:
         name: temp-HDP-UTILS
         description: "HDP-UTILS-1.1.0.21"
-        repo: "{{ repo_base_url }}/HDP-UTILS-1.1.0.21/repos/sles12"
+        repo: "{{ hdp_repo_base_url }}"
         state: present
         disable_gpg_check : yes
         runrefresh: yes
