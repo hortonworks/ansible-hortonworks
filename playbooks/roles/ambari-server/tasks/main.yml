@@ -22,6 +22,20 @@
     state: latest
   notify: Reload systemd
 
+- name: Create missing ambari-server symlinks
+  file:
+    src: "/usr/lib/ambari-server/lib/{{ item }}"
+    dest: "/usr/lib/python2.7/site-packages/{{ item }}"
+    owner: root
+    group: root
+    state: link
+  with_items:
+  - "resource_management"
+  - "ambari_simplejson"
+  - "ambari_jinja2"
+  - "ambari_commons"
+  - "ambari_server"
+
 - meta: flush_handlers
 
 - block:
