@@ -1,0 +1,30 @@
+---
+postgres_version: 9.6
+postgres_repo_name: "pgdg{{ postgres_version | replace('.','') }}"
+postgres_repo_url: "https://download.postgresql.org/pub/repos/yum/{{ postgres_version }}/redhat/rhel-7-x86_64"
+postgres_repo_key: "https://download.postgresql.org/pub/repos/yum/RPM-GPG-KEY-PGDG-{{ postgres_version | replace('.','') }}"
+postgres_packages:
+  - postgresql{{ postgres_version | replace('.','') }}-server
+postgres_service_name: "postgresql-{{ postgres_version }}"
+postgres_initdb_command: "/usr/pgsql-{{ postgres_version }}/bin/postgresql{{ (postgres_version is version_compare('10', '>=')) | ternary('-','') }}{{ postgres_version | replace('.','') }}-setup initdb"
+postgres_data_directory: "/var/lib/pgsql/{{ postgres_version }}/data"
+postgres_config_file: "{{ postgres_data_directory }}/postgresql.conf"
+postgres_hba_file: "{{ postgres_data_directory }}/pg_hba.conf"
+
+mysql_version: 5.6
+mysql_repo_url: "http://repo.mysql.com/yum/mysql-{{ mysql_version }}-community/el/7/x86_64/"
+mysql_repo_key: http://repo.mysql.com/RPM-GPG-KEY-mysql
+mysql_packages:
+  - mysql-community-server
+  - MySQL-python
+mysql_service_name: mysql
+mysql_config_file: /etc/my.cnf
+
+mariadb_version: 10.2
+mariadb_repo_url: "http://yum.mariadb.org/{{ mariadb_version }}/centos7-amd64"
+mariadb_repo_key: http://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+mariadb_packages:
+  - MariaDB-server
+  - MySQL-python
+mariadb_service_name: mariadb
+mariadb_config_file: /etc/my.cnf.d/server.cnf

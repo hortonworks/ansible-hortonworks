@@ -44,6 +44,11 @@
         msg: "Multiple nodes are configured to run Druid components but the database is set to 'embedded'."
       when: druid_hosts|length > 1 and database == 'embedded'
 
+    - name: Fail if Amazon Linux prerequisites are not met
+      fail:
+        msg: "Amazon Linux does not support Hive with the 'embedded' database. Set the database to another option and re-run the playbooks."
+      when: database == 'embedded' and ansible_distribution|lower == "amazon" and hiveserver_hosts|length > 0
+
     - name: Fail if the selected components should not be part of an HDP 3 blueprint
       fail:
         msg: "When installing HDP 3 the component {{ item }} must not be part of the blueprint."

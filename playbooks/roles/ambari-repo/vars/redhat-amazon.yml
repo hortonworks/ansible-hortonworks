@@ -1,2 +1,0 @@
----
-ambari_repo_url: "{{ repo_base_url }}/ambari/centos6/2.x/updates/{{ ambari_version }}"
