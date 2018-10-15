@@ -14,6 +14,17 @@ These Ansible playbooks will build a Hortonworks cluster (Hortonworks Data Platf
   - The dynamic blueprint gives the freedom to distribute components for a chosen topology but this topology must respect Ambari Blueprint restrictions (e.g. if a single `NAMENODE` is set, there must also be a `SECONDARY_NAMENODE`).
   - Another advantage of the dynamic blueprint is that it generates the correct blueprint for when using [HA services](playbooks/roles/ambari-blueprint/templates/blueprint_dynamic.j2#L440), or [external databases](playbooks/roles/ambari-blueprint/templates/blueprint_dynamic.j2#L504) or [Kerberos](playbooks/roles/ambari-blueprint/templates/blueprint_dynamic.j2#L3).
 
+
+## DISCLAIMER
+
+These Ansible playbooks offer a specialised way of deploying Ambari-managed Hortonworks clusters.
+To use these playbooks you'll need to have a good understanding of both [Ansible](https://docs.ansible.com/ansible/latest/index.html) and [Ambari Blueprints]( https://cwiki.apache.org/confluence/display/AMBARI/Blueprints).
+
+This is not a Hortonworks product and these playbooks are not officially supported by Hortonworks.
+
+For a fully Hortonworks-supported and user friendly way of deploying Ambari-managed Hortonworks clusters, please check [Cloudbreak](https://docs.hortonworks.com/HDPDocuments/Cloudbreak/Cloudbreak-2.7.2/content/index.html) first.
+
+
 ## [Installation Instructions](id:instructions)
 
 - AWS: See [INSTALL.md](INSTALL_AWS.md) for AWS build instructions and cluster installation.
