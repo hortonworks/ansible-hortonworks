@@ -26,7 +26,7 @@
   ],
   "host_groups" : [
     {
-      "name" : "mytestcluster-master",
+      "name" : "hdp-singlenode",
       "configurations" : [ ],
       "components" : [
         { "name" : "ZOOKEEPER_CLIENT" },
@@ -75,6 +75,6 @@
   ],
   "Blueprints" : {
     "stack_name" : "HDP",
-    "stack_version" : "{{ hdp_version | regex_replace('.[0-9]+.[0-9]+[0-9_-]*$','') }}"
+    "stack_version" : "2.6"
   }
 }

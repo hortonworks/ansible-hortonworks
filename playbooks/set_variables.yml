@@ -24,7 +24,7 @@
     - block:
         - name: Set the blueprint path (relative to ambari-blueprint role)
           set_fact:
-            blueprint_file_path: "{{ 'roles/ambari-blueprint/templates/' + blueprint_file }}"
+            blueprint_file_path: "{{ 'roles/ambari-blueprint/files/' + blueprint_file }}"
           when: blueprint_file|list|first != '/' and blueprint_file|list|first != '~'
 
         - name: Set the blueprint path (absolute)
@@ -34,7 +34,7 @@
 
         - name: Read the static blueprint content
           set_fact:
-            blueprint_static: "{{ lookup('template', blueprint_file_path) }}"
+            blueprint_static: "{{ lookup('file', blueprint_file_path) }}"
 
         - name: Fail if the static blueprint is not a valid JSON
           fail:
@@ -261,7 +261,7 @@
     - block:
         - name: Set the blueprint path (relative to ambari-blueprint role)
           set_fact:
-            blueprint_file_path: "{{ 'roles/ambari-blueprint/templates/' + blueprint_file }}"
+            blueprint_file_path: "{{ 'roles/ambari-blueprint/files/' + blueprint_file }}"
           when: blueprint_file|list|first != '/' and blueprint_file|list|first != '~'
 
         - name: Set the blueprint path (absolute)
@@ -271,7 +271,7 @@
 
         - name: Read the static blueprint content
           set_fact:
-            blueprint_static: "{{ lookup('template', blueprint_file_path) }}"
+            blueprint_static: "{{ lookup('file', blueprint_file_path) }}"
 
         - name: Fail if the the static blueprint is not a valid JSON
           fail:

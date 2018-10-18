@@ -58,7 +58,7 @@ This role is applied to the Ambari Server node (by default this is the `ambari-s
 
 If using the `blueprint_dynamic` option, it generates the blueprint using a [Jinja2 template](ambari-blueprint/templates/blueprint_dynamic.j2).
 
-If using a static blueprint, it uploads that file as a blueprint. It still uses the [template](https://docs.ansible.com/ansible/latest/modules/template_module.html) module so this static blueprint can include [Jinja2 variables](ambari-blueprint/templates/blueprint_hdfs_only.j2#L56) if needed.
+If using a static blueprint, it uploads that file as a blueprint. It still uses the [template](https://docs.ansible.com/ansible/latest/modules/template_module.html) module so this static blueprint can include [Jinja2 variables](ambari-blueprint/files/blueprint_hdfs_only.j2#L56) if needed.
 
 Then it generates the [Cluster Creation Template](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-ClusterCreationTemplateStructure) which is a [Jinja2 template](ambari-blueprint/templates/cluster_template.j2) irrespective of the blueprint type (this can be changed using the `cluster_template_file` variable).
 

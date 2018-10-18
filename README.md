@@ -10,7 +10,7 @@ These Ansible playbooks will build a Hortonworks cluster (Hortonworks Data Platf
 - The aim is to first build the nodes in a Cloud environment, prepare them (OS settings, database, KDC, etc) and then install Ambari and create the cluster using Ambari Blueprints.
   - If the infrastructure is already built (Terraform, bare-metal, etc.), it can also use a [static inventory](inventory/static).
 
-- It can use a static blueprint or a [dynamically generated](playbooks/ro1les/ambari-blueprint/templates/blueprint_dynamic.j2) one based on the components from the Ansible [variables file](playbooks/group_vars/all#L161).
+- It can use a static blueprint or a [dynamically generated](playbooks/roles/ambari-blueprint/templates/blueprint_dynamic.j2) one based on the components from the Ansible [variables file](playbooks/group_vars/all#L161).
   - The dynamic blueprint gives the freedom to distribute components for a chosen topology but this topology must respect Ambari Blueprint restrictions (e.g. if a single `NAMENODE` is set, there must also be a `SECONDARY_NAMENODE`).
   - Another advantage of the dynamic blueprint is that it generates the correct blueprint for when using [HA services](playbooks/roles/ambari-blueprint/templates/blueprint_dynamic.j2#L440), or [external databases](playbooks/roles/ambari-blueprint/templates/blueprint_dynamic.j2#L504) or [Kerberos](playbooks/roles/ambari-blueprint/templates/blueprint_dynamic.j2#L3).
 
@@ -55,7 +55,7 @@ Therefore, these Ansible playbooks try to take advantage of Blueprint's `host_gr
 </p>
 
 - If the blueprint is dynamic, these `host_groups` are defined in the [variable file](playbooks/group_vars/all#L162) and they need to match the Ansible inventory groups that will run those components.
-- If the blueprint is static, these `host_groups` are defined in the [blueprint itself](playbooks/roles/ambari-blueprint/templates/blueprint_hdfs_only.j2#L29) and they need to match the Ansible inventory groups that will run those components.
+- If the blueprint is static, these `host_groups` are defined in the [blueprint itself](playbooks/roles/ambari-blueprint/files/blueprint_hdfs_only.j2#L29) and they need to match the Ansible inventory groups that will run those components.
 
 
 ### Cloud inventory

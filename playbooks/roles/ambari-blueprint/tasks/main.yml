@@ -50,22 +50,28 @@
     msg: Cluster {{ cluster_name }} already exists!
   when: cluster_check.status != 404
 
-- name: Generate the cluster blueprint
+- name: Generate the cluster dynamic blueprint
   set_fact:
-    cluster_blueprint: "{{ lookup('template', blueprint_file, convert_data=False) }} "
+    cluster_blueprint: "{{ lookup('template', blueprint_file, convert_data=False) }}"
+  when: blueprint_file == 'blueprint_dynamic.j2'
+
+- name: Generate the cluster static blueprint
+  set_fact:
+    cluster_blueprint: "{{ lookup('file', blueprint_file, convert_data=False) }}"
+  when: blueprint_file != 'blueprint_dynamic.j2'
 
 - name: Print the cluster blueprint
   debug:
-    var: cluster_blueprint|from_json
+    var: cluster_blueprint
     verbosity: 1
 
 - name: Generate the cluster creation template
   set_fact:
-    cluster_template: "{{ lookup('template', cluster_template_file, convert_data=False) }} "
+    cluster_template: "{{ lookup('template', cluster_template_file, convert_data=False) }}"
 
 - name: Print the cluster creation template
   debug:
-    var: cluster_template|from_json
+    var: cluster_template
     verbosity: 1
 
 - name: Delete any existing blueprint called {{ blueprint_name }}
@@ -88,7 +94,7 @@
     user: "{{ ambari_admin_user }}"
     password: "{{ ambari_admin_password }}"
     headers: '{"X-Requested-By":"ambari"}'
-    body: "{{ cluster_blueprint }}"
+    body: "{{ cluster_blueprint|to_json }} "
     body_format: raw
     status_code: 200,201,202,409
     timeout: 60
@@ -102,7 +108,7 @@
     user: "{{ ambari_admin_user }}"
     password: "{{ ambari_admin_password }}"
     headers: '{"X-Requested-By":"ambari"}'
-    body: "{{ cluster_template }}"
+    body: "{{ cluster_template|to_json }} "
     body_format: raw
     status_code: 200,201,202
     timeout: 120
