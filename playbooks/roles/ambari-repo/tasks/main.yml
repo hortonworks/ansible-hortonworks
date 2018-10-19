@@ -13,7 +13,7 @@
 
 - name: set ambari-repo facts
   set_fact:
-     ambari_repo_url: "{{  ambari_repo_url | defaults(ambari_repo_url_default) }}"
+     ambari_repo_url: "{{  ambari_repo_url | default(ambari_repo_url_default) }}"
 
 - name: Add the Ambari repository (yum)
   yum_repository:
