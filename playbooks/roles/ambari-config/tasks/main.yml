@@ -9,7 +9,20 @@
         - "{{ ansible_os_family|lower }}.yml"
         - defaults.yml
       paths:
-        - ../ambari-config/vars
+        - ../ambari-config/defaults
+
+- name: set repo variables
+  set_fact:
+    repo_os_family: "{{ repo_os_family | defaults(repo_os_family_default) }}"
+    baseurl_os_family: "{{ baseurl_os_family | defaults(baseurl_os_family_default) }}"
+    hdp_main_repo_url: "{{ hdp_main_repo_url | defaults(hdp_main_repo_url_default) }}"
+    hdf_main_repo_url: "{{ hdf_main_repo_url | defaults(hdf_main_repo_url_default) }}"
+    hdpsearch_main_repo_url: "{{ hdpsearch_main_repo_url | defaults(hdpsearch_main_repo_url_default) }}"
+    main_os_target: "{{ main_os_target | defaults(main_os_target_default) }}"
+    gpl_repo_url: "{{ gpl_repo_url | defaults(gpl_repo_url_default) }}"
+    utils_repo_url: "{{ utils_repo_url | defaults(utils_repo_url_default) }}"
+    utils_os_target: "{{ utils_os_target | defaults(utils_os_target_default) }}"
+
 
 - name: Set the GPL Licensed setting in Ambari
   lineinfile:

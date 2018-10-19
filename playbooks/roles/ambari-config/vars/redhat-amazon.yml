@@ -1,0 +1,12 @@
+---
+repo_os_family_default: "centos6"
+baseurl_os_family_default: "redhat6"
+
+hdp_main_repo_url_default: "{{ repo_base_url }}/HDP/centos6/{{ hdp_major_version }}.x/updates/{{ hdp_version }}"
+hdf_main_repo_url_default: "{{ repo_base_url }}/HDF/centos6/{{ hdf_major_version }}.x/updates/{{ hdf_version }}"
+main_os_target_default: "operating_systems/redhat6"
+
+gpl_repo_url_default: "{{ repo_base_url }}/HDP-GPL/centos6/{{ hdp_major_version }}.x/updates/{{ hdp_version }}"
+
+utils_repo_url_default: "{{ repo_base_url }}/HDP-UTILS-{{ utils_version }}/repos/centos6"
+utils_os_target_default: "operating_systems/redhat6/repositories/HDP-UTILS-{{ utils_version }}"

@@ -15,6 +15,12 @@
       paths:
         - ../ambari-blueprint/vars
 
+- name: set variables for jdbc drivers
+  set_fact:
+    postgres_jdbc_location: "{{ postgres_jdbc_location | defaults(postgres_jdbc_location_default) }}"
+    mysql_jdbc_location: "{{ mysql_jdbc_location | defaults(mysql_jdbc_location_default) }}"
+    mariadb_jdbc_location: "{{ mariadb_jdbc_location | defaults(mariadb_jdbc_location_default) }}"
+
 - block:
     - name: Get the VersionDefinition id from Ambari (Ambari >= 2.6)
       uri:

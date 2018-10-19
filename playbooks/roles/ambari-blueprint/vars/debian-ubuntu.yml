@@ -1,6 +1,6 @@
 ---
-postgres_jdbc_location: /usr/share/java/postgresql.jar
+postgres_jdbc_location_default: /usr/share/java/postgresql.jar
 
-mysql_jdbc_location: /usr/share/java/mysql-connector-java.jar
+mysql_jdbc_location_default: /usr/share/java/mysql-connector-java.jar
 
-mariadb_jdbc_location: /usr/share/java/mysql-connector-java.jar
+mariadb_jdbc_location_default: /usr/share/java/mysql-connector-java.jar
