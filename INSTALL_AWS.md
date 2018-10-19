@@ -28,7 +28,7 @@ This node must be able to connect to the cluster nodes via SSH and to the AWS AP
 2. Create and source the Python virtual environment
 
    ```
-   virtualenv ~/ansible; source ~/ansible/bin/activate 
+   virtualenv ~/ansible; source ~/ansible/bin/activate
    ```
 
 
@@ -61,7 +61,7 @@ This node must be able to connect to the cluster nodes via SSH and to the AWS AP
 2. Create and source the Python virtual environment
 
    ```
-   virtualenv ~/ansible; source ~/ansible/bin/activate 
+   virtualenv ~/ansible; source ~/ansible/bin/activate
    ```
 
 
@@ -94,7 +94,7 @@ This node must be able to connect to the cluster nodes via SSH and to the AWS AP
 2. Create and source the Python virtual environment
 
    ```
-   virtualenv ~/ansible; source ~/ansible/bin/activate  
+   virtualenv ~/ansible; source ~/ansible/bin/activate
    ```
 
 
@@ -189,15 +189,16 @@ There can be any number of host_groups (as long as they correspond to the Bluepr
 
 And host_groups can have any names and any number of nodes but they should correspond with the host_groups in the Ambari Blueprint and respect the Blueprint spec (for example, there shouldn't be more than 1 node in the host_group which contains the `AMBARI_SERVER` component, but there can be 100+ nodes in the slave / worker host_group).
 
-| Variable        | Description                                                               |
-| --------------- | ------------------------------------------------------------------------- |
-| host_group      | The name of the host_group used by the [Ambari Blueprint](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-BlueprintFieldDescriptions). This will be appended to the cluster name in order to form a unique group in the AWS VPC. Other roles can be added to correspond with the required architecture. |
-| count           | The number of nodes to be built under this host_group. |
-| image           | The AMI ID of the OS image to be used. More details [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html). The easiest way to find out the ID is by using the EC2 console and clicking on the `Launch Instance` button. |
-| type            | The instance-type / size of the node. A list of all the instance-types can be found [here](https://aws.amazon.com/ec2/instance-types/) and the pricing [here](https://aws.amazon.com/ec2/pricing/). |
-| public_ip       | If the VM should have a Public IP assigned to it. Required if the build node does not have access to the private IP range of the cluster nodes. |
-| security_groups | The security groups that should be applied to the node. The nodes should have at least the default security group that allows traffic in the same group. |
-| root_volume     | The vast majority of AMIs require an EBS root volume. The default size of this root volume is small, irrespective of the instance-type, so use this variable to set the size of the root volume to the desired value. More details about root devices [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/RootDeviceStorage.html) and about types of EBS Volumes [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html). |
+| Variable          | Description                                                               |
+| ----------------- | ------------------------------------------------------------------------- |
+| host_group        | The name of the host_group used by the [Ambari Blueprint](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-BlueprintFieldDescriptions). This will be appended to the cluster name in order to form a unique group in the AWS VPC. Other roles can be added to correspond with the required architecture. |
+| count             | The number of nodes to be built under this host_group. |
+| image             | The AMI ID of the OS image to be used. More details [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html). The easiest way to find out the ID is by using the EC2 console and clicking on the `Launch Instance` button. |
+| type              | The instance-type / size of the node. A list of all the instance-types can be found [here](https://aws.amazon.com/ec2/instance-types/) and the pricing [here](https://aws.amazon.com/ec2/pricing/). |
+| spot / spot_price | Set `spot` to `true` to build the nodes as [spot instances](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-spot-instances.html). This can significantly reduce the node cost but the nodes would be destroyed if the price reaches the value of `spot_price`. The spot pricing list can be found [here](https://aws.amazon.com/ec2/spot/pricing/). |
+| public_ip         | If the VM should have a Public IP assigned to it. Required if the build node does not have access to the private IP range of the cluster nodes. |
+| security_groups   | The security groups that should be applied to the node. The nodes should have at least the default security group that allows traffic in the same group. |
+| root_volume       | The vast majority of AMIs require an EBS root volume. The default size of this root volume is small, irrespective of the instance-type, so use this variable to set the size of the root volume to the desired value. More details about root devices [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/RootDeviceStorage.html) and about types of EBS Volumes [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html). |
 
 
 # Set the cluster variables
@@ -243,6 +244,7 @@ Modify the file at `~/ansible-hortonworks/playbooks/group_vars/all` to set the c
 | database                                 | The type of database that should be used. A choice between `embedded` (Ambari default), `postgres`, `mysql` or `mariadb`. |
 | database_options                         | These options are only relevant for the non-`embedded` database. |
 | `.external_hostname`                     | The hostname/IP of the database server. This needs to be prepared as per the [documentation](https://docs.hortonworks.com/HDPDocuments/Ambari-2.6.2.2/bk_ambari-administration/content/ch_amb_ref_using_existing_databases.html). No need to load any schema, this will be done by Ansible, but the users and databases must be created in advance. If left empty `''` then the playbooks will install the database server on the Ambari node and prepare everything with the settings defined bellow. To change any settings (like the version or repository path) modify the OS specific files under the `playbooks/roles/database/vars/` folder. |
+| `.add_repo`                              | If set to `yes`, Ansible will add a repo file pointing to the repository where the database packages are located (by default, the repo URL is public). Set this to `no` to disable this behaviour and use repositories that are already available to the OS. |
 | `.ambari_db_name`, `.ambari_db_username`, `.ambari_db_password` | The name of the database that Ambari should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |
 | `.hive_db_name`, `.hive_db_username`, `.hive_db_password`       | The name of the database that Hive should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |
 | `.oozie_db_name`, `.oozie_db_username`, `.oozie_db_password`    | The name of the database that Oozie should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |

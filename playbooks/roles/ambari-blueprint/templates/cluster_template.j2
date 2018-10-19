@@ -36,7 +36,7 @@
       "hosts" : [
         {% for node in groups[group]|sort -%}
 
-        { "fqdn" : "{{ hostvars[node]['ansible_fqdn'] | lower }}" }{% if not loop.last %},{% endif %}
+        { "fqdn" : "{{ hostvars[node]['ansible_fqdn'] | lower }}", "rack_info": "{{ hostvars[node]['rack'] | default('/default-rack') }}" }{% if not loop.last %},{% endif %}
 
         {% endfor %}
 

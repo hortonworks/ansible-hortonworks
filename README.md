@@ -10,9 +10,20 @@ These Ansible playbooks will build a Hortonworks cluster (Hortonworks Data Platf
 - The aim is to first build the nodes in a Cloud environment, prepare them (OS settings, database, KDC, etc) and then install Ambari and create the cluster using Ambari Blueprints.
   - If the infrastructure is already built (Terraform, bare-metal, etc.), it can also use a [static inventory](inventory/static).
 
-- It can use a static blueprint or a [dynamically generated](playbooks/ro1les/ambari-blueprint/templates/blueprint_dynamic.j2) one based on the components from the Ansible [variables file](playbooks/group_vars/all#L161).
+- It can use a static blueprint or a [dynamically generated](playbooks/roles/ambari-blueprint/templates/blueprint_dynamic.j2) one based on the components from the Ansible [variables file](playbooks/group_vars/all#L161).
   - The dynamic blueprint gives the freedom to distribute components for a chosen topology but this topology must respect Ambari Blueprint restrictions (e.g. if a single `NAMENODE` is set, there must also be a `SECONDARY_NAMENODE`).
   - Another advantage of the dynamic blueprint is that it generates the correct blueprint for when using [HA services](playbooks/roles/ambari-blueprint/templates/blueprint_dynamic.j2#L440), or [external databases](playbooks/roles/ambari-blueprint/templates/blueprint_dynamic.j2#L504) or [Kerberos](playbooks/roles/ambari-blueprint/templates/blueprint_dynamic.j2#L3).
+
+
+## DISCLAIMER
+
+These Ansible playbooks offer a specialised way of deploying Ambari-managed Hortonworks clusters.
+To use these playbooks you'll need to have a good understanding of both [Ansible](https://docs.ansible.com/ansible/latest/index.html) and [Ambari Blueprints]( https://cwiki.apache.org/confluence/display/AMBARI/Blueprints).
+
+This is not a Hortonworks product and these playbooks are not officially supported by Hortonworks.
+
+For a fully Hortonworks-supported and user friendly way of deploying Ambari-managed Hortonworks clusters, please check [Cloudbreak](https://docs.hortonworks.com/HDPDocuments/Cloudbreak/Cloudbreak-2.7.2/content/index.html) first.
+
 
 ## [Installation Instructions](id:instructions)
 
@@ -44,7 +55,7 @@ Therefore, these Ansible playbooks try to take advantage of Blueprint's `host_gr
 </p>
 
 - If the blueprint is dynamic, these `host_groups` are defined in the [variable file](playbooks/group_vars/all#L162) and they need to match the Ansible inventory groups that will run those components.
-- If the blueprint is static, these `host_groups` are defined in the [blueprint itself](playbooks/roles/ambari-blueprint/templates/blueprint_hdfs_only.j2#L29) and they need to match the Ansible inventory groups that will run those components.
+- If the blueprint is static, these `host_groups` are defined in the [blueprint itself](playbooks/roles/ambari-blueprint/files/blueprint_hdfs_only.j2#L29) and they need to match the Ansible inventory groups that will run those components.
 
 
 ### Cloud inventory
@@ -126,7 +137,7 @@ Currently, these playbooks are divided into the following parts:
 - [x] CentOS/RHEL 7 support
 - [x] Ubuntu 14 support
 - [x] Ubuntu 16 support
-- [x] Amazon Linux AMI (2016.x and 2017.x) working
+- [x] Amazon Linux 2 AMI support (Ambari 2.7+)
 - [x] SUSE Linux Enterprise Server 11 support
 - [x] SUSE Linux Enterprise Server 12 support
 
@@ -150,6 +161,7 @@ Currently, these playbooks are divided into the following parts:
 - [x] Configure Ambari Server with external database options
 - [ ] Configure Ambari Server with SSL
 - [x] Configure custom Repositories and specific HDP/HDF versions
+- [x] Configure Rack Awareness (static inventory)
 - [x] Build HDP clusters
 - [x] Build HDF clusters
 - [x] Build HDP clusters with HDF nodes

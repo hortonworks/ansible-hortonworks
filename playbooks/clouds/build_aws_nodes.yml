@@ -18,6 +18,7 @@
     zone: "{{ cloud_config.zone }}"
     image: "{{ outer_loop.image }}"
     instance_type: "{{ outer_loop.type }}"
+    spot_price: "{{ (outer_loop.spot|default(false) == true) | ternary(outer_loop.spot_price,omit) }}"
     vpc_subnet_id: "{{ cluster_subnet.subnet.id }}"
     groups: "{{ outer_loop.security_groups }}"
     assign_public_ip: "{{ outer_loop.public_ip }}"
@@ -58,8 +59,11 @@
       Cluster: "{{ cluster_name }}"
       Role: "{{ outer_loop.host_group }}"
       Group: "{{ cluster_name }}-{{ outer_loop.host_group }}"
+      Name: "{{ cluster_name }}-{{ outer_loop.host_group }}"
+      Owner: "{{ cluster_owner | default(omit) }}"
     wait: yes
     wait_timeout: 600
+    spot_wait_timeout: 600
   register: current_ec2
   when: outer_loop.root_volume.ebs
 

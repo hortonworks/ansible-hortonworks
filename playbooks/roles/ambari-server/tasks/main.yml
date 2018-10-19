@@ -1,13 +1,10 @@
 ---
-- name: Load default variables
-  include_vars:
-    file: 'defaults/main.yml'
-
 - name: Load variables
   include_vars: "{{ item }}"
   with_first_found:
     - files:
         - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}-{{ ansible_distribution_major_version }}.yml"
+        - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}-{{ ansible_distribution_version }}.yml"
         - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}.yml"
         - "{{ ansible_os_family|lower }}-{{ ansible_distribution_major_version }}.yml"
         - "{{ ansible_os_family|lower }}.yml"
@@ -63,7 +60,7 @@
         name: "{{ item }}"
         update_cache: yes
         state: present
-      with_items: "{{ hostvars[inventory_hostname][database + '_packages'] | join(',') }}"
+      with_items: "{{ lookup('vars', database + '_packages') | join(',') }}"
 
     - block:
         - name: Load the Ambari Server schema (postgres)
@@ -122,14 +119,14 @@
       when: database == "mysql" or database == "mariadb"
 
     - name: Configure the Ambari JDBC driver
-      shell: /usr/sbin/ambari-server setup --jdbc-db={{ database | regex_replace('mariadb', 'mysql') }} --jdbc-driver={{ hostvars[inventory_hostname][database + '_jdbc_location'] }}
+      shell: /usr/sbin/ambari-server setup --jdbc-db={{ database | regex_replace('mariadb', 'mysql') }} --jdbc-driver={{ lookup('vars', database + '_jdbc_location') }}
       notify: Restart ambari-server
 
     - name: Set the Ambari Server database setup options
       set_fact:
         ambari_database_options: "--database={{ database | regex_replace('mariadb', 'mysql') }} \
                                   --databasehost={{ database_options.external_hostname|default(ansible_fqdn,true) }} \
-                                  --databaseport={{ hostvars[inventory_hostname][database | regex_replace('mariadb', 'mysql') + '_port'] }} \
+                                  --databaseport={{ lookup('vars', database | regex_replace('mariadb', 'mysql') + '_port') }} \
                                   --databasename={{ database_options.ambari_db_name }} \
                                   --databaseusername={{ database_options.ambari_db_username }} \
                                   --databasepassword={{ database_options.ambari_db_password }}"

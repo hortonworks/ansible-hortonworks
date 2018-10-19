@@ -14,7 +14,7 @@
         <unique>true</unique>
       </repo>
 {% endif %}
-{% if install_hdpsearch|default(false) %}
+{% if install_hdpsearch|default(false) and hdpsearch_main_repo_url is defined %}
       <repo>
         <baseurl>{{ hdpsearch_main_repo_url }}</baseurl>
         <repoid>HDP-SOLR-{{ hdpsearch_version }}-{{ hdpsearch_build_number }}</repoid>

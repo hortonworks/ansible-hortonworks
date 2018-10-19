@@ -34,7 +34,7 @@ It can even be one of the cluster nodes.
 2. Create and source the Python virtual environment
 
    ```
-   virtualenv ~/ansible; source ~/ansible/bin/activate 
+   virtualenv ~/ansible; source ~/ansible/bin/activate
    ```
 
 
@@ -75,7 +75,7 @@ It can even be one of the cluster nodes.
 2. Create and source the Python virtual environment
 
    ```
-   virtualenv ~/ansible; source ~/ansible/bin/activate 
+   virtualenv ~/ansible; source ~/ansible/bin/activate
    ```
 
 
@@ -116,7 +116,7 @@ It can even be one of the cluster nodes.
 2. Create and source the Python virtual environment
 
    ```
-   virtualenv ~/ansible; source ~/ansible/bin/activate  
+   virtualenv ~/ansible; source ~/ansible/bin/activate
    ```
 
 
@@ -179,6 +179,7 @@ The following variables can be set for each node:
 | ansible_user                  | The Linux user with sudo permissions that Ansible will use to connect to the host (doesn't have to be root. |                         |
 | ansible_ssh_pass              | (Optional) The SSH password to use when connecting to the host (this is the password of the `ansible_user`). Either this or `ansible_ssh_private_key_file` should be configured. |
 | ansible_ssh_private_key_file  | (Optional) Local path to the SSH private key that will be used to login into the host. Either this or `ansible_ssh_pass` should be configured. |
+| rack                          | (Optional) Rack info for the host. Defaults to `/default-rack`. |
 
 
 # Test the inventory
@@ -239,6 +240,7 @@ Modify the file at `~/ansible-hortonworks/playbooks/group_vars/all` to set the c
 | database                                 | The type of database that should be used. A choice between `embedded` (Ambari default), `postgres`, `mysql` or `mariadb`. |
 | database_options                         | These options are only relevant for the non-`embedded` database. |
 | `.external_hostname`                     | The hostname/IP of the database server. This needs to be prepared as per the [documentation](https://docs.hortonworks.com/HDPDocuments/Ambari-2.6.2.2/bk_ambari-administration/content/ch_amb_ref_using_existing_databases.html). No need to load any schema, this will be done by Ansible, but the users and databases must be created in advance. If left empty `''` then the playbooks will install the database server on the Ambari node and prepare everything with the settings defined bellow. To change any settings (like the version or repository path) modify the OS specific files under the `playbooks/roles/database/vars/` folder. |
+| `.add_repo`                              | If set to `yes`, Ansible will add a repo file pointing to the repository where the database packages are located (by default, the repo URL is public). Set this to `no` to disable this behaviour and use repositories that are already available to the OS. |
 | `.ambari_db_name`, `.ambari_db_username`, `.ambari_db_password` | The name of the database that Ambari should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |
 | `.hive_db_name`, `.hive_db_username`, `.hive_db_password`       | The name of the database that Hive should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |
 | `.oozie_db_name`, `.oozie_db_username`, `.oozie_db_password`    | The name of the database that Oozie should use and the username and password to connect to it. If `database_options.external_hostname` is defined, these values will be used to connect to the database, otherwise the Ansible playbook will create the database and the user. |

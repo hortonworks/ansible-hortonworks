@@ -25,7 +25,7 @@
     {
       "admin-properties" : {
         "DB_FLAVOR" : "{{ database|regex_replace('mariadb', 'mysql')|upper }}",
-        "SQL_CONNECTOR_JAR" : "{{ hostvars[inventory_hostname][database + '_jdbc_location'] }}",
+        "SQL_CONNECTOR_JAR" : "{{ lookup('vars', database + '_jdbc_location') }}",
         "db_host" : "{{ database_options.external_hostname|default(ansible_fqdn,true) }}",
         "db_name" : "{{ database_options.rangeradmin_db_name }}",
         "db_user" : "{{ database_options.rangeradmin_db_username }}",
@@ -303,7 +303,7 @@
     {
       "kms-properties" : {
         "DB_FLAVOR" : "{{ database|regex_replace('mariadb', 'mysql')|upper }}",
-        "SQL_CONNECTOR_JAR" : "{{ hostvars[inventory_hostname][database + '_jdbc_location'] }}",
+        "SQL_CONNECTOR_JAR" : "{{ lookup('vars', database + '_jdbc_location') }}",
         "KMS_MASTER_KEY_PASSWD" : "{{ ranger_security_options.kms_master_key_password }}",
         "db_host" : "{{ database_options.external_hostname|default(ansible_fqdn,true) }}",
         "db_name" : "{{ database_options.rangerkms_db_name }}",
@@ -463,6 +463,14 @@
       }
     },
     {
+      "yarn-env" : {
+{% if 'YARN_REGISTRY_DNS' in blueprint_all_services %}
+        "registry.dns.bind-port": "{{ registry_dns_bind_port | default('53') }}",
+{% endif %}
+        "yarn_user" : "yarn"
+      }
+    },
+    {
       "yarn-site" : {
         {% if resourcemanager_groups|length > 1 -%}
         "hadoop.registry.zk.quorum": "{% for zk in zookeeper_groups %}%HOSTGROUP::{{ zk }}%:2181{% if not loop.last %},{% endif %}{% endfor %}",
@@ -490,6 +498,9 @@
 {% if rangeradmin_hosts|length > 0 and ranger_options.enable_plugins|default(no) %}
         "yarn.acl.enable" : "true",
         "yarn.authorization-provider": "org.apache.ranger.authorization.yarn.authorizer.RangerYarnAuthorizer",
+{% endif %}
+{% if 'YARN_REGISTRY_DNS' in blueprint_all_services %}
+        "hadoop.registry.dns.bind-port": "{{ registry_dns_bind_port | default('53') }}",
 {% endif %}
         "yarn.client.nodemanager-connect.retry-interval-ms" : "10000"
       }

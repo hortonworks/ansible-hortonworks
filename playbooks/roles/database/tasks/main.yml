@@ -4,6 +4,7 @@
   with_first_found:
     - files:
         - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}-{{ ansible_distribution_major_version }}.yml"
+        - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}-{{ ansible_distribution_version }}.yml"
         - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}.yml"
         - "{{ ansible_os_family|lower }}-{{ ansible_distribution_major_version }}.yml"
         - "{{ ansible_os_family|lower }}.yml"
@@ -55,7 +56,7 @@
         - "deb {{ mysql_repo_url }} {{ ansible_lsb.codename }} mysql-tools"
         - "deb-src {{ mysql_repo_url }} {{ ansible_lsb.codename }} mysql-{{ mysql_version }}"
       when: ansible_os_family|lower == "debian"
-  when: database == "mysql"
+  when: database == "mysql" and database_options.add_repo
 
 - block:
     - name: Add the mariadb repository (yum)
@@ -77,7 +78,35 @@
         disable_gpg_check : yes
         runrefresh: yes
       when: ansible_os_family|lower == "suse"
-  when: database == "mariadb"
+  when: database == "mariadb" and database_options.add_repo
+
+- block:
+    - name: Add the postgres repository (yum)
+      yum_repository:
+        name: "{{ postgres_repo_name }}"
+        description: "PostgreSQL"
+        baseurl: "{{ postgres_repo_url }}"
+        state: present
+        gpgcheck: yes
+        gpgkey: "{{ postgres_repo_key }}"
+      when: ansible_os_family|lower == "redhat"
+
+    - name: Add the postgres repository key (apt)
+      apt_key:
+        data: "{{ lookup('file', postgres_repo_keyfile) }}"
+        id: "{{ postgres_repo_key }}"
+      when: ansible_os_family|lower == "debian"
+
+    - name: Add the postgres repository (apt)
+      apt_repository:
+        filename: pgdg
+        repo: "{{ item }}"
+        state: present
+        update_cache: yes
+      with_items:
+        - "deb {{ postgres_repo_url }} {{ ansible_lsb.codename }}-pgdg main"
+      when: ansible_os_family|lower == "debian"
+  when: database == "postgres" and database_options.add_repo and (postgres_repo_url|default(''))!=''
 
 - name: Install {{ database }} database packages
   package:
