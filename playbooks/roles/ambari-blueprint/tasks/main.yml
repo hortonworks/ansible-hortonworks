@@ -100,7 +100,7 @@
     user: "{{ ambari_admin_user }}"
     password: "{{ ambari_admin_password }}"
     headers: '{"X-Requested-By":"ambari"}'
-    body: "{{ cluster_blueprint|to_json }} "
+    body: "{{ cluster_blueprint|to_json }}"
     body_format: raw
     status_code: 200,201,202,409
     timeout: 60
@@ -114,7 +114,7 @@
     user: "{{ ambari_admin_user }}"
     password: "{{ ambari_admin_password }}"
     headers: '{"X-Requested-By":"ambari"}'
-    body: "{{ cluster_template|to_json }} "
+    body: "{{ cluster_template|to_json }}"
     body_format: raw
     status_code: 200,201,202
     timeout: 120
