@@ -426,6 +426,13 @@
     },
 {% endif %}
 {% endif %}
+{% if accumulomaster_groups|length > 0 %}
+    {
+      "accumulo-site" : {
+        "instance.zookeeper.timeout" : "90s",
+      }
+    },
+{% endif %}
 {% if namenode_groups|length > 0 %}
     {
       "hadoop-env" : {

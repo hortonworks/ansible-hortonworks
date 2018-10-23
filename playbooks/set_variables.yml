@@ -71,6 +71,8 @@
   tasks:
     - name: Initialize the control variables
       set_fact:
+        accumulomaster_groups: []
+        accumulotablet_groups: []
         namenode_groups: []
         zkfc_groups: []
         resourcemanager_groups: []
@@ -104,6 +106,20 @@
           set_fact:
             namenode_groups: "{{ namenode_groups }} + [ '{{ item.host_group }}' ]"
           when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and 'NAMENODE' in item.services
+          with_items: "{{ blueprint_dynamic }}"
+          no_log: True
+
+        - name: Populate the accumulotablets groups list
+          set_fact:
+            accumulotablet_groups: "{{ accumulotablet_groups }} + [ '{{ item.host_group }}' ]"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and 'ACCUMULO_TSERVER' in item.services
+          with_items: "{{ blueprint_dynamic }}"
+          no_log: True
+
+        - name: Populate the accumulomaster groups list
+          set_fact:
+            accumulomaster_groups: "{{ accumulomaster_groups }} + [ '{{ item.host_group }}' ]"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and 'ACCUMULO_MASTER' in item.services
           with_items: "{{ blueprint_dynamic }}"
           no_log: True
 

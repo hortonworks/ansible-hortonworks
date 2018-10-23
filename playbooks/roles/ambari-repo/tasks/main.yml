@@ -16,6 +16,11 @@
   set_fact:
      ambari_repo_url: "{{  ambari_repo_url | default(ambari_repo_url_default) }}"
 
+- name: set ambari-repo yum facts
+  set_fact:
+    ambari_yum_repo_gpgcheck: "{{ ambari_yum_repo_gpgcheck | default('true') }}"
+    ambari_yum_repo_gpgkey: "{{ ambari_yum_repo_gpgkey | default(ambari_repo_url + '/RPM-GPG-KEY/RPM-GPG-KEY-Jenkins') }}"
+
 - name: Add the Ambari repository (yum)
   yum_repository:
     name: "ambari-{{ ambari_version }}"
@@ -23,8 +28,8 @@
     baseurl: "{{ ambari_repo_url }}"
     file: 'ambari'
     state: present
-    gpgcheck: yes
-    gpgkey: "{{ ambari_repo_url }}/RPM-GPG-KEY/RPM-GPG-KEY-Jenkins"
+    gpgcheck: "{{ ambari_yum_repo_gpgcheck }}"
+    gpgkey: "{{ ambari_yum_repo_gpgkey }}"
   when: ansible_os_family|lower == "redhat"
 
 - name: Add the Ambari repository (zypper)
