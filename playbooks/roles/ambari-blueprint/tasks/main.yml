@@ -51,11 +51,6 @@
     status_code: 200,201,202,404
   register: cluster_check
 
-- name: Fail if a cluster {{ cluster_name }} already exists
-  fail:
-    msg: Cluster {{ cluster_name }} already exists!
-  when: cluster_check.status != 404
-
 - name: Generate the cluster dynamic blueprint
   set_fact:
     cluster_blueprint: "{{ lookup('template', blueprint_file, convert_data=False) }}"
@@ -79,6 +74,11 @@
   debug:
     var: cluster_template
     verbosity: 1
+
+- name: Fail if a cluster {{ cluster_name }} already exists
+  fail:
+    msg: Cluster {{ cluster_name }} already exists!
+  when: cluster_check.status != 404
 
 - name: Delete any existing blueprint called {{ blueprint_name }}
   uri:

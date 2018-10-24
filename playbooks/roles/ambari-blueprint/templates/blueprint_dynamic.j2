@@ -426,13 +426,20 @@
     },
 {% endif %}
 {% endif %}
-{% if accumulomaster_groups|length > 0 %}
+{% if blueprint_config_options is defined %}
+{% for file in blueprint_config_options %}
     {
-      "accumulo-site" : {
-        "instance.zookeeper.timeout" : "90s",
+      "{{ file['name'] }}" : {
+{% for item in file['parameters'] %}
+{% for key,val in item.items() %}
+        "{{ key }}" : "{{ val }}",
+{% endfor %}
+{% endfor %}
       }
     },
+{% endfor %}
 {% endif %}
+
 {% if namenode_groups|length > 0 %}
     {
       "hadoop-env" : {
