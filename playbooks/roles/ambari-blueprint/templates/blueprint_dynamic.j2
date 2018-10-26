@@ -809,7 +809,6 @@
   ],
 
   "host_groups" : [
-    {% set ns = namespace(hivedb_embedded_defined=false) %}
     {% for blueprint_item in blueprint_dynamic if groups[blueprint_item.host_group] is defined and groups[blueprint_item.host_group]|length > 0 -%}
 
     {
@@ -822,9 +821,9 @@
 {% if security|lower == "mit-kdc" or security|lower == "active-directory" -%}
         { "name" : "KERBEROS_CLIENT" },
 {% endif %}
-
+        {% if hive_mysql_embedded_group is defined and hive_mysql_embedded_group == blueprint_item.host_group %}{ "name" : "MYSQL_SERVER" },{% endif %}
         {% for service in blueprint_item.services -%}
-        { "name" : "{{ service }}" }{% if service == "HIVE_METASTORE" and database == "embedded" and not ns.hivedb_embedded_defined %},{ "name" : "MYSQL_SERVER" }{% set ns.hivedb_embedded_defined=true %}{% endif %}{% if not loop.last %},{% endif %}
+        { "name" : "{{ service }}" }{% if not loop.last %},{% endif %}
 
         {% endfor %}
 
