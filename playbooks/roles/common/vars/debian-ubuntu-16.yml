@@ -10,6 +10,7 @@ packages:
   - python3-apt             # python-apt required by Ansible
   - libssl-dev              # openssl-devel recommended for Ranger KMS
   - python2.7               # python 2.7 required by Ambari
+  - libtirpc-dev            # libtirpc required by HDP 2.6+
 
 openjdk_package: openjdk-8-jdk
 
