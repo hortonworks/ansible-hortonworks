@@ -173,7 +173,7 @@ Currently, these playbooks are divided into the following parts:
 ### Dynamic blueprint supported features
 > The components that will be installed are only those defined in the `blueprint_dynamic` [variable](playbooks/group_vars/all#L161).
 > - Supported in this case means all prerequites (databases, passwords, required configs) are taken care of and the component is deployed successfully on the chosen `host_group`.
-- [x] HDP Services: `HDFS`, `YARN + MapReduce2`, `Hive`, `HBase`, `Oozie`, `ZooKeeper`, `Storm`, `Atlas`, `Kafka`, `Knox`, `Log Search`, `Ranger`, `Ranger KMS`, `SmartSense`, `Spark2`, `Zeppelin`, `Druid`, `Superset`
+- [x] HDP Services: `HDFS`, `YARN + MapReduce2`, `Hive`, `HBase`, `Accumulo`, `Oozie`, `ZooKeeper`, `Storm`, `Atlas`, `Kafka`, `Knox`, `Log Search`, `Ranger`, `Ranger KMS`, `SmartSense`, `Spark2`, `Zeppelin`, `Druid`, `Superset`
 - [x] HDF Services: `NiFi`, `NiFi Registry`, `Schema Registry`, `Streaming Analytics Manager`, `ZooKeeper`, `Storm`, `Kafka`, `Knox`, `Ranger`, `Log Search`
 - [x] HA Configuration: NameNode, ResourceManager, Hive, HBase, Ranger KMS, Druid
 - [x] Secure clusters with MIT KDC (Ambari managed)

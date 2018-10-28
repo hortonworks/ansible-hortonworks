@@ -301,6 +301,11 @@ Modify the file at `~/ansible-hortonworks/playbooks/group_vars/all` to set the c
 | `.admin_password`              | The password for the Superset admin user.                                               |
 | smartsense_security_options`.admin_password` | The password for the Activity Explorer's Zeppelin admin user.             |
 | logsearch_security_options`.admin_password`  | The password for the Log Search admin user.                               |
+| accumulo_security_options      | Security related options for Accumulo (such as passwords).                              |
+| `.root_password`               | Password for the Accumulo root user. This password will be used to initialize Accumulo and to create the trace user.       |
+| `.instance_secret`             | A secret unique to a given instance that all Accumulo server processes must know in order to communicate with one another. |
+| `.trace_user`                  | User that the tracer process uses to write tracing data to Accumulo.                    |
+| `.trace_password`              | Password for the trace user.                                                            |
 
 ### ambari configuration
 

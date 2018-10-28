@@ -108,3 +108,10 @@
         msg: "One or more of the following components are missing from the blueprint: DRUID_BROKER, DRUID_COORDINATOR, DRUID_ROUTER, DRUID_MIDDLEMANAGER, DRUID_HISTORICAL, DRUID_OVERLORD."
       when: druid_hosts|length > 0 and
            ['DRUID_BROKER', 'DRUID_COORDINATOR', 'DRUID_ROUTER', 'DRUID_MIDDLEMANAGER', 'DRUID_HISTORICAL', 'DRUID_OVERLORD'] | difference(blueprint_all_services) | length > 0
+
+    - name: Fail if the required Accumulo components are not part of the blueprint
+      fail:
+        msg: "One or more of the following components are missing from the blueprint: ACCUMULO_CLIENT, ACCUMULO_MASTER, ACCUMULO_MONITOR, ACCUMULO_TRACER, ACCUMULO_GC, ACCUMULO_TSERVER."
+      when: (['ACCUMULO_CLIENT', 'ACCUMULO_MASTER', 'ACCUMULO_MONITOR', 'ACCUMULO_TRACER', 'ACCUMULO_GC', 'ACCUMULO_TSERVER'] | difference(blueprint_all_clients | union(blueprint_all_services)) | length > 0)
+            and
+            (['ACCUMULO_CLIENT', 'ACCUMULO_MASTER', 'ACCUMULO_MONITOR', 'ACCUMULO_TRACER', 'ACCUMULO_GC', 'ACCUMULO_TSERVER'] | difference(blueprint_all_clients | union(blueprint_all_services)) | length < 6)

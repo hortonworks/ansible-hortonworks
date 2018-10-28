@@ -696,6 +696,23 @@
         "oozie_user" : "oozie"
       }
     },
+{% if 'ACCUMULO_MASTER' in blueprint_all_services %}
+    {
+      "accumulo-site" : {
+        "instance.volumes": "hdfs://{% if namenode_groups|length > 1 %}{{ hdfs_ha_name }}{% else %}%HOSTGROUP::{{ namenode_groups[0] }}%:8020{% endif %}/apps/accumulo/data",
+        "trace.user": "{{ accumulo_security_options.trace_user | default("trace") }}",
+        "instance.zookeeper.timeout": "30s"
+      }
+    },
+    {
+      "accumulo-env" : {
+        "accumulo_root_password": "{{ accumulo_security_options.root_password }}",
+        "instance_secret": "{{ accumulo_security_options.instance_secret }}",
+        "trace_password": "{{ accumulo_security_options.trace_password }}",
+        "accumulo_instance_name": "hdp-accumulo-instance"
+      }
+    },
+{% endif %}
     {
       "hbase-site" : {
         {% if namenode_groups|length > 1 -%}
