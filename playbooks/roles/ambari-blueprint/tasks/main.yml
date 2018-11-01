@@ -113,13 +113,14 @@
     dest: /tmp/sat_url_update.json
   
 - uri:
-    url: "http://{{ ansible_fqdn }}:8080/api/v1/stacks/HDP/versions/{{ ambari_version }}/repository_versions/1"
+    url: "http://{{ ansible_fqdn }}:8080/api/v1/stacks/HDP/versions/{{ hdp_minor_version }}/repository_versions/1"
     method: PUT
     force_basic_auth: yes
     user: "{{ ambari_admin_user }}"
     password: "{{ ambari_admin_password }}"
-    headers: '{"X-Requested-By":"ambari"}'
-    #body: '{  "operating_systems":[  {  "OperatingSystems":{  "ambari_managed_repositories":false, "os_type":"redhat7", "stack_name":"HDP", "stack_version":"2.6" }, "repositories":[  {  "Repositories":{  "base_url":"http://basebox.dev9.acs.sd.spawar.navy.mil/yum/tcri", "repo_id":"HDP-2.6", "repo_name":"HDP-2.6" } }, {  "Repositories":{  "base_url":"http://basebox.dev9.acs.sd.spawar.navy.mil/yum/tcri", "repo_id":"HDP-UTILS-1.1.0.20", "repo_name":"HDP-UTILS-1.1.0.20" } }, {  "Repositories":{  "base_url":"un", "repo_id":"HDP-2.6-GPL", "repo_name":"HDP-2.6-GPL" } } ] } ] }'
+    headers:
+      "X-Requested-By": "ambari"
+      "Content-type": "Application/json"
     body: "{{ lookup('file', '/tmp/sat_url_update.json')|to_json }}"
     status_code: 200
   when: True #not ambari_managed_repositories
