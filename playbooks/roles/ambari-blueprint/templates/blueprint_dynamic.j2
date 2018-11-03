@@ -1,5 +1,15 @@
 {
   "configurations" : [
+    {
+      "cluster-env" : {
+        "properties_attributes" : { },
+        "properties" : {
+          "command_retry_enabled" : "true",
+          "commands_to_retry" : "INSTALL,START",
+          "command_retry_max_time_in_sec" : "3600",
+        }
+      }
+    },
 {% if security|lower == "mit-kdc" or security|lower == "active-directory" %}
     {
       "kerberos-env": {
@@ -769,7 +779,13 @@
     },
 {% endif %}
     {
+      "hst-agent-conf" : {
+        "command.check_commands_retry_count" : "100",
+      }
+    },
+    {
       "hst-server-conf" : {
+        "command.check_commands_retry_count" : "100",
         "customer.smartsense.id" : "{{ smartsense.id | default('unspecified', true) }}",
         "customer.account.name" : "{{ smartsense.account_name | default('unspecified', true) }}",
         "customer.notification.email" : "{{ smartsense.customer_email | default('unspecified', true) }}",

@@ -113,7 +113,7 @@
     dest: /tmp/sat_url_update.json
   
 - uri:
-    url: "http://{{ ansible_fqdn }}:8080/api/v1/stacks/HDP/versions/{{ ambari_version }}/repository_versions/1"
+    url: "http://{{ ansible_fqdn }}:8080/api/v1/stacks/HDP/versions/{{ hdp_minor_version }}/repository_versions/1"
     method: PUT
     force_basic_auth: yes
     user: "{{ ambari_admin_user }}"
