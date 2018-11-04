@@ -720,6 +720,23 @@
         "oozie_user" : "oozie"
       }
     },
+{% if 'ACCUMULO_MASTER' in blueprint_all_services %}
+    {
+      "accumulo-site" : {
+        "instance.volumes": "hdfs://{% if namenode_groups|length > 1 %}{{ hdfs_ha_name }}{% else %}%HOSTGROUP::{{ namenode_groups[0] }}%:8020{% endif %}/apps/accumulo/data",
+        "trace.user": "{{ accumulo_security_options.trace_user | default("trace") }}",
+        "instance.zookeeper.timeout": "30s"
+      }
+    },
+    {
+      "accumulo-env" : {
+        "accumulo_root_password": "{{ accumulo_security_options.root_password }}",
+        "instance_secret": "{{ accumulo_security_options.instance_secret }}",
+        "trace_password": "{{ accumulo_security_options.trace_password }}",
+        "accumulo_instance_name": "hdp-accumulo-instance"
+      }
+    },
+{% endif %}
     {
       "hbase-site" : {
         {% if namenode_groups|length > 1 -%}
@@ -839,7 +856,6 @@
   ],
 
   "host_groups" : [
-    {% set ns = namespace(hivedb_embedded_defined=false) %}
     {% for blueprint_item in blueprint_dynamic if groups[blueprint_item.host_group] is defined and groups[blueprint_item.host_group]|length > 0 -%}
 
     {
@@ -852,9 +868,9 @@
 {% if security|lower == "mit-kdc" or security|lower == "active-directory" -%}
         { "name" : "KERBEROS_CLIENT" },
 {% endif %}
-
+        {% if hive_mysql_embedded_group is defined and hive_mysql_embedded_group == blueprint_item.host_group %}{ "name" : "MYSQL_SERVER" },{% endif %}
         {% for service in blueprint_item.services -%}
-        { "name" : "{{ service }}" }{% if service == "HIVE_METASTORE" and database == "embedded" and not ns.hivedb_embedded_defined %},{ "name" : "MYSQL_SERVER" }{% set ns.hivedb_embedded_defined=true %}{% endif %}{% if not loop.last %},{% endif %}
+        { "name" : "{{ service }}" }{% if not loop.last %},{% endif %}
 
         {% endfor %}
 

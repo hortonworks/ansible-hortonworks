@@ -1,0 +1,78 @@
+###########
+#
+# These variables would be used by the 'blueprint_dynamic.j2' Jinja2 template to generate the blueprint JSON.
+# This blueprint will build an HDP cluster with Accumulo, made of 3 master services nodes and 1 or more worker nodes.
+# One of the master services nodes is running Ambari and other utility services - here called the management node.
+# The other two master services are running the main HA Hadoop services, including the Accumulo masters.
+#
+###########
+
+blueprint_name: '{{ cluster_name }}_blueprint'                  # the name of the blueprint as it will be stored in Ambari
+blueprint_file: 'blueprint_dynamic.j2'                          # the blueprint JSON file - 'blueprint_dynamic.j2' is a Jinja2 template that generates the required JSON
+blueprint_dynamic:                                              # properties for the dynamic blueprint - these are only used by the 'blueprint_dynamic.j2' template to generate the JSON
+  - host_group: "hdp-masternode-01"
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'ACCUMULO_CLIENT']
+    services:
+      - ZOOKEEPER_SERVER
+      - NAMENODE
+      - ZKFC
+      - JOURNALNODE
+      - RESOURCEMANAGER
+      - HIVE_SERVER
+      - HIVE_METASTORE
+      - ACCUMULO_MASTER
+      - ACCUMULO_MONITOR
+      - ACCUMULO_TRACER
+      - ACCUMULO_GC
+      - KAFKA_BROKER
+      - ACTIVITY_ANALYZER
+      - HST_AGENT
+      - METRICS_MONITOR
+  - host_group: "hdp-masternode-02"
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'ACCUMULO_CLIENT']
+    services:
+      - ZOOKEEPER_SERVER
+      - NAMENODE
+      - ZKFC
+      - JOURNALNODE
+      - RESOURCEMANAGER
+      - APP_TIMELINE_SERVER
+      - YARN_REGISTRY_DNS
+      - TIMELINE_READER
+      - HIVE_SERVER
+      - HIVE_METASTORE
+      - ACCUMULO_MASTER
+      - ACCUMULO_MONITOR
+      - ACCUMULO_TRACER
+      - ACCUMULO_GC
+      - KAFKA_BROKER
+      - HISTORYSERVER
+      - SPARK2_JOBHISTORYSERVER
+      - ACTIVITY_ANALYZER
+      - HST_AGENT
+      - METRICS_MONITOR
+  - host_group: "hdp-management"
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'ACCUMULO_CLIENT']
+    services:
+      - ZOOKEEPER_SERVER
+      - JOURNALNODE
+      - OOZIE_SERVER
+      - KNOX_GATEWAY
+      - ZEPPELIN_MASTER
+      - AMBARI_SERVER
+      - INFRA_SOLR
+      - HST_SERVER
+      - ACTIVITY_ANALYZER
+      - ACTIVITY_EXPLORER
+      - HST_AGENT
+      - METRICS_COLLECTOR
+      - METRICS_GRAFANA
+      - METRICS_MONITOR
+  - host_group: "hdp-worker"
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'ACCUMULO_CLIENT']
+    services:
+      - DATANODE
+      - NODEMANAGER
+      - ACCUMULO_TSERVER
+      - HST_AGENT
+      - METRICS_MONITOR

@@ -64,6 +64,9 @@
     wait: yes
     wait_timeout: 600
     spot_wait_timeout: 600
+    user_data: |
+      #!/bin/sh
+      [ -e /bin/yum-config-manager ] && yum-config-manager --enable rhui-REGION-rhel-server-optional
   register: current_ec2
   when: outer_loop.root_volume.ebs
 

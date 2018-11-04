@@ -75,6 +75,7 @@
         accumulotablet_groups: []
         namenode_groups: []
         zkfc_groups: []
+        hive_mysql_embedded_group: ''
         resourcemanager_groups: []
         journalnode_groups: []
         zookeeper_groups: []
@@ -141,6 +142,13 @@
           set_fact:
             journalnode_groups: "{{ journalnode_groups }} + [ '{{ item.host_group }}' ]"
           when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and 'JOURNALNODE' in item.services
+          with_items: "{{ blueprint_dynamic }}"
+          no_log: True
+
+        - name: Populate the hive_mysql_embedded groups list
+          set_fact:
+            hive_mysql_embedded_group: "{{ item.host_group }}"
+          when: not hive_mysql_embedded_group and database == 'embedded' and 'HIVE_METASTORE' in item.services and groups[item.host_group] is defined and groups[item.host_group]|length > 0
           with_items: "{{ blueprint_dynamic }}"
           no_log: True
 
@@ -354,24 +362,26 @@
   hosts: hadoop-cluster
   gather_facts: False
   tasks:
-    - name: Check if /usr/bin/python exists
-      raw: bash -c "test -e /usr/bin/python && echo -n exists || echo -n"
-      register: default_python2_path
+    - block:
+        - name: Check if /usr/bin/python exists
+          raw: bash -c "test -e /usr/bin/python && echo -n exists || echo -n"
+          register: default_python2_path
 
-    - name: Check if /usr/bin/python3 exists
-      raw: bash -c "test -e /usr/bin/python3 && echo -n exists || echo -n"
-      register: default_python3_path
-      when: default_python2_path.stdout == ""
+        - name: Check if /usr/bin/python3 exists
+          raw: bash -c "test -e /usr/bin/python3 && echo -n exists || echo -n"
+          register: default_python3_path
+          when: default_python2_path.stdout == ""
 
-    - name: Fail if no standard python path could be found
-      fail:
-        msg: "Python could not be found at /usr/bin/python or /usr/bin/python3. If using a custom python path, set the 'ansible_python_interpreter' inventory variable to the valid path for your environment."
-      when: default_python2_path.stdout == "" and default_python3_path.stdout != "exists"
+        - name: Fail if no standard python path could be found
+          fail:
+            msg: "Python could not be found at /usr/bin/python or /usr/bin/python3. If using a custom python path, set the 'ansible_python_interpreter' inventory variable to the valid path for your environment."
+          when: default_python2_path.stdout == "" and default_python3_path.stdout != "exists"
 
-    - name: Set the ansible_python_interpreter to /usr/bin/python3
-      set_fact:
-        ansible_python_interpreter: "/usr/bin/python3"
-      when: default_python3_path.stdout is defined and default_python3_path.stdout == "exists"
+        - name: Set the ansible_python_interpreter to /usr/bin/python3
+          set_fact:
+            ansible_python_interpreter: "/usr/bin/python3"
+          when: default_python3_path.stdout is defined and default_python3_path.stdout == "exists"
+      when: ansible_python_interpreter is not defined
 
     - name: Set the install_hdp variable to all nodes
       set_fact:

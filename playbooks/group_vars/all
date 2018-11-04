@@ -132,6 +132,11 @@ smartsense_security_options:
 logsearch_security_options:
   admin_password: "{{ default_password }}"                # the password for the Logsearch admin user
 
+accumulo_security_options:
+  root_password: "{{ default_password }}"                 # the password for the Accumulo root user
+  instance_secret: "{{ default_password }}"               # a secret unique to a given instance
+  trace_user: "trace"                                     # user that the tracer process uses to write tracing data to Accumulo
+  trace_password: "{{ default_password }}"                # password for the trace user
 
 ##########################
 ## ambari configuration ##
