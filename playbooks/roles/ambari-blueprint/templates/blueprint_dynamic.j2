@@ -733,7 +733,7 @@
         "accumulo_root_password": "{{ accumulo_security_options.root_password }}",
         "instance_secret": "{{ accumulo_security_options.instance_secret }}",
         "trace_password": "{{ accumulo_security_options.trace_password }}",
-        "accumulo_instance_name": "hdp-accumulo-instance"
+        "accumulo_instance_name": "{{ accumulo_instance_name | default('hdp-accumulo-instance') }}"
       }
     },
 {% endif %}
