@@ -12,6 +12,7 @@
       paths:
         - ../ambari-repo/vars
 
+
 - name: set ambari-repo facts
   set_fact:
      ambari_repo_url: "{{  ambari_repo_url | default(ambari_repo_url_default) }}"
