@@ -61,6 +61,19 @@
       * hard nofile 32768
       * soft nproc 32768
       * hard nproc 32768
+      root       soft    nproc     unlimited
+      ams        -       nofile   64000
+      atlas      -       nofile   64000
+      druid      -       nofile   64000
+      hive       -       nofile   64000
+      infra-solr -       nofile   64000
+      kms        -       nofile   64000
+      knox       -       nofile   64000
+      logsearch  -       nofile   64000
+      ranger     -       nofile   64000
+      spark      -       nofile   64000
+      zeppelin   -       nofile   64000
+      zookeeper  -       nofile   64000
     marker: "# {mark} ANSIBLE MANAGED BLOCK"
 
 - name: Set swappiness to {{ swappiness }}
