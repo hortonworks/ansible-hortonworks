@@ -76,8 +76,13 @@
     verbosity: 1
 
 - name: Fail if a cluster {{ cluster_name }} already exists
-  fail:
+  debug:
     msg: Cluster {{ cluster_name }} already exists!
+  when: cluster_check.status != 404
+
+- name: set skip_var
+  set_fact:
+    cluster_exists: True
   when: cluster_check.status != 404
 
 - name: Delete any existing blueprint called {{ blueprint_name }}
@@ -90,7 +95,7 @@
     headers: '{"X-Requested-By":"ambari"}'
     status_code: 200,201,202,404
     return_content: no
-  when: cluster_check.status == 404
+  when: cluster_check.status == 404 and not cluster_exists
 
 - name: Upload the blueprint {{ blueprint_name }} to the Ambari server
   uri:
@@ -105,12 +110,14 @@
     status_code: 200,201,202,409
     timeout: 60
     return_content: no
+  when: cluster_check.status == 404 and not cluster_exists
 
 - name: copy ansible managed template
   local_action:
     module: template
     src: sat_url_update.json.j2
     dest: /tmp/sat_url_update.json
+  when: cluster_check.status == 404 and not cluster_exists
   
 - uri:
     url: "http://{{ ansible_fqdn }}:8080/api/v1/stacks/HDP/versions/{{ hdp_minor_version }}/repository_versions/1"
@@ -123,18 +130,20 @@
       "Content-type": "Application/json"
     body: "{{ lookup('file', '/tmp/sat_url_update.json')|to_json }}"
     status_code: 200
-  when: True #not ambari_managed_repositories
+  when: cluster_check.status == 404 and not cluster_exists
 
 - name: Restart ambari-server
   service:
     name: ambari-server
     state: restarted
+  when: cluster_check.status == 404 and not cluster_exists
 
 - name: Wait for Ambari Server to start listening on port 8080
   wait_for:
     port: 8080
     host: 0.0.0.0
     delay: 1
+  when: cluster_check.status == 404 and not cluster_exists
 
 - name: Launch the create cluster request
   uri:
@@ -150,6 +159,7 @@
     timeout: 120
     return_content: yes
   register: cluster_create_task
+  when: cluster_check.status == 404 and not cluster_exists
 
 - name: Wait for the cluster to be built
   uri:
@@ -167,11 +177,14 @@
          (cluster_check_task.content|from_json).Requests.request_status == 'ABORTED')
   retries: "{{ wait_timeout // 10 }}"
   delay: 10
-  when: wait and cluster_create_task is defined and cluster_create_task
+  when: wait and cluster_create_task is defined and cluster_create_task and (cluster_check.status == 404 and not cluster_exists)
 
-- name: Fail if the cluster create task is in an error state
-  fail:
-    msg: "Failed to build the {{ cluster_name }} cluster. Task Status is {{ (cluster_check_task.content|from_json).Requests.request_status }}."
-  when: wait and ((cluster_check_task.content|from_json).Requests.request_status == 'FAILED' or
-         (cluster_check_task.content|from_json).Requests.request_status == 'TIMEDOUT' or
-         (cluster_check_task.content|from_json).Requests.request_status == 'ABORTED')
+- block:
+  - name: Fail if the cluster create task is in an error state
+    fail:
+      msg: "Failed to build the {{ cluster_name }} cluster. Task Status is {{ (cluster_check_task.content|from_json).Requests.request_status }}."
+    when: wait and ((cluster_check_task.content|from_json).Requests.request_status == 'FAILED' or
+           (cluster_check_task.content|from_json).Requests.request_status == 'TIMEDOUT' or
+           (cluster_check_task.content|from_json).Requests.request_status == 'ABORTED') 
+  when: cluster_create_task is defined and (cluster_check.status == 404 and not cluster_exists)
+#and (cluster_check.status == 404 and not cluster_exists)
