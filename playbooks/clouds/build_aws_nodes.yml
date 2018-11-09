@@ -1,5 +1,12 @@
 ---
 - set_fact: outer_loop="{{ item }}"
+- set_fact:
+    aws_tags: "{{ aws_tags_custom | default({})
+    | combine({ 'Cluster': cluster_name })
+    | combine({ 'Role': outer_loop.host_group })
+    | combine({ 'Group': cluster_name + '-' + outer_loop.host_group })
+    | combine({ 'Name': cluster_name + '-' + outer_loop.host_group })
+     }}"
 
 - name: Get AMI information
   ec2_ami_facts:
@@ -55,12 +62,7 @@
       - { device_name: /dev/xvdy, ephemeral: ephemeral23 }
     count_tag:
       Group: "{{ cluster_name }}-{{ outer_loop.host_group }}"
-    instance_tags:
-      Cluster: "{{ cluster_name }}"
-      Role: "{{ outer_loop.host_group }}"
-      Group: "{{ cluster_name }}-{{ outer_loop.host_group }}"
-      Name: "{{ cluster_name }}-{{ outer_loop.host_group }}"
-      Owner: "{{ cluster_owner | default(omit) }}"
+    instance_tags: "{{ aws_tags }}"
     wait: yes
     wait_timeout: 600
     spot_wait_timeout: 600
@@ -69,6 +71,37 @@
       [ -e /bin/yum-config-manager ] && yum-config-manager --enable rhui-REGION-rhel-server-optional
   register: current_ec2
   when: outer_loop.root_volume.ebs
+
+- name: Set name tag for AWS instances
+  ec2_tag:
+    region: "{{ cloud_config.region }}"
+    resource: "{{ item.1.id }}"
+    tags:
+      Name: "{{ aws_tags.Name }}-{{ '%02d' | format(item.0 + 1) }}"
+  with_indexed_items: "{{ current_ec2.instances }}"
+  loop_control:
+    label: "{{ item.1.id }} - {{ aws_tags.Name }}-{{ '%02d' | format(item.0 + 1) }}"
+
+- name: Get volumes ids
+  ec2_vol:
+    region: "{{ cloud_config.region }}"
+    instance: "{{ item }}"
+    state: list
+  with_items: "{{ current_ec2.instance_ids }}"
+  register: ec2_instances_volumes
+  loop_control:
+    label: "{{ item }}"
+
+- name: Tag volumes
+  ec2_tag:
+    region: "{{ cloud_config.region }}"
+    resource: "{{ item.1.id }}"
+    tags: "{{ aws_tags | combine({'Instance': item.1.attachment_set.instance_id}, {'Device': item.1.attachment_set.device}) }}"
+  with_subelements:
+    - "{{ ec2_instances_volumes.results }}"
+    - volumes
+  loop_control:
+    label: "{{ item.1.id }} - {{ item.1.attachment_set.device }}"
 
 - name: Wait for SSH to start
   wait_for:
