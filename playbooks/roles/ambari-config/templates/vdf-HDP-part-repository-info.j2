@@ -1,16 +1,16 @@
-    <os family="{{ baseurl_os_family }}">
+<os family="{{ baseurl_os_family }}">
       <package-version>{{ hdp_version|replace('-','_') }}_*</package-version>
       <repo>
         <baseurl>{{ hdp_main_repo_url }}</baseurl>
         <repoid>{{ hdp_main_repo_name }}</repoid>
-        <reponame>HDP</reponame>
+        <reponame>{[ hdp_main_repo_name }}</reponame>
         <unique>false</unique>
       </repo>
 {% if install_hdf|default(false) %}
       <repo>
         <baseurl>{{ hdf_main_repo_url }}</baseurl>
         <repoid>{{ hdf_main_repo_name }}</repoid>
-        <reponame>HDF</reponame>
+        <reponame>{{ hdf_main_repo_name }}</reponame>
         <unique>false</unique>
       </repo>
 {% endif %}
@@ -18,7 +18,7 @@
       <repo>
         <baseurl>{{ hdpsearch_main_repo_url }}</baseurl>
         <repoid>{{ hdpsearch_main_repo_url }}</repoid>
-        <reponame>HDP-SOLR</reponame>
+        <reponame>{{ hdpsearch_main_repo_url }}</reponame>
         <unique>false</unique>
       </repo>
 {% endif %}
@@ -26,7 +26,7 @@
       <repo>
         <baseurl>{{ gpl_repo_url }}</baseurl>
         <repoid>{{ gpl_repo_name }}</repoid>
-        <reponame>HDP-GPL</reponame>
+        <reponame>{{ gpl_repo_name }}</reponame>
         <unique>false</unique>
         <tags>
           <tag>GPL</tag>
@@ -36,8 +36,9 @@
       <repo>
         <baseurl>{{ utils_repo_url }}</baseurl>
         <repoid>{{ utils_repo_name }}</repoid>
-        <reponame>HDP-UTILS</reponame>
+        <reponame>{{ utils_repo_name }}</reponame>
         <unique>false</unique>
       </repo>
     </os>
+
 

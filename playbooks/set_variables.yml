@@ -18,7 +18,7 @@
             ambari_groups: "{{ ambari_groups }} + [ '{{ item.host_group }}' ]"
           when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and 'AMBARI_SERVER' in item.services
           with_items: "{{ blueprint_dynamic }}"
-          no_log: True
+        #  no_log: True
       when: blueprint_file == 'blueprint_dynamic.j2'
 
     - block:

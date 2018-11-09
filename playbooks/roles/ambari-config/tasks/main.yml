@@ -214,7 +214,7 @@
         user: "{{ ambari_admin_user }}"
         password: "{{ ambari_admin_password }}"
         headers: '{"X-Requested-By":"ambari"}'
-        body: " {\"VersionDefinition\":{ \"version_url\":\"file:/tmp/cluster_vdf.xml\"}} "
+        body: " {\"VersionDefinition\":{ \"version_url\":\"file:/tmp/cluster_vdf.xml\"}}"
         body_format: raw
         status_code: 200,201,202
         return_content: no
