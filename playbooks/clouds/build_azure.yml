@@ -3,9 +3,6 @@
   hosts: localhost
   connection: local
   gather_facts: False
-  vars_files:
-    - ../group_vars/all
-    - ../../inventory/azure/group_vars/all
   tasks:
     - name: Build {{ cloud_config.resource_group }} Resource Group
       azure_rm_resourcegroup:
