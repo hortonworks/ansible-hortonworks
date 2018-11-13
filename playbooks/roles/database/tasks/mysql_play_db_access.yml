@@ -4,11 +4,11 @@
 - name: Create the {{ db_username }} database user and IP based access from {{ outer_loop }} ({{ database }})
   mysql_user:
     name: "{{ db_username }}"
-    host: "{{ hostvars[outer_loop]['ansible_'~local_loop]['ipv4']['address'] }}"
+    host: "{{ hostvars[outer_loop]['ansible_'~local_loop | regex_replace('-','_')]['ipv4']['address'] }}"
     priv: "{{ db_name }}.*:ALL"
     password: "{{ db_password }}"
     state: present
   loop_control:
     loop_var: local_loop
   with_items: "{{ hostvars[outer_loop]['ansible_interfaces'] }}"
-  when: local_loop != 'lo' and 'ipv4' in hostvars[outer_loop]['ansible_'~local_loop]
+  when: local_loop != 'lo' and 'ipv4' in hostvars[outer_loop]['ansible_'~local_loop | regex_replace('-','_')]
