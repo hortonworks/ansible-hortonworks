@@ -54,7 +54,7 @@
         mpack_filename: "solr-service-mpack-{{ hdpsearch_version }}.tar.gz"
 
     - name: "Install the HDP Search Management Pack"
-      shell: "echo yes | ambari-server install-mpack --mpack={{ repo_base_url }}/HDP-SOLR/hdp-solr-ambari-mp/{{ mpack_filename }}"
+      shell: "echo yes | ambari-server install-mpack --mpack={{ hdp_solr_server_mpack }}"
       notify: Restart ambari-server
       args:
         creates: "/var/lib/ambari-server/resources/mpacks/solr-ambari-mpack-{{ hdpsearch_version }}"
