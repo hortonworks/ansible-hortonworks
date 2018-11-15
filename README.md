@@ -55,7 +55,7 @@ Therefore, these Ansible playbooks try to take advantage of Blueprint's `host_gr
 </p>
 
 - If the blueprint is dynamic, these `host_groups` are defined in the [variable file](playbooks/group_vars/all#L162) and they need to match the Ansible inventory groups that will run those components.
-- If the blueprint is static, these `host_groups` are defined in the [blueprint itself](playbooks/roles/ambari-blueprint/files/blueprint_hdfs_only.j2#L29) and they need to match the Ansible inventory groups that will run those components.
+- If the blueprint is static, these `host_groups` are defined in the [blueprint itself](playbooks/roles/ambari-blueprint/files/blueprint_hdfs_only.json#L27) and they need to match the Ansible inventory groups that will run those components.
 
 
 ### Cloud inventory
