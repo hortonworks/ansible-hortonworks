@@ -3,7 +3,7 @@
       <repo>
         <baseurl>{{ hdp_main_repo_url }}</baseurl>
         <repoid>{{ hdp_main_repo_name }}</repoid>
-        <reponame>{[ hdp_main_repo_name }}</reponame>
+        <reponame>{{ hdp_main_repo_name }}</reponame>
         <unique>false</unique>
       </repo>
 {% if install_hdf|default(false) %}

@@ -78,15 +78,19 @@
       set_fact:
         mpack_filename: "hdf-ambari-mpack-{{ hdf_version }}-{{ hdf_build_number }}.tar.gz"
 
+    - name: set hdf url
+      set_fact:
+        hdf_mpack_url: "{{ nifi_mpack_url | default(hdf_main_repo_url + '/tars/hdf_ambari_mp/' + mpack_filename) }}"
+
     - name: "Install the HDF Management Pack"
-      shell: "echo yes | ambari-server install-mpack --mpack={{ hdf_main_repo_url }}/tars/hdf_ambari_mp/{{ mpack_filename }}"
+      shell: "echo yes | ambari-server install-mpack --mpack={{ hdf_mpack_url }}"
       notify: Restart ambari-server
       args:
         creates: "/var/lib/ambari-server/resources/mpacks/{{ mpack_filename | regex_replace('.tar.gz$','') }}"
       when: hdf_major_version|int >= 3
 
     - name: "Install the HDF Management Pack (with --purge)"
-      shell: "echo yes | ambari-server install-mpack --mpack={{ hdf_main_repo_url }}/tars/hdf_ambari_mp/{{ mpack_filename }} --purge"
+      shell: "echo yes | ambari-server install-mpack --mpack={{ hdf_mpack_url }} --purge"
       notify: Restart ambari-server
       args:
         creates: "/var/lib/ambari-server/resources/mpacks/{{ mpack_filename | regex_replace('.tar.gz$','') }}"
