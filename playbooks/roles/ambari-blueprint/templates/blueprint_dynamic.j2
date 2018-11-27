@@ -855,7 +855,7 @@
         "supervisor.childopts" : "{{ storm_supervisor_opts }}",
 {% endif %}
 {% if storm_supervisor_opts is defined %}
-        "supervisor.slots.ports" : "[{% for x in range(0,storm_worker_slots) %}'{{ 6700|int + x }}'{% if not loop.last %},{% endif %}{% endfor %}]",
+        "supervisor.slots.ports" : "[{% for x in range(0,storm_worker_slots) %}{{ 6700|int + x }}{% if not loop.last %},{% endif %}{% endfor %}]",
 {% endif %}
 
       }
