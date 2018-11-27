@@ -837,7 +837,27 @@
 {% if rangeradmin_hosts|length > 0 and ranger_options.enable_plugins|default(no) and (security|lower == "mit-kdc" or security|lower == "active-directory") %}
         "nimbus.authorizer" : "org.apache.ranger.authorization.storm.authorizer.RangerStormAuthorizer",
 {% endif %}
-        "storm.zookeeper.retry.intervalceiling.millis" : "30000"
+        "storm.zookeeper.retry.intervalceiling.millis" : "30000",
+{% if storm_mode is defined %}
+        "storm.cluster.mode" : "{{ storm_mode | default('distributed') }}",
+{% endif %}
+        "storm.local.dir" : "{{ storm_localdir | default('/hadoop/storm') }}",
+{% if storm_nimbus_opts is defined %}
+        "nimbus.childopts" : "{{ storm_nimbus_opts }}",
+{% endif %}
+{% if storm_nimbus_opts is defined %}
+        "ui.childopts" : "{{ storm_ui_opts }}",
+{% endif %}
+{% if storm_drpc_opts is defined %}
+        "drpc.childopts" : "{{ storm_drpc_opts }}",
+{% endif %}
+{% if storm_supervisor_opts is defined %}
+        "supervisor.childopts" : "{{ storm_supervisor_opts }}",
+{% endif %}
+{% if storm_supervisor_opts is defined %}
+        "supervisor.slots.ports" : "[{% for x in range(0,storm_worker_slots) %}'{{ 6700|int + x }}'{% if not loop.last %},{% endif %}{% endfor %}]",
+{% endif %}
+
       }
     },
     {
