@@ -72,8 +72,10 @@
 
 - name: Print the cluster creation template
   debug:
-    var: cluster_template
+    var: cluster_template|to_json
     verbosity: 1
+
+- copy: content="{{ cluster_blueprint }}" dest=/tmp/generated_blueprint.json
 
 - name: Fail if a cluster {{ cluster_name }} already exists
   debug:

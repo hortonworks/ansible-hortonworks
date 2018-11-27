@@ -846,8 +846,16 @@
         "authorizer.class.name" : "org.apache.ranger.authorization.kafka.authorizer.RangerKafkaAuthorizer",
 {% endif %}
         "offsets.topic.replication.factor" : "1",
-        "zookeeper.session.timeout.ms" : "30000"
-      }
+        "zookeeper.session.timeout.ms" : "30000",
+        "message.max.bytes" : "{{ message_max_bytes | default('1000000') }}",
+        "replica.fetch.max.bytes" : "{{ replica_fetch_max_bytes | default('1048576') }}",
+        "max.partition.fetch.bytes" : "{{ max_partition_fetch_bytes | default('1500000') }}",
+        "fetch.message.max.bytes" : "{{ fetch_message_max_bytes | default('1500000') }}",
+        "offsets.retention.minutes" : "{{ offsets_retention_minutes | default('86400000') }}",
+        "log.retention.bytes" : "{{ log_retention_bytes  | default('-1') }}",
+        "log.dirs" : "{{ kafka_data_dir  | default('/kafka-logs') }}",
+        "log.retention.hours" : "{{ log_retention_hours | default('168') }}",
+      },
     },
     {
       "zoo.cfg": {
@@ -855,7 +863,6 @@
       }
     }
   ],
-
   "host_groups" : [
     {% for blueprint_item in blueprint_dynamic if groups[blueprint_item.host_group] is defined and groups[blueprint_item.host_group]|length > 0 -%}
 
