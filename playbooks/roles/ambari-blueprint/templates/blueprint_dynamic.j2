@@ -879,7 +879,33 @@
     },
     {
       "zoo.cfg": {
-        "clientPort" : "2181"
+        "clientPort" : "{{ clientPort | default('2181') }}",
+        "autopurge.purgeInterval" : "{{ purgeInterval | default('24') }}",
+        "autopurge.snapRetainCount" : "{{ snapRetainCount |  default('30') }}",
+        "dataDir" : "{{ dataDir | default('/hadoop/zookeeper') }}",
+        "dataLogDir" : "{{ dataLogDir | default('/hadoop/zookeeper') }}",
+        "initLimit" : "{{ initLimit | default('10') }}",
+        "tickTime" : "{{ tickTime | default('3000') }}",
+        "syncLimit" : "{{ syncLimit | default('5') }}",
+        "maxClientCnxns" : "{{ maxClientCnxns | default('60') }}",
+        "minSessionTimeout" : "{{ minSessionTimeout | default('6000') }}",
+        "maxSessionTimeout" : "{{ maxSessionTimeout | default('60000') }}",
+        "leaderServes" : "{{ leaderServes | default('yes') }}",
+        "enableSecurity" : "{{ enableSecurity | default('false') }}"
+      }
+    },
+    {
+      "zookeeper-log4j": {
+        "zookeeper.root.logger" : "{{ zookeper_root_logger | default('INFO, CONSOLE') }}",
+        "zookeeper.console.threshold" : "{{ zookeper_console_threshold | default('INFO') }}",
+        "zookeeper.log.dir" : "{{ zookeeper_log_dir | default('.') }}",
+        "zookeeper.log.file" : "{{ zookeeper_log_file | default('zookeeper.log') }}",
+        "zookeeper.log.threshold" : "{{ zookeeper_log_threshold | default('INFO') }}",
+        "zookeeper.log.maxfilesize" : "{{ zookeeper_log_maxfilesize | default('256MB') }}",
+        "zookeeper.log.maxbackupindex" : "{{ zookeeper_log_maxbackupindex | default('20') }}",
+        "zookeeper.tracelog.dir" : "{{ zookeeper_log_dir | default('.') }}",
+        "zookeeper.tracelog.file" : "{{ zookeeper_tracelog_file | default('zookeeper_trace.log') }}",
+        "log4j.rootLogger" : "{{ zookeper_root_logger | default('INFO, CONSOLE') }}"
       }
     }
   ],
@@ -917,5 +943,4 @@
     "stack_name" : "{% if namenode_groups|length > 0 %}HDP{% else %}HDF{% endif %}",
     "stack_version" : "{% if namenode_groups|length > 0 %}{{ hdp_minor_version }}{% else %}{{ hdf_minor_version }}{% endif %}"
   }
-} 
-
+}
