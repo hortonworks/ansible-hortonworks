@@ -907,6 +907,23 @@
         "zookeeper.tracelog.file" : "{{ zookeeper_tracelog_file | default('zookeeper_trace.log') }}",
         "log4j.rootLogger" : "{{ zookeper_root_logger | default('INFO, CONSOLE') }}"
       }
+    },
+    {
+      "spark2-defaults": {
+        "spark.history.retainedApplications" : "{{ retainedApplications | default('50')}}",
+        "spark.history.fs.cleaner.maxAge" : "{{ cleanerMaxAge | default('7')}}",
+        "spark.driver.port" : "{{ spark_driver_port | default('55000')}}",
+        "spark.executor.port" : "{{ spark_executor_port | default('55100')}}",
+        "spark.blockManager.port" : "{{ spark_blockmgr_port | default('55200')}}",
+        "spark.broadcast.port" : "{{ spark_broadcast_port | default('55300')}}",
+        "spark.fileserver.port" : "{{ spark_fileserver_port | default('55400')}}",
+        "spark.replClassServer.port" : "{{ spark_replclass_port | default('55500')}}",
+        "spark.history.ui.port" : "{{ spark_history_srv_ui | default('18080')}}",
+        "spark.executor.memory" : "{{ spark_executor_memory | default('1G')}}",
+        "spark.executor.cores" : "{{ spark_executor_cores | default('1')}}",
+        "spark.eventLog.dir" : "{{ spark_eventlog_dir | default('hdfs:///spark2-history/') }}",
+        "spark.history.fs.logDirectory" : "{{ spark_eventlog_dir | default('hdfs:///spark2-history/') }}"
+      }
     }
   ],
   "host_groups" : [
