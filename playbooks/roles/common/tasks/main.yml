@@ -101,29 +101,31 @@
 - name: Disable selinux
   selinux:
     state: disabled
-  when: ansible_os_family|lower == "redhat" and ansible_distribution|lower != "amazon"
+  when: ansible_os_family|lower == "redhat" and ansible_distribution|lower != "amazon" and is_vm_docker_containers != "yes"
 
 - name: Disable Transparent Huge Pages until the next reboot
   shell: echo never > /sys/kernel/mm/transparent_hugepage/enabled && echo never > /sys/kernel/mm/transparent_hugepage/defrag
   args:
     removes: /sys/kernel/mm/transparent_hugepage/enabled
+  when: is_vm_docker_containers != "yes"
 
 - name: Disable Transparent Huge Pages in Grub 2
   lineinfile:
     path: /etc/default/grub
     state: present
     line: 'GRUB_CMDLINE_LINUX=$GRUB_CMDLINE_LINUX" transparent_hugepage=never"'
-  when: (ansible_os_family|lower == "redhat" and ansible_distribution_major_version|int >= 7) or
+  when: ((ansible_os_family|lower == "redhat" and ansible_distribution_major_version|int >= 7) or
         (ansible_distribution|lower == "amazon" and ansible_distribution_version|int >= 2) or
         (ansible_os_family|lower == "debian" and ansible_distribution_major_version|int >= 7) or
-        (ansible_os_family|lower == "suse" and ansible_distribution_major_version|int >= 12)
+        (ansible_os_family|lower == "suse" and ansible_distribution_major_version|int >= 12)) and 
+        is_vm_docker_containers != "yes"
   notify: Generate the Grub config file
 
 - meta: flush_handlers
 
 - name: Configure tuned (RHEL/CentOS 7)
   include_tasks: tuned.yml
-  when: ansible_os_family|lower == "redhat" and ansible_distribution_major_version|int == 7
+  when: ansible_os_family|lower == "redhat" and ansible_distribution_major_version|int == 7 and is_vm_docker_containers != "yes"
 
 - block:
     - name: Attempt to fetch the http secret key (if exists)
