@@ -481,9 +481,27 @@
 {% if rangerkms_hosts|length > 0 %}
         "dfs.encryption.key.provider.uri" : "kms://http@{% for kmshost in rangerkms_hosts %}{{ hostvars[kmshost]['ansible_fqdn'] }}{% if not loop.last %};{% endif %}{% endfor %}:9292/kms",
 {% endif %}
-        "dfs.datanode.data.dir" : "/hadoop/hdfs/data",
+        "dfs.namenode.name.dir" : "{{ dfs_namenode_name_dir | default('/hadoop/hdfs/namenode') }}",
+        "dfs.datanode.data.dir" : "{{ dfs_datanode_data_dir | default('/hadoop/hdfs/data') }}",
         "dfs.datanode.failed.volumes.tolerated" : "0",
         "dfs.replication" : "3"
+      }
+    },
+    {
+      "mapred-site" : {
+        "properties_attributes" : { },
+        "properties" : {
+          "mapreduce.map.memory.mb" : "{{ mapreduce_map_memory_mb | default('512') }}",
+          "mapreduce.map.java.opts" : "{{ mapreduce_map_java_opts | default('-Xmx410m') }}",
+          "mapreduce.reduce.memory.mb" : "{{ mapreduce_reduce_memory_mb | default('1024') }}",
+          "mapreduce.reduce.java.opts" : "{{ mapreduce_reduce_java_opts | default('-Xmx756m') }}",
+{% if yarn_app_mapreduce_am_job_client_port is defined %}
+          "yarn.app.mapreduce.am.job.client.port-range" : "{{ yarn_app_mapreduce_am_job_client_port }}",
+{% endif %}
+{% if mapreduce_application_classpath  is defined %}
+          "mapreduce.application.classpath" : "{{ mapreduce_application_classpath }}",
+{% endif %}
+        },
       }
     },
     {
@@ -526,7 +544,19 @@
 {% if 'YARN_REGISTRY_DNS' in blueprint_all_services %}
         "hadoop.registry.dns.bind-port": "{{ registry_dns_bind_port | default('53') }}",
 {% endif %}
-        "yarn.client.nodemanager-connect.retry-interval-ms" : "10000"
+        "yarn.client.nodemanager-connect.retry-interval-ms" : "10000",
+        "yarn.nodemanager.local-dirs" : "{{ yarn_nodemanager_local_dirs  | default('/hadoop/yarn/local') }}",
+        "yarn.nodemanager.log-dirs" : "{{ yarn_log_dir | default('/hadoop/yarn/log') }}",
+        "yarn.scheduler.minimum-allocation-mb" : "{{ yarn_sch_min_alloc_mb | default('512') }}",
+        "yarn.scheduler.maximum-allocation-mb" : "{{ yarn_sch_max_alloc_mb | default('5120') }}",
+        "yarn.scheduler.minimum-allocation-vcores" : "{{ yarn_sch_min_alloc_vcores | default('1') }}",
+        "yarn.scheduler.maximum-allocation-vcores" : "{{ yarn_sch_max_alloc_vcores | default('8') }}",
+        "yarn.nodemanager.resource.memory-mb" : "{{ yarn_nodemgr_mem_mb | default('5120') }}",
+        "yarn.nodemanager.resource.cpu-vcores" : "{{ yarn_nodemgr_cpu_vcores | default('8') }}",
+{% if yarn_application_classpath  is defined %}
+        "yarn.application.classpath" : "{{ yarn_application_classpath }}",
+{% endif %}
+
       }
     },
     {
