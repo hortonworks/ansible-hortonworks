@@ -17,7 +17,7 @@
   
   - name: set skip if exists
     set_fact:
-      run_ambari_setup: "{{ cluster_check.status == 404 }}"
+      run_ambari_setup: "{{ cluster_check.status == 404 or cluster_check.status == -1 }}"
 
   - debug: var=run_ambari_setup
 
