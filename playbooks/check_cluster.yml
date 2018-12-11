@@ -1,0 +1,32 @@
+---
+#- import_playbook: "set_variables.yml"
+
+
+- hosts: ambari-server
+  tasks:
+  - name: Check if a cluster {{ cluster_name }} already exists
+    uri:
+      url: "http://{{ ansible_fqdn }}:8080/api/v1/clusters/{{ cluster_name }}"
+      method: GET
+      force_basic_auth: yes
+      user: "{{ ambari_admin_user }}"
+      password: "{{ ambari_admin_password }}"
+      headers: '{"X-Requested-By":"ambari"}'
+      status_code: -1,200,201,202,404
+    register: cluster_check
+  
+  - name: set skip if exists
+    set_fact:
+      run_ambari_setup: "{{ cluster_check.status == 404 }}"
+
+  - debug: var=run_ambari_setup
+
+- name: Set fact accross hosts
+  hosts: all:localhost
+  tasks:
+
+  - name: set on all hosts
+    set_fact:
+      run_ambari_setup: "{{ hostvars[groups['ambari-server'][0]]['run_ambari_setup'] }}"
+
+  - debug: var=run_ambari_setup

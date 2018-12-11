@@ -752,10 +752,28 @@
     },
 {% if 'ACCUMULO_MASTER' in blueprint_all_services %}
     {
+      "accumulo-log4j" : {
+        "properties_attributes" : { },
+        "properties" : {
+          "monitor_forwarding_log_level" : "{{ accumulo_monitor_forwarding_log_level | default('WARN') }}",
+          "debug_num_logs" : "{{  accumulo_debug_num_logs | default('10') }}",
+          "info_log_size" : "{{  accumulo_info_log_size| default('512M') }}",
+          "audit_log_level" : "{{ accumulo_audit_log_level | default('OFF') }}",
+          "debug_log_size" : "{{ accumulo_debug_log_size | default('512M') }}",
+          "info_num_logs" : "{{ accumulo_info_num_logs | default('10') }}"
+         }
+      }
+    },
+{% endif %}
+{% if 'ACCUMULO_MASTER' in blueprint_all_services %}
+    {
       "accumulo-site" : {
         "instance.volumes": "hdfs://{% if namenode_groups|length > 1 %}{{ hdfs_ha_name }}{% else %}%HOSTGROUP::{{ namenode_groups[0] }}%:8020{% endif %}/apps/accumulo/data",
         "trace.user": "{{ accumulo_security_options.trace_user | default("trace") }}",
-        "instance.zookeeper.timeout": "30s"
+        "instance.zookeeper.timeout": "30s",
+{% if accumulo_logger_dir_walog is defined %}
+        logger.dir.walog: "{{ accumulo_logger_dir_walog }}",
+{% endif %}
       }
     },
     {

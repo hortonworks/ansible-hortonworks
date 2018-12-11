@@ -1,4 +1,6 @@
 ---
+- import_playbook: "check_cluster.yml"
+
 - import_playbook: "prepare_nodes.yml"
   when: run_ambari_setup
   tags: prepare_nodes
