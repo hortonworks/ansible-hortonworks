@@ -3,16 +3,16 @@ openjdk_path: /usr/lib/jvm/java-1.8.0-openjdk
 
 postgres_packages:
   - postgresql
-  - python27-psycopg2
+  - python-psycopg2
   - postgresql-jdbc
 postgres_jdbc_location: /usr/share/java/postgresql-jdbc.jar
 
 mysql_packages:
-  - MySQL-python27
+  - MySQL-python
   - mysql-connector-java
 mysql_jdbc_location: /usr/share/java/mysql-connector-java.jar
 
 mariadb_packages:
-  - MySQL-python27
+  - MySQL-python
   - mysql-connector-java
 mariadb_jdbc_location: /usr/share/java/mysql-connector-java.jar

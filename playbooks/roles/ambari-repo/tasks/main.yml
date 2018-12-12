@@ -4,12 +4,34 @@
   with_first_found:
     - files:
         - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}-{{ ansible_distribution_major_version }}.yml"
+        - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}-{{ ansible_distribution_version }}.yml"
         - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}.yml"
         - "{{ ansible_os_family|lower }}-{{ ansible_distribution_major_version }}.yml"
         - "{{ ansible_os_family|lower }}.yml"
         - defaults.yml
       paths:
         - ../ambari-repo/vars
+
+
+- name: set ambari-repo facts
+  set_fact:
+     ambari_repo_url: "{{  ambari_repo_url | default(ambari_repo_url_default) }}"
+
+- name: set ambari-repo yum facts
+  set_fact:
+    ambari_yum_repo_gpgcheck: "{{ ambari_yum_repo_gpgcheck | default('true') }}"
+    ambari_yum_repo_gpgkey: "{{ ambari_yum_repo_gpgkey | default(ambari_repo_url + '/RPM-GPG-KEY/RPM-GPG-KEY-Jenkins') }}"
+
+- name: Add the Ambari repository (yum)
+  yum_repository:
+    name: "ambari-{{ ambari_version }}"
+    description: "ambari Version - ambari-{{ ambari_version }}"
+    baseurl: "{{ ambari_repo_url }}"
+    file: 'ambari'
+    state: present
+    gpgcheck: "{{ ambari_yum_repo_gpgcheck }}"
+    gpgkey: "{{ ambari_yum_repo_gpgkey }}"
+  when: ansible_os_family|lower == "redhat"
 
 - name: Add the Ambari repository (zypper)
   zypper_repository:
@@ -40,7 +62,7 @@
       zypper_repository:
         name: temp-HDP-UTILS
         description: "HDP-UTILS-1.1.0.21"
-        repo: "{{ hdp_repo_base_url }}"
+        repo: "{{ repo_base_url }}/HDP-UTILS-1.1.0.21/repos/sles12"
         state: present
         disable_gpg_check : yes
         runrefresh: yes
@@ -52,12 +74,9 @@
 
     - name: Install snappy from HDP-UTILS repo (bug in SLES 12 HDP-UTILS repo)
       zypper:
-        name: "{{ item }}"
+        name: snappy-1.0.5-1,snappy-devel-1.0.5-1
         state: present
         oldpackage: yes
-      with_items:
-        - "snappy-1.0.5-1"
-        - "snappy-devel-1.0.5-1"
 
     - name: Remove the HDP-UTILS repository previously added (SLES 12)
       zypper_repository:

@@ -44,6 +44,11 @@
         msg: "Multiple nodes are configured to run Druid components but the database is set to 'embedded'."
       when: druid_hosts|length > 1 and database == 'embedded'
 
+    - name: Fail if Amazon Linux prerequisites are not met
+      fail:
+        msg: "Amazon Linux does not support Hive with the 'embedded' database. Set the database to another option and re-run the playbooks."
+      when: database == 'embedded' and ansible_distribution|lower == "amazon" and hiveserver_hosts|length > 0
+
     - name: Fail if the selected components should not be part of an HDP 3 blueprint
       fail:
         msg: "When installing HDP 3 the component {{ item }} must not be part of the blueprint."
@@ -103,3 +108,10 @@
         msg: "One or more of the following components are missing from the blueprint: DRUID_BROKER, DRUID_COORDINATOR, DRUID_ROUTER, DRUID_MIDDLEMANAGER, DRUID_HISTORICAL, DRUID_OVERLORD."
       when: druid_hosts|length > 0 and
            ['DRUID_BROKER', 'DRUID_COORDINATOR', 'DRUID_ROUTER', 'DRUID_MIDDLEMANAGER', 'DRUID_HISTORICAL', 'DRUID_OVERLORD'] | difference(blueprint_all_services) | length > 0
+
+    - name: Fail if the required Accumulo components are not part of the blueprint
+      fail:
+        msg: "One or more of the following components are missing from the blueprint: ACCUMULO_CLIENT, ACCUMULO_MASTER, ACCUMULO_MONITOR, ACCUMULO_TRACER, ACCUMULO_GC, ACCUMULO_TSERVER."
+      when: (['ACCUMULO_CLIENT', 'ACCUMULO_MASTER', 'ACCUMULO_MONITOR', 'ACCUMULO_TRACER', 'ACCUMULO_GC', 'ACCUMULO_TSERVER'] | difference(blueprint_all_clients | union(blueprint_all_services)) | length > 0)
+            and
+            (['ACCUMULO_CLIENT', 'ACCUMULO_MASTER', 'ACCUMULO_MONITOR', 'ACCUMULO_TRACER', 'ACCUMULO_GC', 'ACCUMULO_TSERVER'] | difference(blueprint_all_clients | union(blueprint_all_services)) | length < 6)

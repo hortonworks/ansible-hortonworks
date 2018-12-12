@@ -1,0 +1,2 @@
+---
+ambari_repo_url: "{{ repo_base_url }}/ambari/amazonlinux2/2.x/updates/{{ ambari_version }}"

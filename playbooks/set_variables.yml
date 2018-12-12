@@ -18,13 +18,13 @@
             ambari_groups: "{{ ambari_groups }} + [ '{{ item.host_group }}' ]"
           when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and 'AMBARI_SERVER' in item.services
           with_items: "{{ blueprint_dynamic }}"
-          no_log: True
+        #  no_log: True
       when: blueprint_file == 'blueprint_dynamic.j2'
 
     - block:
         - name: Set the blueprint path (relative to ambari-blueprint role)
           set_fact:
-            blueprint_file_path: "{{ 'roles/ambari-blueprint/templates/' + blueprint_file }}"
+            blueprint_file_path: "{{ 'roles/ambari-blueprint/files/' + blueprint_file }}"
           when: blueprint_file|list|first != '/' and blueprint_file|list|first != '~'
 
         - name: Set the blueprint path (absolute)
@@ -34,7 +34,7 @@
 
         - name: Read the static blueprint content
           set_fact:
-            blueprint_static: "{{ lookup('template', blueprint_file_path) }}"
+            blueprint_static: "{{ lookup('file', blueprint_file_path) }}"
 
         - name: Fail if the static blueprint is not a valid JSON
           fail:
@@ -71,8 +71,11 @@
   tasks:
     - name: Initialize the control variables
       set_fact:
+        accumulomaster_groups: []
+        accumulotablet_groups: []
         namenode_groups: []
         zkfc_groups: []
+        hive_mysql_embedded_group: ''
         resourcemanager_groups: []
         journalnode_groups: []
         zookeeper_groups: []
@@ -107,6 +110,20 @@
           with_items: "{{ blueprint_dynamic }}"
           no_log: True
 
+        - name: Populate the accumulotablets groups list
+          set_fact:
+            accumulotablet_groups: "{{ accumulotablet_groups }} + [ '{{ item.host_group }}' ]"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and 'ACCUMULO_TSERVER' in item.services
+          with_items: "{{ blueprint_dynamic }}"
+          no_log: True
+
+        - name: Populate the accumulomaster groups list
+          set_fact:
+            accumulomaster_groups: "{{ accumulomaster_groups }} + [ '{{ item.host_group }}' ]"
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and 'ACCUMULO_MASTER' in item.services
+          with_items: "{{ blueprint_dynamic }}"
+          no_log: True
+
         - name: Populate the ZKFailoverController groups list
           set_fact:
             zkfc_groups: "{{ zkfc_groups }} + [ '{{ item.host_group }}' ]"
@@ -125,6 +142,13 @@
           set_fact:
             journalnode_groups: "{{ journalnode_groups }} + [ '{{ item.host_group }}' ]"
           when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and 'JOURNALNODE' in item.services
+          with_items: "{{ blueprint_dynamic }}"
+          no_log: True
+
+        - name: Populate the hive_mysql_embedded groups list
+          set_fact:
+            hive_mysql_embedded_group: "{{ item.host_group }}"
+          when: not hive_mysql_embedded_group and database == 'embedded' and 'HIVE_METASTORE' in item.services and groups[item.host_group] is defined and groups[item.host_group]|length > 0
           with_items: "{{ blueprint_dynamic }}"
           no_log: True
 
@@ -188,14 +212,14 @@
         - name: Populate the rangeradmin groups list
           set_fact:
             rangeradmin_groups: "{{ rangeradmin_groups }} + [ '{{ item.host_group }}' ]"
-          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and ('RANGER_ADMIN' in item.services)
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and ('RANGER_ADMIN' in item.services or 'RANGER_USERSYNC' in item.services)
           with_items: "{{ blueprint_dynamic }}"
           no_log: True
 
         - name: Populate the rangeradmin hosts list
           set_fact:
             rangeradmin_hosts: "{{ rangeradmin_hosts }} + {{ groups[item.host_group] }}"
-          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and ('RANGER_ADMIN' in item.services)
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and ('RANGER_ADMIN' in item.services or 'RANGER_USERSYNC' in item.services)
           with_items: "{{ blueprint_dynamic }}"
           no_log: True
 
@@ -261,7 +285,7 @@
     - block:
         - name: Set the blueprint path (relative to ambari-blueprint role)
           set_fact:
-            blueprint_file_path: "{{ 'roles/ambari-blueprint/templates/' + blueprint_file }}"
+            blueprint_file_path: "{{ 'roles/ambari-blueprint/files/' + blueprint_file }}"
           when: blueprint_file|list|first != '/' and blueprint_file|list|first != '~'
 
         - name: Set the blueprint path (absolute)
@@ -271,7 +295,7 @@
 
         - name: Read the static blueprint content
           set_fact:
-            blueprint_static: "{{ lookup('template', blueprint_file_path) }}"
+            blueprint_static: "{{ lookup('file', blueprint_file_path) }}"
 
         - name: Fail if the the static blueprint is not a valid JSON
           fail:
@@ -285,8 +309,43 @@
 
         - name: Populate the hiveserver hosts list
           set_fact:
-            hiveserver_hosts: "{{ hiveserver_hosts }} + {{ 'localhost' }}"
+            hiveserver_hosts: "{{ groups['hadoop-cluster'] }}"
           when: blueprint_static['host_groups'] | string is search("HIVE_SERVER") or blueprint_static['host_groups'] | string is search("HIVE_METASTORE")
+
+        - name: Populate the oozie hosts list
+          set_fact:
+            oozie_hosts: "{{ groups['hadoop-cluster'] }}"
+          when: blueprint_static['host_groups'] | string is search("OOZIE_SERVER")
+
+        - name: Populate the druid hosts list
+          set_fact:
+            druid_hosts: "{{ groups['hadoop-cluster'] }}"
+          when: blueprint_static['host_groups'] | string is search("DRUID_BROKER") or blueprint_static['host_groups'] | string is search("DRUID_COORDINATOR") or blueprint_static['host_groups'] | string is search("DRUID_ROUTER") or blueprint_static['host_groups'] | string is search("DRUID_HISTORICAL") or blueprint_static['host_groups'] | string is search("DRUID_OVERLORD")
+
+        - name: Populate the superset hosts list
+          set_fact:
+            superset_hosts: "{{ groups['hadoop-cluster'] }}"
+          when: blueprint_static['host_groups'] | string is search("SUPERSET")
+
+        - name: Populate the rangeradmin hosts list
+          set_fact:
+            rangeradmin_hosts: "{{ groups['hadoop-cluster'] }}"
+          when: blueprint_static['host_groups'] | string is search("RANGER_ADMIN") or blueprint_static['host_groups'] | string is search("RANGER_USERSYNC")
+
+        - name: Populate the rangerkms hosts list
+          set_fact:
+            rangerkms_hosts: "{{ groups['hadoop-cluster'] }}"
+          when: blueprint_static['host_groups'] | string is search("RANGER_KMS_SERVER")
+
+        - name: Populate the streamline hosts list
+          set_fact:
+            streamline_hosts: "{{ groups['hadoop-cluster'] }}"
+          when: blueprint_static['host_groups'] | string is search("STREAMLINE_SERVER")
+
+        - name: Populate the registry hosts list
+          set_fact:
+            registry_hosts: "{{ groups['hadoop-cluster'] }}"
+          when: blueprint_static['host_groups'] | string is search("REGISTRY_SERVER")
 
         - name: Set the install_hdf variable
           set_fact:
@@ -303,24 +362,26 @@
   hosts: hadoop-cluster
   gather_facts: False
   tasks:
-    - name: Check if /usr/bin/python exists
-      raw: bash -c "test -e /usr/bin/python && echo -n exists || echo -n"
-      register: default_python2_path
+    - block:
+        - name: Check if /usr/bin/python exists
+          raw: bash -c "test -e /usr/bin/python && echo -n exists || echo -n"
+          register: default_python2_path
 
-    - name: Check if /usr/bin/python3 exists
-      raw: bash -c "test -e /usr/bin/python3 && echo -n exists || echo -n"
-      register: default_python3_path
-      when: default_python2_path.stdout == ""
+        - name: Check if /usr/bin/python3 exists
+          raw: bash -c "test -e /usr/bin/python3 && echo -n exists || echo -n"
+          register: default_python3_path
+          when: default_python2_path.stdout == ""
 
-    - name: Fail if no standard python path could be found
-      fail:
-        msg: "Python could not be found at /usr/bin/python or /usr/bin/python3. If using a custom python path, set the 'ansible_python_interpreter' inventory variable to the valid path for your environment."
-      when: default_python2_path.stdout == "" and default_python3_path.stdout != "exists"
+        - name: Fail if no standard python path could be found
+          fail:
+            msg: "Python could not be found at /usr/bin/python or /usr/bin/python3. If using a custom python path, set the 'ansible_python_interpreter' inventory variable to the valid path for your environment."
+          when: default_python2_path.stdout == "" and default_python3_path.stdout != "exists"
 
-    - name: Set the ansible_python_interpreter to /usr/bin/python3
-      set_fact:
-        ansible_python_interpreter: "/usr/bin/python3"
-      when: default_python3_path.stdout is defined and default_python3_path.stdout == "exists"
+        - name: Set the ansible_python_interpreter to /usr/bin/python3
+          set_fact:
+            ansible_python_interpreter: "/usr/bin/python3"
+          when: default_python3_path.stdout is defined and default_python3_path.stdout == "exists"
+      when: ansible_python_interpreter is not defined
 
     - name: Set the install_hdp variable to all nodes
       set_fact:

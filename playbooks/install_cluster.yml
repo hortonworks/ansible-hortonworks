@@ -1,10 +1,22 @@
 ---
+- import_playbook: "check_cluster.yml"
+
 - import_playbook: "prepare_nodes.yml"
+  when: run_ambari_setup
+  tags: prepare_nodes
 
 - import_playbook: "install_ambari.yml"
+  when: run_ambari_setup
+  tags: ambari
 
 - import_playbook: "configure_ambari.yml"
+  when: run_ambari_setup
+  tags: ambari,blueprint
 
 - import_playbook: "apply_blueprint.yml"
+  when: run_ambari_setup
+  tags: blueprint
 
 - import_playbook: "post_install.yml"
+  when: run_ambari_setup
+  tags: post_install

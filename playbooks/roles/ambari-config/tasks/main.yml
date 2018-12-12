@@ -4,12 +4,26 @@
   with_first_found:
     - files:
         - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}-{{ ansible_distribution_major_version }}.yml"
+        - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}-{{ ansible_distribution_version }}.yml"
         - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}.yml"
         - "{{ ansible_os_family|lower }}-{{ ansible_distribution_major_version }}.yml"
         - "{{ ansible_os_family|lower }}.yml"
         - defaults.yml
       paths:
         - ../ambari-config/vars
+
+- name: set repo variables
+  set_fact:
+    repo_os_family: "{{ repo_os_family | default(repo_os_family_default) }}"
+    baseurl_os_family: "{{ baseurl_os_family | default(baseurl_os_family_default) }}"
+    hdp_main_repo_url: "{{ hdp_main_repo_url | default(hdp_main_repo_url_default) }}"
+    hdf_main_repo_url: "{{ hdf_main_repo_url | default(hdf_main_repo_url_default) }}"
+    hdpsearch_main_repo_url: "{{ hdpsearch_main_repo_url | default(hdpsearch_main_repo_url_default) }}"
+    main_os_target: "{{ main_os_target | default(main_os_target_default) }}"
+    gpl_repo_url: "{{ gpl_repo_url | default(gpl_repo_url_default) }}"
+    utils_repo_url: "{{ utils_repo_url | default(utils_repo_url_default) }}"
+    utils_os_target: "{{ utils_os_target | default(utils_os_target_default) }}"
+
 
 - name: Set the GPL Licensed setting in Ambari
   lineinfile:
@@ -40,11 +54,24 @@
         mpack_filename: "solr-service-mpack-{{ hdpsearch_version }}.tar.gz"
 
     - name: "Install the HDP Search Management Pack"
-      shell: "echo yes | ambari-server install-mpack --mpack={{ repo_base_url }}/HDP-SOLR/hdp-solr-ambari-mp/{{ mpack_filename }}"
+      shell: "echo yes | ambari-server install-mpack --mpack={{ hdp_solr_server_mpack }}"
       notify: Restart ambari-server
       args:
         creates: "/var/lib/ambari-server/resources/mpacks/solr-ambari-mpack-{{ hdpsearch_version }}"
   when: install_hdpsearch is defined and install_hdpsearch
+
+#- debug: msg="{{ ambari_version }}"
+#- debug: msg="{{ hdf_major_version }}"
+#
+#- debug: msg="I SHOULD NOT PRINT THIS"
+#  when: ambari_version is version_compare('2.6', '>=') and not install_hdp|default(false)
+#
+#- debug: msg="{{ hdf_major_version|float }}"
+#- debug: msg="{{ hdf_major_version|int }}"
+#
+#- debug: msg="I SHOULD PRINT THIS"
+#  when: hdf_major_version >= 3
+#- fail: msg="forcefail"
 
 - block:
     - block:
@@ -64,19 +91,25 @@
       set_fact:
         mpack_filename: "hdf-ambari-mpack-{{ hdf_version }}-{{ hdf_build_number }}.tar.gz"
 
+    - name: set hdf url
+      set_fact:
+        hdf_mpack_url: "{{ nifi_mpack_url | default(hdf_main_repo_url + '/tars/hdf_ambari_mp/' + mpack_filename) }}"
+
+    - debug: msg="{{  mpack_filename | regex_replace('.tar.gz$','') }}"
+
     - name: "Install the HDF Management Pack"
-      shell: "echo yes | ambari-server install-mpack --mpack={{ hdf_management_pack_file }}"
+      shell: "echo yes | ambari-server install-mpack --mpack={{ hdf_mpack_url }}"
       notify: Restart ambari-server
       args:
         creates: "/var/lib/ambari-server/resources/mpacks/{{ mpack_filename | regex_replace('.tar.gz$','') }}"
-      when: hdf_major_version|int >= 3
+      when: hdf_major_version >= 3
 
     - name: "Install the HDF Management Pack (with --purge)"
-      shell: "echo yes | ambari-server install-mpack --mpack={{ hdf_main_repo_url }}/tars/hdf_ambari_mp/{{ mpack_filename }} --purge"
+      shell: "echo yes | ambari-server install-mpack --mpack={{ hdf_mpack_url }} --purge"
       notify: Restart ambari-server
       args:
         creates: "/var/lib/ambari-server/resources/mpacks/{{ mpack_filename | regex_replace('.tar.gz$','') }}"
-      when: hdf_major_version|int < 3
+      when: hdf_major_version < 3
 
     - meta: flush_handlers
 
@@ -94,19 +127,21 @@
         return_content: no
       when: ambari_version is version_compare('2.6', '<')
 
-    - name: Upload the HDF Version Definition file for HDF-only clusters (Ambari 2.6+)
-      template:
-        src: "{{ item }}"
-        dest: "/tmp/cluster_vdf.xml"
-        mode: 0640
-        force: yes
-      with_first_found:
-        - files:
-            - "vdf-HDF-{{ hdf_version }}.xml.j2"
-            - "vdf-HDF-{{ hdf_minor_version }}-latest.xml.j2"
-            - "vdf-HDF-{{ hdf_major_version }}-latest.xml.j2"
-          paths:
-            - ../templates
+#    - name: Upload the HDF Version Definition file for HDF-only clusters (Ambari 2.6+)
+#      template:
+#        src: "{{ item }}"
+#        dest: "/tmp/cluster_vdf.xml"
+#        mode: 0640
+#        force: yes
+#      with_first_found:
+#        - files:
+#            - "vdf-HDF-{{ hdf_version }}.xml.j2"
+#            - "vdf-HDF-{{ hdf_minor_version }}-latest.xml.j2"
+#            - "vdf-HDF-{{ hdf_major_version }}-latest.xml.j2"
+#          paths:
+#            - ../templates
+#      when: ambari_version is version_compare('2.6', '>=') and not install_hdp|default(false)
+    - debug: msg="I SHOULD NOT PRINT THIS"
       when: ambari_version is version_compare('2.6', '>=') and not install_hdp|default(false)
   when: install_hdf is defined and install_hdf
 

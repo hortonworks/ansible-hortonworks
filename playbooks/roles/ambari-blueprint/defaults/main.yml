@@ -1,3 +1,8 @@
 ---
 postgres_port: 5432
 mysql_port: 3306
+
+#################################
+## dynamic blueprint variables ##
+#################################
+registry_dns_bind_port: '53'

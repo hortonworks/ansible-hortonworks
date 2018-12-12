@@ -1,0 +1,1 @@
+hdp_solr_server_mpack: "{{ repo_base_url }}/HDP-SOLR/hdp-solr-ambari-mp/{{ mpack_filename }}"

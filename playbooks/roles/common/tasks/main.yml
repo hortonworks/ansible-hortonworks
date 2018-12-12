@@ -4,6 +4,7 @@
   with_first_found:
     - files:
         - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}-{{ ansible_distribution_major_version }}.yml"
+        - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}-{{ ansible_distribution_version }}.yml"
         - "{{ ansible_os_family|lower }}-{{ ansible_distribution|lower }}.yml"
         - "{{ ansible_os_family|lower }}-{{ ansible_distribution_major_version }}.yml"
         - "{{ ansible_os_family|lower }}.yml"
@@ -71,18 +72,18 @@
     ignoreerrors: yes
 
 - block:
-    - name: Stop the {{ firewall_service_name }} firewall service
+    - name: Stop the firewall service
       service:
         name: "{{ firewall_service_name }}"
         state: stopped
       ignore_errors: true
 
-    - name: Disable the {{ firewall_service_name }} firewall service
+    - name: Disable the firewall service
       service:
         name: "{{ firewall_service_name }}"
         enabled: no
       ignore_errors: true
-  when: disable_firewall
+  when: disable_firewall and firewall_service_name is defined
 
 - name: Disable selinux
   selinux:
@@ -99,8 +100,10 @@
     path: /etc/default/grub
     state: present
     line: 'GRUB_CMDLINE_LINUX=$GRUB_CMDLINE_LINUX" transparent_hugepage=never"'
-  when: (ansible_os_family|lower == "redhat" and ansible_distribution_major_version|int == 7) or (ansible_os_family|lower == "debian" and ansible_distribution_major_version|int >= 7) or (ansible_os_family|lower == "suse" and ansible_distribution_major_version|int == 12)
-
+  when: (ansible_os_family|lower == "redhat" and ansible_distribution_major_version|int >= 7) or
+        (ansible_distribution|lower == "amazon" and ansible_distribution_version|int >= 2) or
+        (ansible_os_family|lower == "debian" and ansible_distribution_major_version|int >= 7) or
+        (ansible_os_family|lower == "suse" and ansible_distribution_major_version|int >= 12)
   notify: Generate the Grub config file
 
 - meta: flush_handlers

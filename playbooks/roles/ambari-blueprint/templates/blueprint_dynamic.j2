@@ -1,5 +1,15 @@
 {
   "configurations" : [
+    {
+      "cluster-env" : {
+        "properties_attributes" : { },
+        "properties" : {
+          "command_retry_enabled" : "true",
+          "commands_to_retry" : "INSTALL,START",
+          "command_retry_max_time_in_sec" : "3600",
+        }
+      }
+    },
 {% if security|lower == "mit-kdc" or security|lower == "active-directory" %}
     {
       "kerberos-env": {
@@ -25,7 +35,7 @@
     {
       "admin-properties" : {
         "DB_FLAVOR" : "{{ database|regex_replace('mariadb', 'mysql')|upper }}",
-        "SQL_CONNECTOR_JAR" : "{{ hostvars[inventory_hostname][database + '_jdbc_location'] }}",
+        "SQL_CONNECTOR_JAR" : "{{ lookup('vars', database + '_jdbc_location') }}",
         "db_host" : "{{ database_options.external_hostname|default(ansible_fqdn,true) }}",
         "db_name" : "{{ database_options.rangeradmin_db_name }}",
         "db_user" : "{{ database_options.rangeradmin_db_username }}",
@@ -303,7 +313,7 @@
     {
       "kms-properties" : {
         "DB_FLAVOR" : "{{ database|regex_replace('mariadb', 'mysql')|upper }}",
-        "SQL_CONNECTOR_JAR" : "{{ hostvars[inventory_hostname][database + '_jdbc_location'] }}",
+        "SQL_CONNECTOR_JAR" : "{{ lookup('vars', database + '_jdbc_location') }}",
         "KMS_MASTER_KEY_PASSWD" : "{{ ranger_security_options.kms_master_key_password }}",
         "db_host" : "{{ database_options.external_hostname|default(ansible_fqdn,true) }}",
         "db_name" : "{{ database_options.rangerkms_db_name }}",
@@ -426,6 +436,20 @@
     },
 {% endif %}
 {% endif %}
+{% if blueprint_config_options is defined %}
+{% for file in blueprint_config_options %}
+    {
+      "{{ file['name'] }}" : {
+{% for item in file['parameters'] %}
+{% for key,val in item.items() %}
+        "{{ key }}" : "{{ val }}",
+{% endfor %}
+{% endfor %}
+      }
+    },
+{% endfor %}
+{% endif %}
+
 {% if namenode_groups|length > 0 %}
     {
       "hadoop-env" : {
@@ -457,9 +481,35 @@
 {% if rangerkms_hosts|length > 0 %}
         "dfs.encryption.key.provider.uri" : "kms://http@{% for kmshost in rangerkms_hosts %}{{ hostvars[kmshost]['ansible_fqdn'] }}{% if not loop.last %};{% endif %}{% endfor %}:9292/kms",
 {% endif %}
-        "dfs.datanode.data.dir" : "/hadoop/hdfs/data",
+        "dfs.namenode.name.dir" : "{{ dfs_namenode_name_dir | default('/hadoop/hdfs/namenode') }}",
+        "dfs.datanode.data.dir" : "{{ dfs_datanode_data_dir | default('/hadoop/hdfs/data') }}",
         "dfs.datanode.failed.volumes.tolerated" : "0",
         "dfs.replication" : "3"
+      }
+    },
+    {
+      "mapred-site" : {
+        "properties_attributes" : { },
+        "properties" : {
+          "mapreduce.map.memory.mb" : "{{ mapreduce_map_memory_mb | default('512') }}",
+          "mapreduce.map.java.opts" : "{{ mapreduce_map_java_opts | default('-Xmx410m') }}",
+          "mapreduce.reduce.memory.mb" : "{{ mapreduce_reduce_memory_mb | default('1024') }}",
+          "mapreduce.reduce.java.opts" : "{{ mapreduce_reduce_java_opts | default('-Xmx756m') }}",
+{% if yarn_app_mapreduce_am_job_client_port is defined %}
+          "yarn.app.mapreduce.am.job.client.port-range" : "{{ yarn_app_mapreduce_am_job_client_port }}",
+{% endif %}
+{% if mapreduce_application_classpath  is defined %}
+          "mapreduce.application.classpath" : "{{ mapreduce_application_classpath }}",
+{% endif %}
+        },
+      }
+    },
+    {
+      "yarn-env" : {
+{% if 'YARN_REGISTRY_DNS' in blueprint_all_services %}
+        "registry.dns.bind-port": "{{ registry_dns_bind_port | default('53') }}",
+{% endif %}
+        "yarn_user" : "yarn"
       }
     },
     {
@@ -491,7 +541,22 @@
         "yarn.acl.enable" : "true",
         "yarn.authorization-provider": "org.apache.ranger.authorization.yarn.authorizer.RangerYarnAuthorizer",
 {% endif %}
-        "yarn.client.nodemanager-connect.retry-interval-ms" : "10000"
+{% if 'YARN_REGISTRY_DNS' in blueprint_all_services %}
+        "hadoop.registry.dns.bind-port": "{{ registry_dns_bind_port | default('53') }}",
+{% endif %}
+        "yarn.client.nodemanager-connect.retry-interval-ms" : "10000",
+        "yarn.nodemanager.local-dirs" : "{{ yarn_nodemanager_local_dirs  | default('/hadoop/yarn/local') }}",
+        "yarn.nodemanager.log-dirs" : "{{ yarn_log_dir | default('/hadoop/yarn/log') }}",
+        "yarn.scheduler.minimum-allocation-mb" : "{{ yarn_sch_min_alloc_mb | default('512') }}",
+        "yarn.scheduler.maximum-allocation-mb" : "{{ yarn_sch_max_alloc_mb | default('5120') }}",
+        "yarn.scheduler.minimum-allocation-vcores" : "{{ yarn_sch_min_alloc_vcores | default('1') }}",
+        "yarn.scheduler.maximum-allocation-vcores" : "{{ yarn_sch_max_alloc_vcores | default('8') }}",
+        "yarn.nodemanager.resource.memory-mb" : "{{ yarn_nodemgr_mem_mb | default('5120') }}",
+        "yarn.nodemanager.resource.cpu-vcores" : "{{ yarn_nodemgr_cpu_vcores | default('8') }}",
+{% if yarn_application_classpath  is defined %}
+        "yarn.application.classpath" : "{{ yarn_application_classpath }}",
+{% endif %}
+
       }
     },
     {
@@ -685,6 +750,41 @@
         "oozie_user" : "oozie"
       }
     },
+{% if 'ACCUMULO_MASTER' in blueprint_all_services %}
+    {
+      "accumulo-log4j" : {
+        "properties_attributes" : { },
+        "properties" : {
+          "monitor_forwarding_log_level" : "{{ accumulo_monitor_forwarding_log_level | default('WARN') }}",
+          "debug_num_logs" : "{{  accumulo_debug_num_logs | default('10') }}",
+          "info_log_size" : "{{  accumulo_info_log_size| default('512M') }}",
+          "audit_log_level" : "{{ accumulo_audit_log_level | default('OFF') }}",
+          "debug_log_size" : "{{ accumulo_debug_log_size | default('512M') }}",
+          "info_num_logs" : "{{ accumulo_info_num_logs | default('10') }}",
+         }
+      }
+    },
+{% endif %}
+{% if 'ACCUMULO_MASTER' in blueprint_all_services %}
+    {
+      "accumulo-site" : {
+        "instance.volumes": "hdfs://{% if namenode_groups|length > 1 %}{{ hdfs_ha_name }}{% else %}%HOSTGROUP::{{ namenode_groups[0] }}%:8020{% endif %}/apps/accumulo/data",
+        "trace.user": "{{ accumulo_security_options.trace_user | default("trace") }}",
+        "instance.zookeeper.timeout": "30s",
+{% if accumulo_logger_dir_walog is defined %}
+        logger.dir.walog: "{{ accumulo_logger_dir_walog }}",
+{% endif %}
+      }
+    },
+    {
+      "accumulo-env" : {
+        "accumulo_root_password": "{{ accumulo_security_options.root_password }}",
+        "instance_secret": "{{ accumulo_security_options.instance_secret }}",
+        "trace_password": "{{ accumulo_security_options.trace_password }}",
+        "accumulo_instance_name": "{{ accumulo_instance_name | default('hdp-accumulo-instance') }}"
+      }
+    },
+{% endif %}
     {
       "hbase-site" : {
         {% if namenode_groups|length > 1 -%}
@@ -744,7 +844,13 @@
     },
 {% endif %}
     {
+      "hst-agent-conf" : {
+        "command.check_commands_retry_count" : "100",
+      }
+    },
+    {
       "hst-server-conf" : {
+        "command.check_commands_retry_count" : "100",
         "customer.smartsense.id" : "{{ smartsense.id | default('unspecified', true) }}",
         "customer.account.name" : "{{ smartsense.account_name | default('unspecified', true) }}",
         "customer.notification.email" : "{{ smartsense.customer_email | default('unspecified', true) }}",
@@ -779,7 +885,27 @@
 {% if rangeradmin_hosts|length > 0 and ranger_options.enable_plugins|default(no) and (security|lower == "mit-kdc" or security|lower == "active-directory") %}
         "nimbus.authorizer" : "org.apache.ranger.authorization.storm.authorizer.RangerStormAuthorizer",
 {% endif %}
-        "storm.zookeeper.retry.intervalceiling.millis" : "30000"
+        "storm.zookeeper.retry.intervalceiling.millis" : "30000",
+{% if storm_mode is defined %}
+        "storm.cluster.mode" : "{{ storm_mode | default('distributed') }}",
+{% endif %}
+        "storm.local.dir" : "{{ storm_localdir | default('/hadoop/storm') }}",
+{% if storm_nimbus_opts is defined %}
+        "nimbus.childopts" : "{{ storm_nimbus_opts }}",
+{% endif %}
+{% if storm_nimbus_opts is defined %}
+        "ui.childopts" : "{{ storm_ui_opts }}",
+{% endif %}
+{% if storm_drpc_opts is defined %}
+        "drpc.childopts" : "{{ storm_drpc_opts }}",
+{% endif %}
+{% if storm_supervisor_opts is defined %}
+        "supervisor.childopts" : "{{ storm_supervisor_opts }}",
+{% endif %}
+{% if storm_supervisor_opts is defined %}
+        "supervisor.slots.ports" : "[{% for x in range(0,storm_worker_slots) %}{{ 6700|int + x }}{% if not loop.last %},{% endif %}{% endfor %}]",
+{% endif %}
+
       }
     },
     {
@@ -787,19 +913,68 @@
 {% if rangeradmin_hosts|length > 0 and ranger_options.enable_plugins|default(no) %}
         "authorizer.class.name" : "org.apache.ranger.authorization.kafka.authorizer.RangerKafkaAuthorizer",
 {% endif %}
-        "zookeeper.session.timeout.ms" : "60000",
-        "zookeeper.connection.timeout.ms" : "180000"
-      }
+        "offsets.topic.replication.factor" : "1",
+        "zookeeper.session.timeout.ms" : "30000",
+        "message.max.bytes" : "{{ message_max_bytes | default('1000000') }}",
+        "replica.fetch.max.bytes" : "{{ replica_fetch_max_bytes | default('1048576') }}",
+        "max.partition.fetch.bytes" : "{{ max_partition_fetch_bytes | default('1500000') }}",
+        "fetch.message.max.bytes" : "{{ fetch_message_max_bytes | default('1500000') }}",
+        "offsets.retention.minutes" : "{{ offsets_retention_minutes | default('86400000') }}",
+        "log.retention.bytes" : "{{ log_retention_bytes  | default('-1') }}",
+        "log.dirs" : "{{ kafka_data_dir  | default('/kafka-logs') }}",
+        "log.retention.hours" : "{{ log_retention_hours | default('168') }}",
+      },
     },
     {
       "zoo.cfg": {
-        "clientPort" : "2181"
+        "clientPort" : "{{ clientPort | default('2181') }}",
+        "autopurge.purgeInterval" : "{{ purgeInterval | default('24') }}",
+        "autopurge.snapRetainCount" : "{{ snapRetainCount |  default('30') }}",
+        "dataDir" : "{{ dataDir | default('/hadoop/zookeeper') }}",
+        "dataLogDir" : "{{ dataLogDir | default('/hadoop/zookeeper') }}",
+        "initLimit" : "{{ initLimit | default('10') }}",
+        "tickTime" : "{{ tickTime | default('3000') }}",
+        "syncLimit" : "{{ syncLimit | default('5') }}",
+        "maxClientCnxns" : "{{ maxClientCnxns | default('60') }}",
+        "minSessionTimeout" : "{{ minSessionTimeout | default('6000') }}",
+        "maxSessionTimeout" : "{{ maxSessionTimeout | default('60000') }}",
+        "leaderServes" : "{{ leaderServes | default('yes') }}",
+        "enableSecurity" : "{{ enableSecurity | default('false') }}"
+      }
+    },
+    {
+      "zookeeper-log4j": {
+        "zookeeper.root.logger" : "{{ zookeper_root_logger | default('INFO, CONSOLE') }}",
+        "zookeeper.console.threshold" : "{{ zookeper_console_threshold | default('INFO') }}",
+        "zookeeper.log.dir" : "{{ zookeeper_log_dir | default('.') }}",
+        "zookeeper.log.file" : "{{ zookeeper_log_file | default('zookeeper.log') }}",
+        "zookeeper.log.threshold" : "{{ zookeeper_log_threshold | default('INFO') }}",
+        "zookeeper.log.maxfilesize" : "{{ zookeeper_log_maxfilesize | default('256MB') }}",
+        "zookeeper.log.maxbackupindex" : "{{ zookeeper_log_maxbackupindex | default('20') }}",
+        "zookeeper.tracelog.dir" : "{{ zookeeper_log_dir | default('.') }}",
+        "zookeeper.tracelog.file" : "{{ zookeeper_tracelog_file | default('zookeeper_trace.log') }}",
+        "log4j.rootLogger" : "{{ zookeper_root_logger | default('INFO, CONSOLE') }}"
+      }
+    },
+    {
+      "spark2-defaults": {
+        "spark.history.retainedApplications" : "{{ retainedApplications | default('50')}}",
+        "spark.history.fs.cleaner.maxAge" : "{{ cleanerMaxAge | default('7')}}",
+        "spark.driver.port" : "{{ spark_driver_port | default('55000')}}",
+        "spark.executor.port" : "{{ spark_executor_port | default('55100')}}",
+        "spark.blockManager.port" : "{{ spark_blockmgr_port | default('55200')}}",
+        "spark.broadcast.port" : "{{ spark_broadcast_port | default('55300')}}",
+        "spark.fileserver.port" : "{{ spark_fileserver_port | default('55400')}}",
+        "spark.replClassServer.port" : "{{ spark_replclass_port | default('55500')}}",
+        "spark.history.ui.port" : "{{ spark_history_srv_ui | default('18080')}}",
+        "spark.executor.memory" : "{{ spark_executor_memory | default('1G')}}",
+        "spark.executor.cores" : "{{ spark_executor_cores | default('1')}}",
+        "spark.eventLog.dir" : "{{ spark_eventlog_dir | default('hdfs:///spark2-history/') }}",
+        "spark.history.fs.logDirectory" : "{{ spark_eventlog_dir | default('hdfs:///spark2-history/') }}"
       }
     }
   ],
-
   "host_groups" : [
-    {% set ns = namespace(hivedb_embedded_defined=false) %}
     {% for blueprint_item in blueprint_dynamic if groups[blueprint_item.host_group] is defined and groups[blueprint_item.host_group]|length > 0 -%}
 
     {
@@ -812,9 +987,9 @@
 {% if security|lower == "mit-kdc" or security|lower == "active-directory" -%}
         { "name" : "KERBEROS_CLIENT" },
 {% endif %}
-
+        {% if hive_mysql_embedded_group is defined and hive_mysql_embedded_group == blueprint_item.host_group %}{ "name" : "MYSQL_SERVER" },{% endif %}
         {% for service in blueprint_item.services -%}
-        { "name" : "{{ service }}" }{% if service == "HIVE_METASTORE" and database == "embedded" and not ns.hivedb_embedded_defined %},{ "name" : "MYSQL_SERVER" }{% set ns.hivedb_embedded_defined=true %}{% endif %}{% if not loop.last %},{% endif %}
+        { "name" : "{{ service }}" }{% if not loop.last %},{% endif %}
 
         {% endfor %}
 

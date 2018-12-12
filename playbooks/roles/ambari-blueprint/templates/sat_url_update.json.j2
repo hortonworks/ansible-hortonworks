@@ -1,0 +1,37 @@
+{  
+  "operating_systems":[  
+  {  
+     "OperatingSystems":{  
+        "ambari_managed_repositories":false, 
+        "os_type":"redhat7", 
+        "stack_name":"HDP", 
+        "stack_version":"2.6" 
+  }, 
+  "repositories":[  
+  {  
+      "Repositories":{  
+        "base_url":"{{ hdp_main_repo_url }}", 
+        "repo_id":"{{ hdp_main_repo_name }}", "repo_name":"{{ hdp_main_repo_name }}" 
+      } 
+  }, 
+  {  
+      "Repositories":{  
+         "base_url":"{{ hdf_main_repo_url }}", 
+         "repo_id":"{{ hdf_main_repo_name }}", 
+         "repo_name":"{{ hdf_main_repo_name }}" 
+      } 
+  }, 
+  {  
+      "Repositories":{  
+         "base_url":"{{ utils_repo_url }}", 
+         "repo_id":"{{ utils_repo_name }}", 
+         "repo_name":"{{ utils_repo_name }}" 
+      } 
+  }, 
+  {  
+      "Repositories":{  
+         "base_url":"{{ gpl_repo_url }}", 
+         "repo_id":"{{ gpl_repo_name }}", "repo_name":"{{ gpl_repo_name }}" 
+      } 
+  } ] } ] 
+}
