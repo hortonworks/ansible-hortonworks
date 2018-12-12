@@ -923,6 +923,7 @@
         "log.retention.bytes" : "{{ log_retention_bytes  | default('-1') }}",
         "log.dirs" : "{{ kafka_data_dir  | default('/kafka-logs') }}",
         "log.retention.hours" : "{{ log_retention_hours | default('168') }}",
+        "delete.topic.enable" : "true"
       },
     },
     {
