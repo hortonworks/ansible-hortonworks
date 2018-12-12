@@ -28,11 +28,6 @@
         (ansible_python_version is version_compare('2.7', '>=') and ((ansible_os_family|lower == "redhat" and ansible_distribution_major_version|int >= 7) or
                                                                      (ansible_os_family|lower == "suse" and ansible_distribution_major_version|int >= 12) or
                                                                      (ansible_os_family|lower == "redhat" and ansible_distribution|lower == "amazon")))
-- name: Comment out package_version = None in script.py
-  replace:
-    path: "/usr/lib/ambari-agent/lib/resource_management/libraries/script/script.py"
-    regexp: 'package_version = None'
-    replace: '# package_version = None'
 
 - meta: flush_handlers
 
