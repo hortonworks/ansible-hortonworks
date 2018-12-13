@@ -370,8 +370,8 @@
 {% if hdf_hosts|length > 0 %}
     {
       "nifi-ambari-config" : {
-        "nifi.node.ssl.port": "{{ nifi_https_port | default('8082') }}",
-        "nifi.node.port": "{{ nifi_http_port | default('6434') }}",
+        "nifi.node.ssl.port": "{{ nifi_https_port | default('9091') }}",
+        "nifi.node.port": "{{ nifi_http_port | default('9090') }}",
         "nifi.security.encrypt.configuration.password": "{{ nifi_security_options.encrypt_password }}",
         "nifi.sensitive.props.key": "{{ nifi_security_options.sensitive_props_key }}"
       }
@@ -386,7 +386,7 @@
       "nifi-properties" : {
         "properties_attributes" : { },
         "properties" : {
-          "nifi.web.proxy.context.path" : "{{ nifi_web_proxy_context_path | default('/acs-nifi,/acs-nifi2,/acs-nifi3') }}",
+          "nifi.web.proxy.context.path" : "{{ nifi_web_proxy_context_path | default('') }}",
           "nifi.web.proxy.host" : "{{ nifi_web_proxy_host | default('') }}"
         }
       }
@@ -892,7 +892,7 @@
       "gateway-site" : {
         "properties_attributes" : { },
         "properties" : {
-          "gateway.port" : "{{ knox_port | default('5669') }}",
+          "gateway.port" : "{{ knox_port | default('8443') }}",
         }
       }
     },
