@@ -245,7 +245,7 @@
         - name: Populate the all services and clients lists
           set_fact:
             blueprint_all_services: "{{ blueprint_all_services | union(item.services) }}"
-            blueprint_all_clients: "{{ blueprint_all_clients | union(item.clients) }}"
+            blueprint_all_clients: "{{ blueprint_all_clients | union(item.clients|default([])) }}"
           when: groups[item.host_group] is defined and groups[item.host_group]|length > 0
           with_items: "{{ blueprint_dynamic }}"
           no_log: True
