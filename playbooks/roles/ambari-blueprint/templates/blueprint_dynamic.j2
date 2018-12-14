@@ -370,8 +370,8 @@
 {% if hdf_hosts|length > 0 %}
     {
       "nifi-ambari-config" : {
-        "nifi.node.ssl.port": "9091",
-        "nifi.node.port": "9090",
+        "nifi.node.ssl.port": "{{ nifi_https_port | default('9091') }}",
+        "nifi.node.port": "{{ nifi_http_port | default('9090') }}",
         "nifi.security.encrypt.configuration.password": "{{ nifi_security_options.encrypt_password }}",
         "nifi.sensitive.props.key": "{{ nifi_security_options.sensitive_props_key }}"
       }
@@ -380,6 +380,15 @@
       "nifi-env" : {
         "nifi_group" : "nifi",
         "nifi_user" : "nifi"
+      }
+    },
+    {
+      "nifi-properties" : {
+        "properties_attributes" : { },
+        "properties" : {
+          "nifi.web.proxy.context.path" : "{{ nifi_web_proxy_context_path | default('') }}",
+          "nifi.web.proxy.host" : "{{ nifi_web_proxy_host | default('') }}"
+        }
       }
     },
 {% if 'NIFI_REGISTRY_MASTER' in blueprint_all_services %}
@@ -877,6 +886,14 @@
         "knox_master_secret": "{{ knox_security_options.master_secret }}",
         "knox_user": "knox",
         "knox_group": "knox"
+      }
+    },
+    {
+      "gateway-site" : {
+        "properties_attributes" : { },
+        "properties" : {
+          "gateway.port" : "{{ knox_port | default('8443') }}",
+        }
       }
     },
 {% endif %}
