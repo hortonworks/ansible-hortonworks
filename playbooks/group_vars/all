@@ -216,5 +216,5 @@ hdfs_ha_name: "{{ cluster_name | regex_replace('_','-') }}"
 ### advanced configuration ##
 #############################
 
-is_vm_docker_containers: 'yes'
+is_vm_docker_containers: 'no' # docker containers have some specifics like mount points for example
 timezone: UTC
