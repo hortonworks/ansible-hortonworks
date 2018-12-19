@@ -121,6 +121,10 @@
         is_vm_docker_containers != "yes"
   notify: Generate the Grub config file
 
+- name: Set timezone to "{{ timezone }}"
+  timezone:
+    name: "{{ timezone }}"
+    
 - meta: flush_handlers
 
 - name: Configure tuned (RHEL/CentOS 7)
