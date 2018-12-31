@@ -7,3 +7,28 @@
         group: hadoop
         mode: 0440
   when: security != "none" and security_options.http_authentication|default(false) and install_hdp is defined and install_hdp
+
+- name: create start accumulo request
+  set_fact:
+    start_accumulo_request: '{"RequestInfo": {"context" :"Start Accumulo via REST"}, "Body": {"ServiceInfo": {"state": "STARTED"} } }'
+  when: inventory_hostname in groups['ambari-server'][0]
+
+- name: start accumulo after blueprint install
+  uri:
+    url: "http://{{ groups['ambari-server'][0] }}:8080/api/v1/clusters/{{ cluster_name }}/services/ACCUMULO"
+    method: PUT
+    force_basic_auth: yes
+    user: "{{ ambari_admin_user }}"
+    password: "{{ ambari_admin_password }}"
+    headers:
+      "X-Requested-By": "ambari"
+      "Content-type": "Application/json"
+    body: "{{ start_accumulo_request|to_json }}"
+    status_code: 200,201,202,404
+    return_content: yes
+  delete_to: localhost
+  run_once: true
+  when: inventory_hostname in groups['ambari-server'][0]
+
+- meta: flush_handlers
+
