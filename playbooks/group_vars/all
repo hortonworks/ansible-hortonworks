@@ -25,6 +25,7 @@ repo_base_url: 'http://public-repo-1.hortonworks.com'     # change this if using
 
 external_dns: yes                                         # set to yes to use the existing DNS (when no, it will update the /etc/hosts file - must be set to 'no' when using Azure)
 disable_firewall: no                                      # set to yes to disable the existing local firewall service (iptables, firewalld, ufw)
+timezone: UTC
 
 
 ########################
@@ -138,6 +139,7 @@ accumulo_security_options:
   trace_user: "trace"                                     # user that the tracer process uses to write tracing data to Accumulo
   trace_password: "{{ default_password }}"                # password for the trace user
 
+
 ##########################
 ## ambari configuration ##
 ##########################
@@ -216,4 +218,4 @@ hdfs_ha_name: "{{ cluster_name | regex_replace('_','-') }}"
 ### advanced configuration ##
 #############################
 
-is_vm_docker_containers: 'no' # docker containers have some specifics like mount points for example
+is_vm_docker_containers: 'no'                             # docker containers have some specifics like mount points for example
