@@ -29,7 +29,7 @@
   When using a static blueprint, this might sometimes fail, as it simply does the regex check in the blueprint's content.
 #}
   "host_groups" :[
-    {% for group in groups|sort if group not in ['all', 'ambari-server', 'hadoop-cluster', 'ungrouped'] and groups[group]|length > 0 and (blueprint_file == 'blueprint_dynamic.j2' and group in blueprint_dynamic|map(attribute='host_group')|list) or (blueprint_file != 'blueprint_dynamic.j2' and blueprint_static['host_groups'] | string is search(group)) %}
+    {% for group in groups|sort if group not in ['all', 'ungrouped'] and groups[group]|length > 0 and (blueprint_file == 'blueprint_dynamic.j2' and group in blueprint_dynamic|map(attribute='host_group')|list) or (blueprint_file != 'blueprint_dynamic.j2' and blueprint_static['host_groups'] | string is search(group)) %}
 
     {
       "name" : "{{ group }}",

@@ -3,7 +3,7 @@ ansible-hortonworks
 
 These Ansible playbooks will build a Hortonworks cluster (Hortonworks Data Platform and / or Hortonworks DataFlow) using Ambari Blueprints. For a full list of supported features check [below](#features).
 
-- Tested with: HDP 3.0, HDP 2.4 -> 2.6.5, HDP Search 3.0.0.0, HDF 2.0 -> 3.2, Ambari 2.4 -> 2.7.
+- Tested with: HDP 3.0 -> 3.1, HDP 2.4 -> 2.6.5, HDP Search 3.0 -> 4.0, HDF 2.0 -> 3.3, Ambari 2.4 -> 2.7 (the versions must be matched as per the [support matrix](https://supportmatrix.hortonworks.com)).
 
 - This includes building the Cloud infrastructure (optional) and taking care of the prerequisites.
 
@@ -55,7 +55,7 @@ Therefore, these Ansible playbooks try to take advantage of Blueprint's `host_gr
 </p>
 
 - If the blueprint is dynamic, these `host_groups` are defined in the [variable file](playbooks/group_vars/all#L162) and they need to match the Ansible inventory groups that will run those components.
-- If the blueprint is static, these `host_groups` are defined in the [blueprint itself](playbooks/roles/ambari-blueprint/files/blueprint_hdfs_only.j2#L29) and they need to match the Ansible inventory groups that will run those components.
+- If the blueprint is static, these `host_groups` are defined in the [blueprint itself](playbooks/roles/ambari-blueprint/files/blueprint_hdfs_only.json#L27) and they need to match the Ansible inventory groups that will run those components.
 
 
 ### Cloud inventory

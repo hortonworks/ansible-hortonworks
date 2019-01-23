@@ -832,7 +832,7 @@
       "name" : "{{ blueprint_item.host_group }}",
       "configurations" : [ ],
       "components" : [
-        {% for client in blueprint_item.clients -%}
+        {% for client in blueprint_item.clients|default([]) -%}
         { "name" : "{{ client }}" },
         {% endfor %}
 {% if security|lower == "mit-kdc" or security|lower == "active-directory" -%}
