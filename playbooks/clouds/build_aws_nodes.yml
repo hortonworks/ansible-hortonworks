@@ -75,33 +75,36 @@
 - name: Set name tag for AWS instances
   ec2_tag:
     region: "{{ cloud_config.region }}"
-    resource: "{{ item.1.id }}"
+    resource: "{{ local_loop.1.id }}"
     tags:
-      Name: "{{ aws_tags.Name }}-{{ '%02d' | format(item.0 + 1) }}"
+      Name: "{{ aws_tags.Name }}-{{ '%02d' | format(local_loop.0 + 1) }}"
   with_indexed_items: "{{ current_ec2.instances }}"
   loop_control:
-    label: "{{ item.1.id }} - {{ aws_tags.Name }}-{{ '%02d' | format(item.0 + 1) }}"
+    label: "{{ local_loop.1.id }} - {{ aws_tags.Name }}-{{ '%02d' | format(local_loop.0 + 1) }}"
+    loop_var: local_loop
 
 - name: Get volumes ids
   ec2_vol:
     region: "{{ cloud_config.region }}"
-    instance: "{{ item }}"
+    instance: "{{ local_loop.id }}"
     state: list
-  with_items: "{{ current_ec2.instance_ids }}"
+  with_items: "{{ current_ec2.instances }}"
   register: ec2_instances_volumes
   loop_control:
-    label: "{{ item }}"
+    label: "{{ local_loop }}"
+    loop_var: local_loop
 
 - name: Tag volumes
   ec2_tag:
     region: "{{ cloud_config.region }}"
-    resource: "{{ item.1.id }}"
-    tags: "{{ aws_tags | combine({'Instance': item.1.attachment_set.instance_id}, {'Device': item.1.attachment_set.device}) }}"
+    resource: "{{ local_loop.1.id }}"
+    tags: "{{ aws_tags | combine({'Instance': local_loop.1.attachment_set.instance_id}, {'Device': local_loop.1.attachment_set.device}) }}"
   with_subelements:
     - "{{ ec2_instances_volumes.results }}"
     - volumes
   loop_control:
-    label: "{{ item.1.id }} - {{ item.1.attachment_set.device }}"
+    label: "{{ local_loop.1.id }} - {{ local_loop.1.attachment_set.device }}"
+    loop_var: local_loop
 
 - name: Wait for SSH to start
   wait_for:
