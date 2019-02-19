@@ -65,6 +65,16 @@
         name: "{{ groups[ambari_groups|first]|first }}"
         groups: "ambari-server"
 
+    - name: Fail if no Ansible inventory group called 'hadoop-cluster' exists
+      fail:
+        msg: "The 'hadoop-cluster' Ansible inventory group is required before continuing. Check the inventory for possible issues."
+      when: groups['hadoop-cluster'] is not defined or (groups['hadoop-cluster'] is defined and groups['hadoop-cluster']|length == 0)
+
+    - name: Fail if no Ansible inventory group called 'ambari-server' exists
+      fail:
+        msg: "The 'ambari-server' Ansible inventory group is required before continuing. Check the inventory for possible issues."
+      when: groups['ambari-server'] is not defined or (groups['ambari-server'] is defined and groups['ambari-server']|length == 0)
+
 - name: Create the Ansible helper variables for the ambari-server
   hosts: ambari-server
   gather_facts: False
