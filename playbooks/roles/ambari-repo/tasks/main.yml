@@ -14,7 +14,7 @@
 
 - name: Add the Ambari repository (yum)
   yum_repository:
-    name: "ambari-{{ ambari_version }}"
+    name: "ambari"
     description: "ambari Version - ambari-{{ ambari_version }}"
     baseurl: "{{ ambari_repo_url }}"
     file: 'ambari'
@@ -25,7 +25,7 @@
 
 - name: Add the Ambari repository (zypper)
   zypper_repository:
-    name: "ambari-{{ ambari_version }}"
+    name: "ambari"
     description: "ambari Version - ambari-{{ ambari_version }}"
     repo: "{{ ambari_repo_url }}"
     state: present
