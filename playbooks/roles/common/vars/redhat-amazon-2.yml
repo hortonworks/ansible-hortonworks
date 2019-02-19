@@ -9,6 +9,7 @@ packages:
   - chrony                  # ntp required by Hadoop
   - openssl-devel           # openssl-devel recommended for Ranger KMS
   - libtirpc-devel          # libtirpc required by HDP 2.6+
+  - libselinux-python       # libselinux-python required by Ansible
 
 openjdk_package: java-1.8.0-openjdk-devel
 
