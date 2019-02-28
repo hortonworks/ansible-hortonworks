@@ -12,7 +12,7 @@
       user: "{{ ambari_admin_user }}"
       password: "{{ ambari_admin_password }}"
       headers: '{"X-Requested-By":"ambari"}'
-      status_code: -1,200,201,202,404
+      status_code: -1,200,201,202,404,403
     register: cluster_check
   
   - name: set skip if exists
