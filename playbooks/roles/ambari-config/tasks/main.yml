@@ -39,9 +39,10 @@
     - name: Set the HDP Search mpack filename
       set_fact:
         mpack_filename: "solr-service-mpack-{{ hdpsearch_version }}.tar.gz"
+        mpack_base_url: "{{ solr_mpack_base_url | default( repo_base_url+ '/HDP-SOLR/hdp-solr-ambari-mp') }}"
 
     - name: "Install the HDP Search Management Pack"
-      shell: "echo yes | ambari-server install-mpack --mpack={{ repo_base_url }}/HDP-SOLR/hdp-solr-ambari-mp/{{ mpack_filename }}"
+      shell: "echo yes | ambari-server install-mpack --mpack={{ mpack_base_url }}/{{ mpack_filename }}"
       notify: Restart ambari-server
       args:
         creates: "/var/lib/ambari-server/resources/mpacks/solr-ambari-mpack-{{ hdpsearch_version }}"
@@ -64,16 +65,17 @@
     - name: Set the HDF mpack filename
       set_fact:
         mpack_filename: "hdf-ambari-mpack-{{ hdf_version }}-{{ hdf_build_number_auto|default(hdf_build_number) }}.tar.gz"
+        mpack_base_url: "{{ hdf_mpack_base_url | default( hdf_main_repo_url+ '/tars/hdf_ambari_mp') }}"
 
     - name: "Install the HDF Management Pack"
-      shell: "echo yes | ambari-server install-mpack --mpack={{ hdf_main_repo_url }}/tars/hdf_ambari_mp/{{ mpack_filename }}"
+      shell: "echo yes | ambari-server install-mpack --mpack={{ mpack_base_url }}/{{ mpack_filename }}"
       notify: Restart ambari-server
       args:
         creates: "/var/lib/ambari-server/resources/mpacks/{{ mpack_filename | regex_replace('.tar.gz$','') }}"
       when: hdf_major_version|int >= 3
 
     - name: "Install the HDF Management Pack (with --purge)"
-      shell: "echo yes | ambari-server install-mpack --mpack={{ hdf_main_repo_url }}/tars/hdf_ambari_mp/{{ mpack_filename }} --purge"
+      shell: "echo yes | ambari-server install-mpack --mpack={{ mpack_base_url }}/{{ mpack_filename }} --purge"
       notify: Restart ambari-server
       args:
         creates: "/var/lib/ambari-server/resources/mpacks/{{ mpack_filename | regex_replace('.tar.gz$','') }}"
