@@ -1,3 +1,5 @@
 ---
 dependencies:
-  - { role: ambari-repo }
+  - role: ambari-repo
+    when: ambari_repo_enabled | default(True) | bool
+    
