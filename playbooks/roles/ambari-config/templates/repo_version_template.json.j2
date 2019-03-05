@@ -1,0 +1,51 @@
+{  
+  "operating_systems":[  
+    {  
+      "OperatingSystems":{  
+        "ambari_managed_repositories":false, 
+        "os_type":"{{ baseurl_os_family }}"
+      }, 
+      "repositories":[  
+        {  
+          "Repositories":{  
+            "base_url":"{{ hdp_main_repo_url }}", 
+            "repo_id":"HDP-{{ hdp_minor_version }}",
+            "repo_name":"HDP" 
+          } 
+        }, 
+{% if install_hdf|default(false) %}
+        {  
+          "Repositories":{  
+            "base_url":"{{ hdf_main_repo_url }}", 
+            "repo_id":"HDF-{{ hdf_minor_version }}", 
+            "repo_name":"HDF" 
+          } 
+        }, 
+{% endif %}
+{% if install_hdpsearch|default(false) and hdpsearch_main_repo_url is defined %}
+        {  
+          "Repositories":{  
+            "base_url":"{{ hdpsearch_main_repo_url }}", 
+            "repo_id":"HDP-SOLR-{{ hdpsearch_version }}-{{ hdpsearch_build_number }}", 
+            "repo_name":"HDP-SOLR" 
+          } 
+        }, 
+{% endif %}  
+        {  
+          "Repositories":{  
+            "base_url":"{{ utils_repo_url }}", 
+            "repo_id":"HDP-UTILS-{{ utils_version }}", 
+            "repo_name":"HDP-UTILS" 
+          } 
+        }, 
+        {  
+          "Repositories":{  
+            "base_url":"{{ gpl_repo_url }}", 
+            "repo_id":"HDP-{{ hdp_minor_version }}-GPL",
+            "repo_name":"HDP-GPL" 
+          } 
+        } 
+      ]
+    }
+  ] 
+}
