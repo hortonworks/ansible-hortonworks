@@ -14,7 +14,7 @@
 - block:
     - name: Get the VersionDefinition id from Ambari (Ambari >= 2.6)
       uri:
-        url: "http://{{ ansible_fqdn }}:8080/api/v1/version_definitions?VersionDefinition/release/version={{ (install_hdp|default(false) == true) | ternary(hdp_version,hdf_version) }}"
+        url: "http://{{ ansible_fqdn }}:8080/api/v1/version_definitions?VersionDefinition/release/version={{ install_hdp|default(false) | ternary(hdp_version,hdf_version) }}"
         method: GET
         force_basic_auth: yes
         user: "{{ ambari_admin_user }}"
@@ -94,7 +94,7 @@
     user: "{{ ambari_admin_user }}"
     password: "{{ ambari_admin_password }}"
     headers: '{"X-Requested-By":"ambari"}'
-    body: "{{ cluster_blueprint|to_json }} "
+    body: " {{ cluster_blueprint|to_json }}"
     body_format: raw
     status_code: 200,201,202,409
     timeout: 60
@@ -108,7 +108,7 @@
     user: "{{ ambari_admin_user }}"
     password: "{{ ambari_admin_password }}"
     headers: '{"X-Requested-By":"ambari"}'
-    body: "{{ cluster_template|to_json }} "
+    body: " {{ cluster_template|to_json }}"
     body_format: raw
     status_code: 200,201,202
     timeout: 120

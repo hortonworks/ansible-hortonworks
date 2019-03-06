@@ -18,7 +18,7 @@
     backup: no
     state: present
     regexp: "^gpl.license.accepted.*"
-    line: "gpl.license.accepted={{ (accept_gpl|default(omit)|bool == true) | ternary('true', 'false') }}"
+    line: "gpl.license.accepted={{ accept_gpl|default(omit)|bool | ternary('true', 'false') }}"
   notify: Restart ambari-server
 
 - name: Attempt to change the default Ambari admin password
@@ -169,7 +169,7 @@
                 - ../templates
       when: ambari_version is version_compare('2.6', '>=')
 
-    - name: ​Enable User Home Directory Creation
+    - name: Enable User Home Directory Creation
       lineinfile:
         path: /etc/ambari-server/conf/ambari.properties
         state: present
@@ -183,7 +183,7 @@
 - block:
     - name: Attempt to get an existing VDF for the required version (Ambari >= 2.6)
       uri:
-        url: "http://{{ ansible_fqdn }}:8080/api/v1/version_definitions?VersionDefinition/release/version={{ (install_hdp|default(false) == true) | ternary(hdp_version,hdf_version) }}"
+        url: "http://{{ ansible_fqdn }}:8080/api/v1/version_definitions?VersionDefinition/release/version={{ install_hdp|default(false) | ternary(hdp_version,hdf_version) }}"
         method: GET
         force_basic_auth: yes
         user: "{{ ambari_admin_user }}"
