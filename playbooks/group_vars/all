@@ -10,7 +10,7 @@ ambari_version: '2.7.3.0'                                 # must be the 4-part f
 hdp_version: '3.1.0.0'                                    # must be the 4-part full version number
 hdp_build_number: 'auto'                                  # the HDP build number from docs.hortonworks.com (if set to 'auto', Ansible will try to get it from the repository)
 
-hdf_version: '3.3.0.0'                                    # must be the 4-part full version number
+hdf_version: '3.4.0.0'                                    # must be the 4-part full version number
 hdf_build_number: 'auto'                                  # the HDF build number from docs.hortonworks.com (if set to 'auto', Ansible will try to get it from the repository)
 
 hdpsearch_version: '4.0.0'                                # must be the full version number
