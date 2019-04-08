@@ -43,7 +43,7 @@
     state: present
   with_items:
     - "{{ groups['hadoop-cluster']|sort(reverse=True) }}"
-  when: not external_dns
+  when: not external_dns|default('True')
 
 - name: Make sure /etc/security/limits.d exists
   file:

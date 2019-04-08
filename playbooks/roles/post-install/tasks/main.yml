@@ -26,7 +26,7 @@
     body: "{{ start_accumulo_request|to_json }}"
     status_code: 200,201,202,404
     return_content: yes
-  delete_to: localhost
+  delegate_to: localhost
   run_once: true
   when: inventory_hostname in groups['ambari-server'][0]
 
