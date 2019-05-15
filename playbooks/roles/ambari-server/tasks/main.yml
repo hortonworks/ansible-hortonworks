@@ -154,6 +154,19 @@
     ambari_java_options: "-j {{ oraclejdk_options.base_folder }}/latest"
   when: java == "oraclejdk"
 
+- name: Update embedded java download url
+  lineinfile:
+    dest: /etc/ambari-server/conf/ambari.properties
+    state: present
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    backrefs: yes
+  notify: Restart ambari-server
+  with_items:
+    - { regexp: '^(jdk.*\.jcpol-url)=(.*)/ARTIFACTS/(.*)', line: '\g<1>={{ repo_base_url }}/ARTIFACTS/\g<3>' }
+    - { regexp: '^(jdk.*\.url)=(.*)/ARTIFACTS/(.*)', line: '\g<1>={{ repo_base_url }}/ARTIFACTS/\g<3>' }
+  when: java == 'embedded'
+
 - name: Run Ambari Server setup
   shell: /usr/sbin/ambari-server setup -s {{ ambari_java_options|default("") }} {{ ambari_database_options|default("") }}
   notify: Restart ambari-server
