@@ -107,7 +107,9 @@
         "xasecure.audit.destination.hdfs" : "true",
         "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ hdfs_ha_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_fqdn'] }}:8020{% endif %}/ranger/audit",
         "xasecure.audit.destination.solr" : "true",
-        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_fqdn'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
+        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_fqdn'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr",
+        "xasecure.audit.destination.solr.batch.filespool.dir" : "{{ ranger_yarn_xasecure_audit_destination_solr_batch_filespool_dir }}",
+        "xasecure.audit.destination.hdfs.batch.filespool.dir" : "{{ ranger_yarn_xasecure_audit_destination_hdfs_batch_filespool_dir }}"
       }
     },
     {
@@ -174,11 +176,13 @@
 {% if namenode_groups|length > 0 %}
         "xasecure.audit.destination.hdfs" : "true",
         "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ hdfs_ha_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_fqdn'] }}:8020{% endif %}/ranger/audit",
+        "xasecure.audit.destination.hdfs.batch.filespool.dir" : "{{ ranger_storm_xasecure_audit_destination_hdfs_batch_filespool_dir }}",
 {% else %}
         "xasecure.audit.destination.hdfs" : "false",
 {% endif %}
         "xasecure.audit.destination.solr" : "true",
-        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_fqdn'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
+        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_fqdn'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr",
+        "xasecure.audit.destination.solr.batch.filespool.dir" : "{{ ranger_storm_xasecure_audit_destination_solr_batch_filespool_dir }}"
       }
     },
 {% endif %}
@@ -251,11 +255,13 @@
 {% if namenode_groups|length > 0 %}
         "xasecure.audit.destination.hdfs" : "true",
         "xasecure.audit.destination.hdfs.dir" : "hdfs://{% if namenode_groups|length > 1 %}{{ hdfs_ha_name }}{% else %}{{ hostvars[groups[namenode_groups.0]|sort|list|first]['ansible_fqdn'] }}:8020{% endif %}/ranger/audit",
+        "xasecure.audit.destination.hdfs.batch.filespool.dir" : "{{ ranger_kafka_xasecure_audit_destination_hdfs_batch_filespool_dir }}",
 {% else %}
         "xasecure.audit.destination.hdfs" : "false",
 {% endif %}
         "xasecure.audit.destination.solr" : "true",
-        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_fqdn'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr"
+        "xasecure.audit.destination.solr.zookeepers" : "{% for zk in zookeeper_hosts %}{{ hostvars[zk]['ansible_fqdn'] }}:2181{% if not loop.last %},{% endif %}{% endfor %}/infra-solr",
+        "xasecure.audit.destination.solr.batch.filespool.dir" : "{{ ranger_kafka_xasecure_audit_destination_solr_batch_filespool_dir }}"
       }
     },
 {% endif %}
@@ -362,6 +368,11 @@
       "nifi-ambari-config" : {
         "nifi.node.ssl.port": "9091",
         "nifi.node.port": "9090",
+        "nifi.internal.dir": "{{ nifi_internal_dir }}",
+        "nifi.content.repository.dir.default": "{{ nifi_content_repository_dir_default }}",
+        "nifi.database.dir": "{{ nifi_database_dir }}",
+        "nifi.flowfile.repository.dir": "{{ nifi_flowfile_repository_dir }}",
+        "nifi.provenance.repository.dir.default": "{{ nifi_provenance_repository_dir_default }}",
         "nifi.security.encrypt.configuration.password": "{{ nifi_security_options.encrypt_password }}",
         "nifi.sensitive.props.key": "{{ nifi_security_options.sensitive_props_key }}"
       }
@@ -369,12 +380,16 @@
     {
       "nifi-env" : {
         "nifi_group" : "nifi",
-        "nifi_user" : "nifi"
+        "nifi_user" : "nifi",
+        "nifi_node_log_dir" : "{{ nifi_node_log_dir }}"
       }
     },
 {% if 'NIFI_REGISTRY_MASTER' in blueprint_all_services %}
     {
       "nifi-registry-ambari-config": {
+        "nifi.registry.internal.dir": "{{ nifi_registry_internal_dir }}",
+        "nifi.registry.database.dir": "{{ nifi_registry_database_dir }}",
+        "nifi.registry.internal.config.dir": "{{ nifi_registry_internal_config_dir }}",
         "nifi.registry.security.encrypt.configuration.password": "{{ nifi_security_options.encrypt_password }}"
       }
     },
@@ -383,7 +398,13 @@
 {% if hdf_minor_version is version_compare('3.2', '>=') %}
         "nifi.registry.db.password": "{{ nifi_security_options.encrypt_password }}",
 {% endif %}
+        "nifi.registry.internal.dir": "{{ nifi_registry_internal_dir }}",
         "nifi.registry.web.jetty.threads" : "200"
+      }
+    },
+    {
+      "nifi-registry-env" : {
+        "nifi_registry_log_dir" : "{{ nifi_registry_log_dir }}"
       }
     },
 {% endif %}
@@ -432,11 +453,16 @@
         "dtnode_heapsize" : "1024m",
         "namenode_heapsize" : "2048m",
         "namenode_opt_maxnewsize" : "384m",
-        "namenode_opt_newsize" : "384m"
+        "namenode_opt_newsize" : "384m",
+        "hdfs_log_dir_prefix" : "{{ hdfs_log_dir_prefix }}",
+        "namenode_backup_dir" : "{{ base_tmp_dir }}/upgrades"
       }
     },
     {
       "hdfs-site" : {
+        "dfs.namenode.checkpoint.dir" : "{{ hdfs_dfs_namenode_checkpoint_dir }}",
+        "dfs.namenode.name.dir" : "{{ hdfs_dfs_namenode_name_dir }}",
+        "dfs.journalnode.edits.dir" : "{{ hdfs_dfs_journalnode_edits_dir }}",
         {% if namenode_groups|length > 1 -%}
         "dfs.client.failover.proxy.provider.{{ hdfs_ha_name }}" : "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider",
         "dfs.ha.automatic-failover.enabled" : "true",
@@ -457,7 +483,7 @@
 {% if rangerkms_hosts|length > 0 %}
         "dfs.encryption.key.provider.uri" : "kms://http@{% for kmshost in rangerkms_hosts %}{{ hostvars[kmshost]['ansible_fqdn'] }}{% if not loop.last %};{% endif %}{% endfor %}:9292/kms",
 {% endif %}
-        "dfs.datanode.data.dir" : "/hadoop/hdfs/data",
+        "dfs.datanode.data.dir" : "{{ hdfs_dfs_datanode_data_dir }}",
         "dfs.datanode.failed.volumes.tolerated" : "0",
         "dfs.replication" : "3"
       }
@@ -467,7 +493,8 @@
 {% if 'YARN_REGISTRY_DNS' in blueprint_all_services %}
         "registry.dns.bind-port": "{{ registry_dns_bind_port | default('53') }}",
 {% endif %}
-        "yarn_user" : "yarn"
+        "yarn_user" : "yarn",
+        "yarn_log_dir_prefix" : "{{ yarn_log_dir_prefix }}"
       }
     },
     {
@@ -502,7 +529,11 @@
 {% if 'YARN_REGISTRY_DNS' in blueprint_all_services %}
         "hadoop.registry.dns.bind-port": "{{ registry_dns_bind_port | default('53') }}",
 {% endif %}
-        "yarn.client.nodemanager-connect.retry-interval-ms" : "10000"
+        "yarn.client.nodemanager-connect.retry-interval-ms" : "10000",
+        "yarn.nodemanager.local-dirs" : "{{ yarn_nodemanager_local_dirs }}",
+        "yarn.nodemanager.log-dirs" : "{{ yarn_nodemanager_log_dirs }}",
+        "yarn.timeline-service.leveldb-state-store.path" : "{{ yarn_timeline_service_leveldb_state_store_path }}",
+        "yarn.timeline-service.leveldb-timeline-store.path" : "{{ yarn_timeline_service_leveldb_timeline_store_path }}"
       }
     },
     {
@@ -527,7 +558,9 @@
 {% if rangeradmin_hosts|length > 0 and ranger_options.enable_plugins|default(no) %}
         "hive.security.authorization.enabled" : "true",
 {% endif %}
-        "hive.metastore.failure.retries" : "24"
+        "hive.metastore.failure.retries" : "24",
+        "hive.server2.logging.operation.log.location" : "{{ base_log_dir }}/hive/operation_logs",
+        "hive.downloaded.resources.dir" : "{{ base_tmp_dir }}/hive/${hive.session.id}_resources"
       }
     },
     {
@@ -559,7 +592,10 @@
 {% if 'ATLAS_SERVER' in blueprint_all_services %}
         "hive.atlas.hook": "true",
 {% endif %}
-        "hive_user" : "hive"
+        "hive_user" : "hive",
+        "hive_log_dir" : "{{ base_log_dir }}/hive",
+        "hcat_log_dir" : "{{ base_log_dir }}/webhcat",
+        "heap_dump_location" : "{{ base_tmp_dir }}"
       }
     },
     {
@@ -625,6 +661,11 @@
         "druid.processing.numThreads": "2",
         "druid.server.http.numThreads": "40",
         "druid.processing.buffer.sizeBytes": "536870912"
+      }
+    },
+    {
+      "hive-interactive-site" : {
+          "hive.druid.working.directory" : "{{ hive_druid_working_directory }}"
       }
     },
 {% endif %}
@@ -693,7 +734,10 @@
         "oozie_database": "Existing PostgreSQL Database",
         {% endif -%}
         {% endif -%}
-        "oozie_user" : "oozie"
+        "oozie_user" : "oozie",
+        "oozie_log_dir" : "{{ oozie_log_dir }}",
+        "oozie_data_dir" : "{{ oozie_data_dir }}",
+        "oozie_tmp_dir" : "{{ base_tmp_dir }}/oozie"
       }
     },
 {% if 'ACCUMULO_MASTER' in blueprint_all_services %}
@@ -725,6 +769,45 @@
         "hbase.coprocessor.regionserver.classes" : "org.apache.ranger.authorization.hbase.RangerAuthorizationCoprocessor",
 {% endif %}
         "hbase.client.retries.number" : "35"
+      }
+    },
+    {
+      "mapred-site" : {
+          "mapreduce.jobhistory.recovery.store.leveldb.path" : "{{ mapreduce_jobhistory_recovery_store_leveldb_path }}"
+      }
+    },
+    {
+      "mapred-env" : {
+        "mapred_log_dir_prefix" : "{{ mapred_log_dir_prefix }}"
+      }
+    },
+{% if 'SPARK_JOBHISTORYSERVER' in blueprint_all_services %}
+    {
+      "spark-env" : {
+        "spark_log_dir" : "{{ base_log_dir }}/spark"
+      }
+    },
+    {
+      "livy-env" : {
+        "livy_log_dir" : "{{ base_log_dir }}/livy"
+      }
+    },
+{% endif %}
+{% if 'SPARK2_JOBHISTORYSERVER' in blueprint_all_services %}
+    {
+      "spark2-env" : {
+        "spark_log_dir" : "{{ base_log_dir }}/spark2"
+      }
+    },
+    {
+      "livy2-env" : {
+        "livy_log_dir" : "{{ base_log_dir }}/livy2"
+      }
+    },
+{% endif %}
+    {
+      "tez-env" : {
+        "heap_dump_location" : "{{ base_tmp_dir }}"
       }
     },
     {
@@ -803,11 +886,55 @@
     },
 {% endif %}
     {
+      "ams-site" : {
+          "phoenix.spool.directory" : "{{ base_tmp_dir }}"
+      }
+    },
+    {
+      "ams-env" : {
+        "metrics_collector_log_dir" : "{{ base_log_dir }}/ambari-metrics-collector",
+        "metrics_monitor_log_dir" : "{{ base_log_dir }}/ambari-metrics-monitor"
+      }
+    },
+    {
+      "ams-hbase-site" : {
+          "hbase.rootdir" : "file://{{ base_metrics_dir }}/ambari-metrics-collector/hbase",
+          "hbase.tmp.dir" : "{{ base_tmp_dir }}/hbase-tmp"
+      }
+    },
+    {
+      "ams-hbase-env" : {
+        "hbase_log_dir" : "{{ base_log_dir }}/ambari-metrics-collector"
+      }
+    },
+    {
+      "ams-grafana-env" : {
+        "metrics_grafana_log_dir" : "{{ base_log_dir }}/ambari-metrics-grafana",
+        "metrics_grafana_data_dir" : "{{ base_metrics_dir }}/ambari-metrics-grafana"
+      }
+    },
+    {
+      "zookeeper-env" : {
+        "zk_log_dir" : "{{ zookeeper_log_dir }}"
+      }
+    },
+    {
+      "kafka-env" : {
+        "kafka_log_dir" : "{{ kafka_log_dir }}"
+      }
+    },
+    {
       "storm-site": {
 {% if rangeradmin_hosts|length > 0 and ranger_options.enable_plugins|default(no) and (security|lower == "mit-kdc" or security|lower == "active-directory") %}
         "nimbus.authorizer" : "org.apache.ranger.authorization.storm.authorizer.RangerStormAuthorizer",
 {% endif %}
-        "storm.zookeeper.retry.intervalceiling.millis" : "30000"
+        "storm.zookeeper.retry.intervalceiling.millis" : "30000",
+        "storm.local.dir" : "{{ storm_local_dir }}"
+      }
+    },
+    {
+      "storm-env" : {
+        "storm_log_dir" : "{{ storm_log_dir }}"
       }
     },
     {
@@ -815,12 +942,25 @@
 {% if rangeradmin_hosts|length > 0 and ranger_options.enable_plugins|default(no) %}
         "authorizer.class.name" : "org.apache.ranger.authorization.kafka.authorizer.RangerKafkaAuthorizer",
 {% endif %}
+        "log.dirs" : "{{ kafka_broker_log_dirs }}",
         "zookeeper.session.timeout.ms" : "30000"
       }
     },
     {
       "zoo.cfg": {
-        "clientPort" : "2181"
+        "clientPort" : "2181",
+        "dataDir" : "{{ zookeeper_data_dir }}"
+      }
+    },
+    {
+      "infra-solr-client-log4j" : {
+        "infra_solr_client_log_dir" : "{{ base_log_dir }}/ambari-infra-solr-client"
+      }
+    },
+    {
+      "infra-solr-env" : {
+          "infra_solr_datadir" : "{{ infra_solr_datadir }}",
+          "infra_solr_log_dir" : "{{ infra_solr_log_dir}}"
       }
     }
   ],

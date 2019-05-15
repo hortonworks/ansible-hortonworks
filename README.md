@@ -162,6 +162,7 @@ Currently, these playbooks are divided into the following parts:
 - [ ] Configure Ambari Server with SSL
 - [x] Configure custom Repositories and specific HDP/HDF versions
 - [x] Configure Rack Awareness (static inventory)
+- [x] Configure custom Paths (data / logs / metrics / tmp)
 - [x] Build HDP clusters
 - [x] Build HDF clusters
 - [x] Build HDP clusters with HDF nodes

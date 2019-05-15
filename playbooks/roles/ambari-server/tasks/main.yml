@@ -19,6 +19,18 @@
     state: latest
   notify: Reload systemd
 
+- name: Update ambari-server log dir
+  lineinfile:
+    dest: /etc/ambari-server/conf/log4j.properties
+    regexp: '^ambari.log.dir='
+    line: 'ambari.log.dir={{ base_log_dir }}/ambari-server'
+
+- name: Update ambari-server tmp dir
+  lineinfile:
+    dest: /etc/ambari-server/conf/ambari.properties
+    regexp: '^server.tmp.dir='
+    line: 'server.tmp.dir={{ base_tmp_dir }}/ambari-server'
+
 - meta: flush_handlers
 
 - block:

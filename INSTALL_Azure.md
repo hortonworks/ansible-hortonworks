@@ -241,6 +241,21 @@ Modify the file at `~/ansible-hortonworks/playbooks/group_vars/all` to set the c
 | `.jce_location`            | The location of the JCE package zip file. This can be the location on the remote systems or on the Ansible controller, depending on the `remote_files` variable. |
 | `.remote_files`            | If this variable is set to `yes` then the tarball and JCE files must already be present on the remote system. If set to `no` then the files will be copied by Ansible (from the Ansible controller to the remote systems). |
 
+### path configuration (optional)
+
+You can override path configuration by setting those variables.
+More variables are available, please see `playbooks/roles/ambari-blueprint/defaults/main.yml`
+
+| Variable                   | Description                                                                                                 |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| base_log_dir               | Configure the base log path. |
+| base_metrics_dir           | Configure the base metrics path. |
+| base_tmp_dir               | Configure the base tmp path. |
+| hadoop_base_dir            | Configure the hadoop base data path. |
+| kafka_base_dir             | Configure the kafka base data path. |
+| nifi_base_dir              | Configure the nifi base data path. |
+| nifi_registry_base_dir     | Configure the nifi-registry base data path. |
+
 ### database configuration
 
 | Variable                                 | Description                                                                                                |
