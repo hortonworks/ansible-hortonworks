@@ -26,19 +26,19 @@ nifi_registry_base_dir: "/var/lib/nifi-registry"
 hdfs_dfs_namenode_checkpoint_dir: "{{ hadoop_base_dir }}/hdfs/namesecondary"
 hdfs_dfs_namenode_name_dir: "{{ hadoop_base_dir }}/hdfs/namenode"
 hdfs_dfs_journalnode_edits_dir: "{{ hadoop_base_dir }}/hdfs/journalnode"
-hdfs_dfs_datanode_data_dir: "{{ hadoop_base_dir }}/hdfs/namenode"
+hdfs_dfs_datanode_data_dir: "{{ hadoop_base_dir }}/hdfs/data"
 hdfs_log_dir_prefix: "{{ base_log_dir }}/hadoop"
 
 # Yarn dirs
 yarn_nodemanager_local_dirs: "{{ hadoop_base_dir }}/yarn/local"
-yarn_nodemanager_log_dirs: "{{ base_log_dir }}/hadoop/yarn"
+yarn_nodemanager_log_dirs: "{{ hadoop_base_dir }}/yarn/log"
 yarn_timeline_service_leveldb_state_store_path: "{{ hadoop_base_dir }}/yarn/timeline"
 yarn_timeline_service_leveldb_timeline_store_path: "{{ hadoop_base_dir }}/yarn/timeline"
-yarn_log_dir_prefix: "{{ base_log_dir }}/hadoop"
+yarn_log_dir_prefix: "{{ base_log_dir }}/hadoop-yarn"
 
 # Mapreduce dirs
 mapreduce_jobhistory_recovery_store_leveldb_path: "{{ hadoop_base_dir }}/mapreduce/jhs"
-mapred_log_dir_prefix: "{{ base_log_dir }}/hadoop"
+mapred_log_dir_prefix: "{{ base_log_dir }}/hadoop-mapreduce"
 
 # Zookeeper dirs
 zookeeper_data_dir: "{{ hadoop_base_dir }}/zookeeper"
