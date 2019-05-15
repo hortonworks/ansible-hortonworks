@@ -996,7 +996,7 @@
       "type" : "KERBEROS"
     },
 {% endif %}
-    "stack_name" : "{% if namenode_groups|length > 0 %}HDP{% else %}HDF{% endif %}",
-    "stack_version" : "{% if namenode_groups|length > 0 %}{{ hdp_minor_version }}{% else %}{{ hdf_minor_version }}{% endif %}"
+    "stack_name" : "{% if install_hdp|default(false) %}HDP{% else %}HDF{% endif %}",
+    "stack_version" : "{% if install_hdp|default(false) %}{{ hdp_minor_version }}{% else %}{{ hdf_minor_version }}{% endif %}"
   }
 }
