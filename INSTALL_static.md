@@ -161,9 +161,9 @@ cd && git clone git@github.com:hortonworks/ansible-hortonworks.git
 ```
 
 
-# Set the static inventory
+# <a name="static_inventory"></a>Set the static inventory
 
-Modify the file at `~/ansible-hortonworks/inventory/static` to set the static inventory.
+Modify the file at `~/ansible-hortonworks/inventory/static` to set the static inventory, or create a cluster specific one (see [Work with Multiple clusters](#multicluster_config)).
 
 The static inventory puts the nodes in different groups as described in the [Ansible Documentation](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#hosts-and-groups).
 
@@ -333,6 +333,57 @@ More variables are available, please see `playbooks/roles/ambari-blueprint/defau
 | blueprint_name                 | The name of the blueprint as it will be stored in Ambari.                                                  |
 | blueprint_file                 | The path to the blueprint file that will be uploaded to Ambari. It can be an absolute path or relative to the `roles/ambari-blueprint/templates` folder. The blueprint file can also contain [Jinja2 Template](http://jinja.pocoo.org/docs/dev/templates/) variables. |
 | blueprint_dynamic              | Settings for the dynamic blueprint template - only used if `blueprint_file` is set to `blueprint_dynamic.j2`. The `host_group` names must match the names from the inventory setting file `~/ansible-hortonworks/inventory/CLOUD/group_vars/all` (this is based on the `host_groups` [Ambari Blueprint concept](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints#Blueprints-BlueprintFieldDescriptions)). The chosen components are split into two lists: clients and services. The chosen Component layout must respect Ambari Blueprint restrictions - for example if a single `NAMENODE` is configured, there must also be a `SECONDARY_NAMENODE` component. |
+
+# <a name="multicluster_config"></a>(Optional) Work with multiple clusters
+
+If you are not working with multiple Hortonworks clusters please follow [this steps](#static_inventory).
+
+## Set the inventory
+
+Create a per cluster inventory file at `~/ansible-hortonworks/inventory/my_cluster_name`.
+
+A cluster host group which include all other groups must be defined:
+
+``` inventory
+[my_cluster_name:children]
+hdp-master
+hdp-slave
+
+[hdp-master]
+master01 ansible_host=192.168.0.2 ansible_user=root ansible_ssh_private_key_file="~/.ssh/id_rsa" rack=/default-rack
+
+[hdp-slave]
+slave01 ansible_host=192.168.0.3 ansible_user=root ansible_ssh_private_key_file="~/.ssh/id_rsa" rack=/default-rack
+#slave02 ansible_host=192.168.0.4 ansible_user=root ansible_ssh_pass=changeme
+```
+
+## Test the inventory
+
+List the inventory:
+
+```
+ansible -i inventory/my_cluster_name all --list-hosts
+```
+
+Confirm access to hosts in the inventory:
+
+```
+ansible -i inventory/my_cluster_name all -m setup
+```
+
+## Set the cluster variables
+
+Create a per cluster config file at `~/ansible-hortonworks/playbooks/group_vars/my_cluster_name`.
+
+Move all cluster specific variables from `~/ansible-hortonworks/playbooks/group_vars/all` to `~/ansible-hortonworks/playbooks/group_vars/my_cluster_name` (at least `cluster_name`).
+
+Shared properties and helper variables can be left inside `~/ansible-hortonworks/playbooks/group_vars/all`.
+
+## Specify the cluster to install
+
+Before installing your cluster, make sure you set the `INVENTORY_TO_USE` environment variable to `my_cluster_name`.
+
+If not set, the static inventory file will be used.
 
 
 # Install the cluster
