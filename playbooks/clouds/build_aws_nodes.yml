@@ -83,18 +83,10 @@
     label: "{{ local_loop.1.id }} - {{ aws_tags.Name }}-{{ '%02d' | format(local_loop.0 + 1) }}"
     loop_var: local_loop
 
-- debug:
-    var: current_ec2.instances
-    verbosity: 2
-
 # as 'instances' gets returned [] for already existing ec2 instances, better use tagged_instances
 # see: https://github.com/ansible/ansible/issues/14593
 - set_fact:    
     ec2_instances: "{{ current_ec2.tagged_instances }}"
-
-- debug:
-    var: ec2_instances
-    verbosity: 2
 
 - name: Get volumes ids
   ec2_vol:
@@ -106,10 +98,6 @@
   loop_control:
     label: "{{ local_loop }}"
     loop_var: local_loop
-
-- debug:
-    var: ec2_instances_volumes
-    verbosity: 2
 
 - name: Tag volumes
   ec2_tag:
