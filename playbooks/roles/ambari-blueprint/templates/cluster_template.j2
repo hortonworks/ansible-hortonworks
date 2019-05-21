@@ -5,14 +5,13 @@
   "repository_version_id": "{{ vdf_id }}",
 {% endif %}
   "default_password" : "{{ default_password }}",
-{% if security|lower == "mit-kdc" or security|lower == "active-directory" %}
+{% if security|lower != "none" %}
   "credentials" : [
     {
       "alias" : "kdc.admin.credential",
 {% if security|lower == "mit-kdc" %}
       "principal" : "{{ security_options.admin_principal }}/admin@{{ security_options.realm | upper }}",
-{% endif %}
-{% if security|lower == "active-directory" %}
+{% else %}
       "principal" : "{{ security_options.admin_principal }}@{{ security_options.realm | upper }}",
 {% endif %}
       "key" : "{{ security_options.admin_password }}",

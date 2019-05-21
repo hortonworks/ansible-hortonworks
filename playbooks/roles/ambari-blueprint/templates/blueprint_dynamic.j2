@@ -1,6 +1,6 @@
 {
   "configurations" : [
-{% if security|lower == "mit-kdc" or security|lower == "active-directory" %}
+{% if security|lower != "none" %}
     {
       "kerberos-env": {
 {% if security|lower == "active-directory" %}
@@ -17,7 +17,7 @@
     },
     {
       "krb5-conf": {
-          "manage_krb5_conf" : "true"
+          "manage_krb5_conf" : "{{ security_options.manage_krb5_conf|default('yes') | ternary('true', 'false') }}"
       }
     },
 {% endif %}
@@ -158,7 +158,7 @@
       }
     },
 {% endif %}
-{% if security|lower == "mit-kdc" or security|lower == "active-directory" -%}
+{% if security|lower != "none" %}
     {
       "ranger-storm-plugin-properties" : {
         "ranger-storm-plugin-enabled" : "Yes"
@@ -279,7 +279,7 @@
 {% if hdf_hosts|length > 0 %}
         "ranger-nifi-plugin-enabled" : "Yes",
 {% endif %}
-{% if security|lower == "mit-kdc" or security|lower == "active-directory" -%}
+{% if security|lower != "none" %}
         "ranger-storm-plugin-enabled" : "Yes",
 {% endif %}
         "ranger-kafka-plugin-enabled" : "Yes",
@@ -718,7 +718,7 @@
         "oozie.service.JPAService.jdbc.username": "{{ database_options.oozie_db_username }}",
         "oozie.service.JPAService.jdbc.password": "{{ database_options.oozie_db_password }}",
         {% endif -%}
-{% if (security|lower == "mit-kdc" or security|lower == "active-directory") and security_options.http_authentication|default(no) %}
+{% if security|lower != "none" and security_options.http_authentication|default(no) %}
         "oozie.authentication.cookie.domain" : "{{ security_options.realm|lower }}",
 {% endif %}
         "oozie.action.retry.interval" : "30"
@@ -816,7 +816,7 @@
         "fs.defaultFS" : "hdfs://{{ hdfs_ha_name }}",
         "ha.zookeeper.quorum" : "{% for zk in zookeeper_groups %}%HOSTGROUP::{{ zk }}%:2181{% if not loop.last %},{% endif %}{% endfor %}",
         {% endif -%}
-{% if (security|lower == "mit-kdc" or security|lower == "active-directory") and security_options.http_authentication|default(no) %}
+{% if security|lower != "none" and security_options.http_authentication|default(no) %}
         "hadoop.http.authentication.simple.anonymous.allowed" : "false",
         "hadoop.http.authentication.signature.secret.file" : "/etc/security/http_secret",
         "hadoop.http.authentication.type" : "kerberos",
@@ -925,7 +925,7 @@
     },
     {
       "storm-site": {
-{% if rangeradmin_hosts|length > 0 and ranger_options.enable_plugins|default(no) and (security|lower == "mit-kdc" or security|lower == "active-directory") %}
+{% if rangeradmin_hosts|length > 0 and ranger_options.enable_plugins|default(no) and security|lower != "none" %}
         "nimbus.authorizer" : "org.apache.ranger.authorization.storm.authorizer.RangerStormAuthorizer",
 {% endif %}
         "storm.zookeeper.retry.intervalceiling.millis" : "30000",
@@ -975,7 +975,7 @@
         {% for client in blueprint_item.clients|default([]) -%}
         { "name" : "{{ client }}" },
         {% endfor %}
-{% if security|lower == "mit-kdc" or security|lower == "active-directory" -%}
+{% if security|lower != "none" %}
         { "name" : "KERBEROS_CLIENT" },
 {% endif %}
         {% if hive_mysql_embedded_group is defined and hive_mysql_embedded_group == blueprint_item.host_group %}{ "name" : "MYSQL_SERVER" },{% endif %}
@@ -991,7 +991,7 @@
 
   ],
   "Blueprints" : {
-{% if security|lower == "mit-kdc" or security|lower == "active-directory" %}
+{% if security|lower != "none" %}
     "security" : {
       "type" : "KERBEROS"
     },

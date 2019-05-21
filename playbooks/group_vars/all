@@ -81,7 +81,7 @@ database_options:
 ## kerberos security configuration ##                     # useful if blueprint is dynamic, but can also be used to deploy the MIT KDC
 #####################################
 
-security: 'none'                                          # can be set to 'none', 'mit-kdc' or 'active-directory'
+security: 'none'                                          # can be set to 'none', 'mit-kdc', 'ipa' or 'active-directory'
 security_options:
   external_hostname: ''                                   # if this is empty, Ansible will install and prepare the MIT KDC on the Ambari node
   realm: 'EXAMPLE.COM'
@@ -91,6 +91,7 @@ security_options:
   ldap_url: 'ldaps://ad.example.com:636'                  # only used when security is set to 'active-directory'
   container_dn: 'OU=hadoop,DC=example,DC=com'             # only used when security is set to 'active-directory'
   http_authentication: yes                                # set to yes to enable HTTP authentication (SPNEGO)
+  manage_krb5_conf: yes                                   # set to no if using FreeIPA/IdM
 
 
 ##########################
