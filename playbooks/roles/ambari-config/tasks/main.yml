@@ -58,12 +58,12 @@
 
         - name: Set the HDF build number
           set_fact:
-            hdf_build_number: "{{ (hdf_repo_build_id.content|from_yaml).BUILD_NUMBER }}"
-      when: hdf_build_number == 'auto'
+            hdf_build_number_auto: "{{ (hdf_repo_build_id.content|from_yaml).BUILD_NUMBER }}"
+      when: hdf_build_number is not defined or hdf_build_number == 'auto'
 
     - name: Set the HDF mpack filename
       set_fact:
-        mpack_filename: "hdf-ambari-mpack-{{ hdf_version }}-{{ hdf_build_number }}.tar.gz"
+        mpack_filename: "hdf-ambari-mpack-{{ hdf_version }}-{{ hdf_build_number_auto|default(hdf_build_number) }}.tar.gz"
 
     - name: "Install the HDF Management Pack"
       shell: "echo yes | ambari-server install-mpack --mpack={{ hdf_main_repo_url }}/tars/hdf_ambari_mp/{{ mpack_filename }}"
@@ -151,8 +151,8 @@
 
             - name: Set the HDP build number (Ambari >= 2.6)
               set_fact:
-                hdp_build_number: "{{ (hdp_repo_build_id.content|from_yaml).BUILD_NUMBER }}"
-          when: hdp_build_number == 'auto'
+                hdp_build_number_auto: "{{ (hdp_repo_build_id.content|from_yaml).BUILD_NUMBER }}"
+          when: hdp_build_number is not defined or hdp_build_number == 'auto'
 
         - name: Upload the HDP Version Definition file (Ambari >= 2.6)
           template:

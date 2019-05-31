@@ -1,7 +1,7 @@
     <type>STANDARD</type>
     <stack-id>HDF-{{ hdf_minor_version }}</stack-id>
     <version>{{ hdf_version }}</version>
-    <build>{{ hdf_build_number }}</build>
+    <build>{{ hdf_build_number_auto|default(hdf_build_number) }}</build>
     <compatible-with>{{ hdf_major_version }}\.[0-2]\.\d+\.\d+</compatible-with>
     <release-notes>http://example.com</release-notes>
     <display>HDF-{{ hdf_version }}</display>

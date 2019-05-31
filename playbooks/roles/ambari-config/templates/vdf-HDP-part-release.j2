@@ -1,7 +1,7 @@
     <type>STANDARD</type>
     <stack-id>HDP-{{ hdp_minor_version }}</stack-id>
     <version>{{ hdp_version }}</version>
-    <build>{{ hdp_build_number }}</build>
+    <build>{{ hdp_build_number_auto|default(hdp_build_number) }}</build>
     <compatible-with>{{ hdp_major_version }}\.\d+\.\d+\.\d+</compatible-with>
     <release-notes>http://example.com</release-notes>
     <display>HDP-{{ hdp_version }}</display>
