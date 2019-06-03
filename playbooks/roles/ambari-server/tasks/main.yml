@@ -19,12 +19,6 @@
     state: latest
   notify: Reload systemd
 
-- name: Update ambari-server log dir
-  lineinfile:
-    dest: /etc/ambari-server/conf/log4j.properties
-    regexp: '^ambari.log.dir='
-    line: 'ambari.log.dir={{ base_log_dir }}/ambari-server'
-
 - meta: flush_handlers
 
 - block:
@@ -155,7 +149,6 @@
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
     backrefs: yes
-  notify: Restart ambari-server
   with_items:
     - { regexp: '^(jdk.*\.jcpol-url)=(.*)/ARTIFACTS/(.*)', line: '\g<1>={{ repo_base_url }}/ARTIFACTS/\g<3>' }
     - { regexp: '^(jdk.*\.url)=(.*)/ARTIFACTS/(.*)', line: '\g<1>={{ repo_base_url }}/ARTIFACTS/\g<3>' }
@@ -163,6 +156,13 @@
 
 - name: Run Ambari Server setup
   shell: /usr/sbin/ambari-server setup -s {{ ambari_java_options|default("") }} {{ ambari_database_options|default("") }}
+  notify: Restart ambari-server
+
+- name: Update ambari-server log dir
+  lineinfile:
+    dest: /etc/ambari-server/conf/log4j.properties
+    regexp: '^ambari.log.dir='
+    line: 'ambari.log.dir={{ base_log_dir }}/ambari-server'
   notify: Restart ambari-server
 
 - name: Increase the Ambari Server startup timeout

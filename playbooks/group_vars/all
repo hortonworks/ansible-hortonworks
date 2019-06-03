@@ -166,7 +166,6 @@ cluster_template_file: 'cluster_template.j2'              # the cluster creation
 ###########################
 
 base_log_dir: '/var/log'
-base_metrics_dir: '/var/lib'
 base_tmp_dir: '/tmp'
 
 

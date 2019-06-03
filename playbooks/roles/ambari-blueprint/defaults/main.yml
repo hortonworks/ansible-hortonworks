@@ -1,86 +1,58 @@
 ---
-postgres_port: 5432
-mysql_port: 3306
+postgres_port: "5432"
+mysql_port: "3306"
 
 #################################
 ## dynamic blueprint variables ##
 #################################
-registry_dns_bind_port: '53'
+registry_dns_bind_port: "53"
+
 
 ########################
 ## path configuration ##
 ########################
 # Common base dirs
-base_log_dir:     "/var/log"
-base_metrics_dir: "/var/lib"
-base_tmp_dir:     "/tmp"
+base_log_dir: "/var/log"
+base_tmp_dir: "/tmp"
 
-# Specific base data dirs
-hadoop_base_dir:        "/hadoop"
-kafka_base_dir:         "/kafka-logs"
-nifi_base_dir:          "/var/lib/nifi"
-nifi_registry_base_dir: "/var/lib/nifi-registry"
+# Services base dirs
+hadoop_base_dir: "/hadoop"
+hdfs_data_base_dir: "/hadoop"
+kafka_log_base_dir: "/kafka-logs"
+nifi_repositories_base_dir: "/var/lib/nifi"
+ams_base_dir: "/var/lib"
+smartsense_base_dir: "/var/lib/smartsense"
+ranger_audit_hdfs_filespool_base_dir: "{{ base_log_dir }}"
+ranger_audit_solr_filespool_base_dir: "{{ base_log_dir }}"
 
-
-# HDFS dirs
+# HDFS main dirs
 hdfs_dfs_namenode_checkpoint_dir: "{{ hadoop_base_dir }}/hdfs/namesecondary"
 hdfs_dfs_namenode_name_dir: "{{ hadoop_base_dir }}/hdfs/namenode"
 hdfs_dfs_journalnode_edits_dir: "{{ hadoop_base_dir }}/hdfs/journalnode"
-hdfs_dfs_datanode_data_dir: "{{ hadoop_base_dir }}/hdfs/data"
-hdfs_log_dir_prefix: "{{ base_log_dir }}/hadoop"
+hdfs_dfs_datanode_data_dir: "{{ hdfs_data_base_dir }}/hdfs/data"
 
-# Yarn dirs
+# YARN main dirs
 yarn_nodemanager_local_dirs: "{{ hadoop_base_dir }}/yarn/local"
 yarn_nodemanager_log_dirs: "{{ hadoop_base_dir }}/yarn/log"
-yarn_timeline_service_leveldb_state_store_path: "{{ hadoop_base_dir }}/yarn/timeline"
-yarn_timeline_service_leveldb_timeline_store_path: "{{ hadoop_base_dir }}/yarn/timeline"
-yarn_log_dir_prefix: "{{ base_log_dir }}/hadoop-yarn"
+yarn_timeline_leveldb_dir: "{{ hadoop_base_dir }}/yarn/timeline"
 
-# Mapreduce dirs
-mapreduce_jobhistory_recovery_store_leveldb_path: "{{ hadoop_base_dir }}/mapreduce/jhs"
-mapred_log_dir_prefix: "{{ base_log_dir }}/hadoop-mapreduce"
+# NiFi main dirs
+nifi_internal_dir: "/var/lib/nifi"
+nifi_database_dir: "{{ nifi_internal_dir }}/database_repository"
+nifi_content_repository_dir: "{{ nifi_repositories_base_dir }}/content_repository"
+nifi_flowfile_repository_dir: "{{ nifi_repositories_base_dir }}/flowfile_repository"
+nifi_provenance_repository_dir: "{{ nifi_repositories_base_dir }}/provenance_repository"
 
-# Zookeeper dirs
-zookeeper_data_dir: "{{ hadoop_base_dir }}/zookeeper"
-zookeeper_log_dir: "{{ base_log_dir }}/zookeeper"
-
-# Kafka dirs
-kafka_log_dir: "{{ base_log_dir }}/kafka"
-kafka_broker_log_dirs: "{{ kafka_base_dir }}"
-
-# Oozie dirs
-oozie_data_dir: "{{ hadoop_base_dir }}/oozie/data"
-oozie_log_dir: "{{ base_log_dir }}/oozie"
-
-# Storm dirs
-storm_local_dir: "{{ hadoop_base_dir }}/storm"
-storm_log_dir: "{{ base_log_dir }}/storm"
-
-# Infra-Solr dirs
-infra_solr_datadir: "{{ hadoop_base_dir }}/ambari-infra-solr/data"
-infra_solr_log_dir: "{{ base_log_dir }}/ambari-infra-solr"
-
-## Ranger audit (spool log) dirs
-ranger_yarn_xasecure_audit_destination_hdfs_batch_filespool_dir: "{{ base_log_dir }}/hadoop/yarn/audit/hdfs/spool"
-ranger_yarn_xasecure_audit_destination_solr_batch_filespool_dir: "{{ base_log_dir }}/hadoop/yarn/audit/solr/spool"
-ranger_kafka_xasecure_audit_destination_hdfs_batch_filespool_dir: "{{ base_log_dir }}/kafka/audit/hdfs/spool"
-ranger_kafka_xasecure_audit_destination_solr_batch_filespool_dir: "{{ base_log_dir }}/kafka/audit/solr/spool"
-ranger_storm_xasecure_audit_destination_hdfs_batch_filespool_dir: "{{ base_log_dir }}/storm/audit/hdfs/spool"
-ranger_storm_xasecure_audit_destination_solr_batch_filespool_dir: "{{ base_log_dir }}/storm/audit/solr/spool"
-
-# NIFI Dirs
-nifi_internal_dir: "{{ nifi_base_dir }}"
-nifi_content_repository_dir_default: "{{ nifi_base_dir }}/content_repository"
-nifi_database_dir: "{{ nifi_base_dir }}/database_repository"
-nifi_flowfile_repository_dir: "{{ nifi_base_dir }}/flowfile_repository"
-nifi_provenance_repository_dir_default: "{{ nifi_base_dir }}/provenance_repository"
-nifi_node_log_dir: "{{ base_log_dir }}/nifi"
-
-## NIFI-Registry Dirs
-nifi_registry_internal_dir: "{{ nifi_registry_base_dir }}"
-nifi_registry_database_dir: "{{ nifi_registry_base_dir }}/database"
-nifi_registry_internal_config_dir: "{{ nifi_registry_base_dir }}/conf"
-nifi_registry_log_dir: "{{ base_log_dir }}/nifi-registry"
+## NiFi-Registry main dirs
+nifi_registry_internal_dir: "/var/lib/nifi-registry"
+nifi_registry_database_dir: "{{ nifi_registry_internal_dir }}/database"
 
 # Other dirs
-hive_druid_working_directory: "{{ base_tmp_dir }}/druid-indexing"
+zookeeper_data_dir: "{{ hadoop_base_dir }}/zookeeper"
+oozie_data_dir: "{{ hadoop_base_dir }}/oozie/data"
+storm_local_dir: "{{ hadoop_base_dir }}/storm"
+infra_solr_datadir: "{{ hadoop_base_dir }}/ambari-infra-solr/data"
+atlas_data_dir: "/var/lib/atlas/data"
+heap_dump_location: "{{ base_tmp_dir }}"
+nfs_file_dump_dir: "{{ base_tmp_dir }}/.hdfs-nfs"
+hive_downloaded_resources_dir: "{{ base_tmp_dir }}/hive/${hive.session.id}_resources"
