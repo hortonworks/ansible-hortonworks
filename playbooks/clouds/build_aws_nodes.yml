@@ -31,6 +31,7 @@
     assign_public_ip: "{{ outer_loop.public_ip }}"
     key_name: "{{ cloud_config.ssh.keyname }}"
     exact_count: "{{ outer_loop.count }}"
+    instance_initiated_shutdown_behavior: "{{ (outer_loop.spot|default(false) == true) | ternary('terminate','stop') }}"
     volumes:
       - device_name: "{{ current_ami['images'][0]['root_device_name'] }}"
         volume_type: "{{ outer_loop.root_volume.type }}"
