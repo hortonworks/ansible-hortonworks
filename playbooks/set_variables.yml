@@ -163,7 +163,7 @@
         - name: Populate the hiveserver hosts list
           set_fact:
             hiveserver_hosts: "{{ hiveserver_hosts }} + {{ groups[item.host_group] }}"
-          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and ('HIVE_SERVER' in item.services or 'HIVE_METASTORE' in item.services or 'SPARK2_JOBHISTORYSERVER' in item.services)
+          when: groups[item.host_group] is defined and groups[item.host_group]|length > 0 and ('HIVE_SERVER' in item.services or 'HIVE_METASTORE' in item.services)
           with_items: "{{ blueprint_dynamic }}"
           no_log: True
 
@@ -304,7 +304,7 @@
         - name: Populate the hiveserver hosts list
           set_fact:
             hiveserver_hosts: "{{ groups['hadoop-cluster'] }}"
-          when: blueprint_static['host_groups'] | string is search("HIVE_SERVER") or blueprint_static['host_groups'] | string is search("HIVE_METASTORE") or blueprint_static['host_groups'] | string is search("SPARK2_JOBHISTORYSERVER")
+          when: blueprint_static['host_groups'] | string is search("HIVE_SERVER") or blueprint_static['host_groups'] | string is search("HIVE_METASTORE") or blueprint_static['host_groups'])
 
         - name: Populate the oozie hosts list
           set_fact:
