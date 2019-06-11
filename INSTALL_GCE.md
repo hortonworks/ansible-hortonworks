@@ -158,7 +158,7 @@ More details about how authentication to the Google Cloud Platform works is on t
 
    All of these are explained in greater details on the [Ansible Guide](https://docs.ansible.com/ansible/latest/scenario_guides/guide_gce.html) but for the purpose of this guide we'll use the following environment variables:
   
-   * **GCE_EMAIL**: the email account associated with the project (can be found on the [Service accounts](https://console.cloud.google.com/iam-admin/serviceaccounts) page -> `Service account ID` column)
+   * **GCE_EMAIL**: the Service account ID associated with the project (can be found on the [Service accounts](https://console.cloud.google.com/iam-admin/serviceaccounts) page -> `Service account ID` column)
    * **GCE_PROJECT**: the id of the project (can be found on the [All projects](https://console.cloud.google.com/iam-admin/projects) page)
    * **GCE_CREDENTIALS_FILE_PATH**: the local path to the JSON credentials file
 
