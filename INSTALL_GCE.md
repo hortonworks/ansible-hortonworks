@@ -122,7 +122,7 @@ More details about how authentication to the Google Cloud Platform works is on t
 
 1. Create a Google Cloud Platform Service Account
 
-   1. Go to the [Service accounts page](https://console.developers.google.com/permissions/serviceaccounts) and login with your Google account.
+   1. Go to the [Service accounts page](https://console.cloud.google.com/iam-admin/serviceaccounts) and login with your Google account.
     
    2. Decide on a project you want to use for the purpose of these scripts or create a new project in the `All projects` page.
    
