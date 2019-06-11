@@ -37,7 +37,7 @@ This node must be able to connect to the cluster nodes via SSH and to the Google
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade   
-   pip install ansible apache-libcloud pycrypto
+   pip install ansible apache-libcloud pycrypto requests google-auth
    ```
 
 
@@ -70,7 +70,7 @@ This node must be able to connect to the cluster nodes via SSH and to the Google
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade   
-   pip install ansible apache-libcloud pycrypto
+   pip install ansible apache-libcloud pycrypto requests google-auth
    ```
 
 
@@ -103,7 +103,7 @@ This node must be able to connect to the cluster nodes via SSH and to the Google
    ```
    pip install setuptools --upgrade
    pip install pip --upgrade
-   pip install ansible apache-libcloud pycrypto
+   pip install ansible apache-libcloud pycrypto requests google-auth
    ```
 
 
@@ -122,15 +122,15 @@ More details about how authentication to the Google Cloud Platform works is on t
 
 1. Create a Google Cloud Platform Service Account
 
-   1. Go to the [Service accounts page](https://console.cloud.google.com/iam-admin/serviceaccounts) and login with your Google account.
+   1. Go to the [Service accounts page](https://console.developers.google.com/iam-admin/serviceaccounts) and login with your Google account.
     
-   2. Decide on a project you want to use for the purpose of these scripts or create a new project in the `All projects` page.
+   2. Decide on a project you want to use for the purpose of these scripts or create a new project using the `CREATE` button.
    
-   3. Once the project has been selected, click on the `CREATE SERVICE ACCOUNT` link.
+   3. Once the project has been selected or created, click on the `CREATE SERVICE ACCOUNT` link.
    
    4. Give the Service account a name and a Role (recommended Role is `Project` -> `Editor`).
    
-   5. Also select the `Furnish a new private key` option and `JSON` as the Key type. This will also initiate a download of the JSON file holding the service account's credentials. Save this file.
+   5. On the next page, use the `CREATE KEY` button under `Create key (optional)` section and set `JSON` as the Key type. This will also initiate a download of the JSON file holding the service account's credentials. Save this file.
    
    6. If this is a new project, you'll also need to [associate a Billing Account](https://console.cloud.google.com/billing/projects) with the project (and create a [new Billing Account](https://console.cloud.google.com/billing) if none exists). If this was done, confirm that everything works by going to the [main Compute Engine page](https://console.cloud.google.com/compute/instances).
 
@@ -153,18 +153,19 @@ More details about how authentication to the Google Cloud Platform works is on t
 
    There are different ways to provide the credentials to the Ansible modules, each with its own advantages and disadvantages:
    * set variables directly inside the Ansible playbooks
-   * populate a `secrets.py` file
    * setting environment variables
 
-   All of these are explained in greater details on the [Ansible Guide](https://docs.ansible.com/ansible/latest/scenario_guides/guide_gce.html) but for the purpose of this guide we'll use the following environment variables:
-  
-   * **GCE_EMAIL**: the Service account ID associated with the project (can be found on the [Service accounts](https://console.cloud.google.com/iam-admin/serviceaccounts) page -> `Service account ID` column)
+   All of these are explained in greater details on the [Ansible Guide](https://docs.ansible.com/ansible/latest/scenario_guides/guide_gce.html#providing-credentials-as-module-parameters) but for the purpose of this guide we'll use the following environment variables:
+
+   * **GCP_AUTH_KIND**: type of authentication being used (choices: machineaccount, serviceaccount, application)
    * **GCE_PROJECT**: the id of the project (can be found on the [All projects](https://console.cloud.google.com/iam-admin/projects) page)
+   * **GCE_EMAIL**: the Service account ID associated with the project (can be found on the [Service accounts](https://console.cloud.google.com/iam-admin/serviceaccounts) page -> `Service account ID` column)
    * **GCE_CREDENTIALS_FILE_PATH**: the local path to the JSON credentials file
 
    ```
-   export GCE_EMAIL=hadoop-test@hadoop-123456.iam.gserviceaccount.com
+   export GCP_AUTH_KIND=serviceaccount
    export GCE_PROJECT=hadoop-123456
+   export GCE_EMAIL=hadoop-test@hadoop-123456.iam.gserviceaccount.com
    export GCE_CREDENTIALS_FILE_PATH=~/Hadoop-12345cb6789d.json
    ```
 
@@ -190,7 +191,7 @@ This is based on Google's [guide](https://cloud.google.com/compute/docs/instance
 
    Go to the [METADATA PAGE](https://console.cloud.google.com/compute/metadata) and click on the `SSH Keys` tab.
    
-   Click `Edit` and add the new key. When you paste the contents of the public key file obtained at the previous step, Google Compute Engine will automatically generate the Username, which is the non-root administrative user that is used to login to the cluster nodes.
+   Click on `Add SSH Keys` and paste the new key. When you paste the contents of the public key file obtained at the previous step, Google Compute Engine will automatically generate the Username, which is the non-root administrative user that is used to login to the cluster nodes.
    
    If you've used a different key than the one generated as part of the Build Setup, step 4, or you want to use a different user to login to the cluster nodes, replace the last bit of the key with the desired username.
    
