@@ -828,6 +828,9 @@
     },
     {
       "hbase-env" : {
+{% if 'ATLAS_SERVER' in blueprint_all_services and hdp_major_version|int >= 3 %}
+        "hbase.atlas.hook": "true",
+{% endif %}
         "hbase_java_io_tmpdir" : "{{ base_tmp_dir }}",
         "hbase_log_dir" : "{{ base_log_dir }}/hbase"
       }
