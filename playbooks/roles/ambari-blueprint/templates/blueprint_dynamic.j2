@@ -863,11 +863,13 @@
         "spark_log_dir" : "{{ base_log_dir }}/spark2"
       }
     },
+{% if hdp_minor_version is version_compare('2.6', '>=') %}
     {
       "livy2-env" : {
         "livy2_log_dir" : "{{ base_log_dir }}/livy2"
       }
     },
+{% endif %}
 {% endif %}
     {
       "tez-env" : {
