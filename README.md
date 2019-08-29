@@ -9,6 +9,7 @@ These Ansible playbooks will build a Hortonworks cluster (Hortonworks Data Platf
 
 - The aim is to first build the nodes in a Cloud environment, prepare them (OS settings, database, KDC, etc) and then install Ambari and create the cluster using Ambari Blueprints.
   - If the infrastructure is already built (Terraform, bare-metal, etc.), it can also use a [static inventory](inventory/static).
+  - For a detailed Terraform implementation check the following: [https://dataengi.com/2018/09/21/terraform-hdp](https://dataengi.com/2018/09/21/terraform-hdp).
 
 - It can use a static blueprint or a [dynamically generated](playbooks/roles/ambari-blueprint/templates/blueprint_dynamic.j2) one based on the components from the Ansible [variables file](playbooks/group_vars/all#L161).
   - The dynamic blueprint gives the freedom to distribute components for a chosen topology but this topology must respect Ambari Blueprint restrictions (e.g. if a single `NAMENODE` is set, there must also be a `SECONDARY_NAMENODE`).
