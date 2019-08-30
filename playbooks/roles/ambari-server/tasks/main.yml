@@ -169,7 +169,7 @@
   lineinfile:
     path: /etc/ambari-server/conf/ambari.properties
     state: present
-    line: 'server.startup.web.timeout=120'
+    line: 'server.startup.web.timeout={{ambari_server_startup_web_timeout}}'
   notify: Restart ambari-server
 
 - meta: flush_handlers

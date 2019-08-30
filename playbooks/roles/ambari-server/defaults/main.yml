@@ -1,3 +1,5 @@
 ---
+ambari_server_startup_web_timeout: 120
+
 postgres_port: 5432
 mysql_port: 3306
