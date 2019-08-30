@@ -39,6 +39,13 @@
     state: present
   notify: Restart ambari-agent
 
+- name: Update ambari-agent user
+  lineinfile:
+    path: /etc/ambari-agent/conf/ambari-agent.ini
+    state: present
+    line: 'run_as_user={{ambari_agent_user}}'
+  notify: Restart ambari-agent
+
 - meta: flush_handlers
 
 - name: Make sure the ambari-agent service is started

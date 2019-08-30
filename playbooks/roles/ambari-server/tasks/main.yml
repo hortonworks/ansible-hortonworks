@@ -172,6 +172,56 @@
     line: 'server.startup.web.timeout={{ambari_server_startup_web_timeout}}'
   notify: Restart ambari-server
 
+- name: Set the Ambari Server user
+  lineinfile:
+    path: /etc/ambari-server/conf/ambari.properties
+    state: present
+    line: 'ambari-server.user={{ambari_server_user}}'
+  notify: Restart ambari-server
+
+#TODO move to new role ansible-user
+- name: Create Ambari Server user
+  user:
+      name: "{{ ambari_server_user }}"
+      system: yes # not required. When creating an account C(state=present), setting this to C(yes) makes the user a system account. This setting cannot be changed on existing users.
+      # ssh_key_bits: default set by ssh-keygen # not required. Optionally specify number of bits in SSH key to create.
+      # update_password: always # not required. choices: always;on_create. C(always) will update passwords if they differ.  C(on_create) will only set the password for newly created users.
+      # non_unique: no # not required. Optionally when used with the -u option, this option allows to change the user ID to a non-unique value.
+      # force: no # not required. This only affects C(state=absent), it forces removal of the user and associated directories on supported platforms. The behavior is the same as C(userdel --force), check the man page for C(userdel) on your system for details and support.
+      # skeleton: undefined # not required. Optionally set a home skeleton directory. Requires create_home option!
+      # expires: undefined # not required. An expiry time for the user in epoch, it will be ignored on platforms that do not support this. Currently supported on GNU/Linux, FreeBSD, and DragonFlyBSD.,Since version 2.6 you can remove the expiry time specify a negative value. Currently supported on GNU/Linux and FreeBSD.
+      # create_home: yes # not required. Unless set to C(no), a home directory will be made for the user when the account is created or if the home directory does not exist.,Changed from C(createhome) to C(create_home) in version 2.5.
+      # password_lock: undefined # not required. Lock the password (usermod -L, pw lock, usermod -C). BUT implementation differs on different platforms, this option does not always mean the user cannot login via other methods. This option does not disable the user, only lock the password. Do not change the password in the same task. Currently supported on Linux, FreeBSD, DragonFlyBSD, NetBSD.
+      # ssh_key_passphrase: undefined # not required. Set a passphrase for the SSH key.  If no passphrase is provided, the SSH key will default to having no passphrase.
+      # groups: undefined # not required. List of groups user will be added to. When set to an empty string C(''), C(null), or C(~), the user is removed from all groups except the primary group. (C(~) means C(null) in YAML),Before version 2.3, the only input format allowed was a comma separated string. Now this parameter accepts a list as well as a comma separated string.
+      # home: undefined # not required. Optionally set the user's home directory.
+      # move_home: no # not required. If set to C(yes) when used with C(home=), attempt to move the user's old home directory to the specified directory if it isn't there already and the old home exists.
+      # password: undefined # not required. Optionally set the user's password to this crypted value.,On macOS systems, this value has to be cleartext. Beware of security issues.,See U(https://docs.ansible.com/ansible/faq.html#how-do-i-generate-crypted-passwords-for-the-user-module) for details on various ways to generate these password values.
+      # generate_ssh_key: no # not required. Whether to generate a SSH key for the user in question. This will B(not) overwrite an existing SSH key.
+      # append: no # not required. If C(yes), add the user to the groups specified in C(groups).,If C(no), user will only be added to the groups specified in C(groups), removing them from all other groups.
+      # uid: undefined # not required. Optionally sets the I(UID) of the user.
+      # ssh_key_comment: ansible-generated on  # not required. Optionally define the comment for the SSH key.
+      # group: undefined # not required. Optionally sets the user's primary group (takes a group name).
+      # shell: undefined # not required. Optionally set the user's shell.,On macOS, before version 2.5, the default shell for non-system users was /usr/bin/false. Since 2.5, the default shell for non-system users on macOS is /bin/bash.
+      # local: no # not required. Forces the use of "local" command alternatives on platforms that implement it. This is useful in environments that use centralized authentification when you want to manipulate the local users. I.E. it uses `luseradd` instead of `useradd`.,This requires that these commands exist on the targeted host, otherwise it will be a fatal error.
+      # seuser: undefined # not required. Optionally sets the seuser type (user_u) on selinux enabled systems.
+      # remove: no # not required. This only affects C(state=absent), it attempts to remove directories associated with the user. The behavior is the same as C(userdel --remove), check the man page for details and support.
+      # state: absent # not required. choices: absent;present. Whether the account should exist or not, taking action if the state is different from what is stated.
+      # ssh_key_file: .ssh/id_rsa # not required. Optionally specify the SSH key filename. If this is a relative filename then it will be relative to the user's home directory.
+      # login_class: undefined # not required. Optionally sets the user's login class, a feature of most BSD OSs.
+      # hidden: undefined # not required. macOS only, optionally hide the user from the login window and system preferences.,The default will be 'True' if the I(system) option is used.
+      # ssh_key_type: rsa # not required. Optionally specify the type of SSH key to generate. Available SSH key types will depend on implementation present on target host.
+  when: ambari_server_user != 'root'
+
+- name: Create Ambari Server and Agent sudoers configuration
+  template:
+    src: ambari_sudoers.j2
+    dest: /etc/sudoers.d/ambari
+    mode: 0600
+  tags:
+  - ambari-user
+  when: ambari_server_user != 'root'
+
 - meta: flush_handlers
 
 - name: Make sure the ambari-server service is started

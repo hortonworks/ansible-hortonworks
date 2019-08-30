@@ -1,0 +1,57 @@
+# Rules taken from: docs.hortonworks.com/HDPDocuments/HDP3/HDP-3.1.0/securing-credentials/content/ambari_sec_configuring_ambari_for_non_root.html
+# Note: However the official rules were incomplete when running a kerberized cluster (java cmd not allowed during DataNode startup).
+# Catch-all solution (at the bottom) grant permissions for all commands
+#
+# Ambari Commands
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /bin/mkdir -p /etc/security/keytabs, /bin/ls /etc/security/keytabs, /bin/chmod * /etc/security/keytabs/*.keytab, /bin/chown * /etc/security/keytabs/*.keytab, /bin/chgrp * /etc/security/keytabs/*.keytab, /bin/rm -f /etc/security/keytabs/*.keytab, /bin/cp -p -f /var/lib/ambari-server/data/tmp/* /etc/security/keytabs/*.keytab
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /bin/mkdir -p /var/lib/ambari-server/data/tmp, /bin/chmod * /var/lib/ambari-server/data/tmp, /bin/chown * /var/lib/ambari-server/data/tmp, /bin/chgrp * /var/lib/ambari-server/data/tmp, /bin/rm -rf /var/lib/ambari-server/data/tmp/*, /bin/cp -f /tmp/* /var/lib/ambari-server/data/tmp/*, /usr/bin/test * *, /bin/stat -c %u %g %a /var/lib/ambari-server/data/tmp/*
+
+# Ambari Customizable Users
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /bin/su hdfs *,/bin/su ambari-qa *,/bin/su ranger *,/bin/su zookeeper *,/bin/su knox *,/bin/su falcon *,/bin/su ams *, /bin/su flume *,/bin/su hbase *,/bin/su spark *,/bin/su accumulo *,/bin/su hive *,/bin/su hcat *,/bin/su kafka *,/bin/su mapred *,/bin/su oozie *,/bin/su sqoop *,/bin/su storm *,/bin/su tez *,/bin/su atlas *,/bin/su yarn *,/bin/su kms *,/bin/su activity_analyzer *,/bin/su livy *,/bin/su zeppelin *,/bin/su infra-solr *,/bin/su logsearch *
+
+# Ambari: Core System Commands
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/bin/yum,/usr/bin/zypper,/usr/bin/apt-get, /bin/mkdir, /usr/bin/test, /bin/ln, /bin/ls, /bin/chown, /bin/chmod, /bin/chgrp, /bin/cp, /usr/sbin/setenforce, /usr/bin/test, /usr/bin/stat, /bin/mv, /bin/sed, /bin/rm, /bin/kill, /bin/readlink, /usr/bin/pgrep, /bin/cat, /usr/bin/unzip, /bin/tar, /usr/bin/tee, /bin/touch, /usr/bin/mysql, /sbin/service mysqld *, /usr/bin/dpkg *, /bin/rpm *, /usr/sbin/hst *
+
+# Ambari: Hadoop and Configuration Commands
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/bin/hdp-select, /usr/bin/conf-select, /usr/hdp/current/hadoop-client/sbin/hadoop-daemon.sh, /usr/lib/hadoop/bin/hadoop-daemon.sh, /usr/lib/hadoop/sbin/hadoop-daemon.sh, /usr/bin/ambari-python-wrap *
+
+# Ambari: System User and Group Commands
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/sbin/groupadd, /usr/sbin/groupmod, /usr/sbin/useradd, /usr/sbin/usermod
+
+# Ambari: Kerberos Commands
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/bin/klist -k /etc/security/keytabs/*
+
+# Ambari: Knox Commands
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/bin/python2.6 /var/lib/ambari-agent/data/tmp/validateKnoxStatus.py *, /usr/hdp/current/knox-server/bin/knoxcli.sh
+
+# Ambari: Ranger Commands
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/*/ranger-usersync/setup.sh, /usr/bin/ranger-usersync-stop, /usr/bin/ranger-usersync-start, /usr/hdp/*/ranger-admin/setup.sh *, /usr/hdp/*/ranger-knox-plugin/disable-knox-plugin.sh *, /usr/hdp/*/ranger-storm-plugin/disable-storm-plugin.sh *, /usr/hdp/*/ranger-hbase-plugin/disable-hbase-plugin.sh *, /usr/hdp/*/ranger-hdfs-plugin/disable-hdfs-plugin.sh *, /usr/hdp/current/ranger-admin/ranger_credential_helper.py, /usr/hdp/current/ranger-kms/ranger_credential_helper.py, /usr/hdp/*/ranger-*/ranger_credential_helper.py
+
+# Ambari Infra and LogSearch Commands
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/lib/ambari-infra-solr/bin/solr *, /usr/lib/ambari-logsearch-logfeeder/run.sh *, /usr/sbin/ambari-metrics-grafana *, /usr/lib/ambari-infra-solr-client/solrCloudCli.sh *
+
+# Run Java
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/bin/java *, /usr/lib/jvm/java-1.8.0-openjdk/bin/java *
+
+# Run Kerberos
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/bin/kinit *, /usr/bin/kadmin *
+
+#Grant the group permission to run the command using visudo
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/sbin/ambari-server
+
+# Grant sudo power to HDP binaries (note version and build number as part of the path)
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-{{ hdp_build_number }}/hadoop/bin/
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-{{ hdp_build_number }}/hadoop-hdfs/bin/
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-{{ hdp_build_number }}/hadoop-yarn/bin/
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-{{ hdp_build_number }}/hadoop-mapreduce/bin/
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-{{ hdp_build_number }}/hive/bin/
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-{{ hdp_build_number }}/hive/scripts/llap/bin/
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-{{ hdp_build_number }}/hive-hcatalog/bin/
+
+# Some YARN components need sudo rights to /bin/su
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /bin/su *
+
+
+Defaults exempt_group = {{ambari_user}}
+Defaults !env_reset,env_delete-=PATH
+Defaults: {{ambari_user}} !requiretty

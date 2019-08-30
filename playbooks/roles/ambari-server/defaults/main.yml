@@ -1,4 +1,9 @@
 ---
+#TODO move to ambari-user role
+ambari_user: "{{ ambari_server_user }}"
+
+ambari_server_user: root
+
 ambari_server_startup_web_timeout: 120
 
 postgres_port: 5432
