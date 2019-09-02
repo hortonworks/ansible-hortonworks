@@ -1,0 +1,12 @@
+## This file configures the AWS inventory plugin
+## More infos on https://docs.ansible.com/ansible/latest/plugins/inventory/aws_ec2.html
+plugin: aws_ec2
+
+# add hosts to tag_Name_Value groups for each Name/Value tag pair
+keyed_groups:
+  - prefix: tag
+    key: tags
+
+# Note: Once the cluster was build, you can filter the dynamic inventory for the cluster:
+#filters:
+#  tag:Cluster: <replace by the cluster_name>
