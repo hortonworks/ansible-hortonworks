@@ -43,6 +43,7 @@
   lineinfile:
     path: /etc/ambari-agent/conf/ambari-agent.ini
     state: present
+    regexp: '^run_as_user='
     line: 'run_as_user={{ambari_agent_user}}'
   notify: Restart ambari-agent
 
