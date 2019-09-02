@@ -3,8 +3,8 @@
 
 - name: Add nodes to hadoop-cluster and {{ outer_loop.host_group }} groups
   add_host:
-    name: "{{ (outer_loop.public_ip|default(false)== true) | ternary(hostvars[local_loop].ec2_dns_name,hostvars[local_loop].ec2_private_dns_name) }}"
-    ansible_host: "{{ (outer_loop.public_ip|default(false)== true) | ternary(hostvars[local_loop].ec2_ip_address,hostvars[local_loop].ec2_private_ip_address) }}"
+    name: "{{ (outer_loop.public_ip|default(false)) | ternary(hostvars[local_loop].public_dns_name,hostvars[local_loop].private_dns_name) }}"
+    ansible_host: "{{ (outer_loop.public_ip|default(false)) | ternary(hostvars[local_loop].public_ip_address,hostvars[local_loop].private_ip_address) }}"
     ansible_user: "{{ cloud_config.admin_username|default('root') }}"
     ansible_ssh_private_key_file: "{{ cloud_config.ssh.privatekey }}"
     ansible_become_user: root
