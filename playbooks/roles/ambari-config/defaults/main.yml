@@ -1,0 +1,16 @@
+---
+
+### These are defaults originaly in each OS type vars
+### by moving these here it allows for over-riding
+
+gpl_repo_url: "{{ repo_base_url }}/HDP-GPL/{{ repo_os_family }}/{{ hdp_major_version }}.x/updates/{{ hdp_version }}"
+
+hdf_main_repo_url: "{{ repo_base_url }}/HDF/{{ repo_os_family }}/{{ hdf_major_version }}.x/updates/{{ hdf_version }}"
+
+hdp_main_repo_url: "{{ repo_base_url }}/HDP/{{ repo_os_family }}/{{ hdp_major_version }}.x/updates/{{ hdp_version }}"
+hdpsearch_main_repo_url: "{{ repo_base_url }}/HDP-SOLR-{{ hdpsearch_version }}-{{ hdpsearch_build_number }}/repos/{{ repo_os_family }}"
+
+main_os_target: "operating_systems/{{ baseurl_os_family }}"
+
+utils_os_target: "operating_systems/{{ baseurl_os_family }}/repositories/HDP-UTILS-{{ utils_version }}"
+utils_repo_url: "{{ repo_base_url }}/HDP-UTILS-{{ utils_version }}/repos/{{ repo_os_family }}"
