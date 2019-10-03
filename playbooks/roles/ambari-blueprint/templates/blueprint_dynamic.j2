@@ -492,6 +492,8 @@
 {% endif %}
         "dfs.namenode.name.dir" : "{{ dfs_namenode_name_dir | default('/hadoop/hdfs/namenode') }}",
         "dfs.datanode.data.dir" : "{{ dfs_datanode_data_dir | default('/hadoop/hdfs/data') }}",
+        "dfs.namenode.checkpoint.dir" : "{{ dfs_namenode_name_dir | default('/hadoop/hdfs/namesecondary') }}",
+        "dfs.journalnode.edits.dir" : "{{ dfs_datanode_data_dir | default('/hadoop/hdfs/journalnode') }}",
         "dfs.datanode.failed.volumes.tolerated" : "0",
         "dfs.replication" : "3"
       }
