@@ -46,6 +46,8 @@
 {{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-*/hive/bin/
 {{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-*/hive/scripts/llap/bin/
 {{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-*/hive-hcatalog/bin/
+# NiFi Ranger scripts
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdf/{{ hdf_version }}-*/nifi/ext/ranger/scripts/
 
 # Some YARN components need sudo rights to /bin/su
 {{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /bin/su *
