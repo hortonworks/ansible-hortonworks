@@ -402,9 +402,9 @@
         "properties" : {
           "nifi.web.proxy.context.path" : "{{ nifi_web_proxy_context_path | default('') }}",
           "nifi.web.proxy.host" : "{{ nifi_web_proxy_host | default('') }}",
-          "nifi.security.identity.mapping.pattern.dn" : "{{ nifi_secid_mapping_pattern_dn | default('') }}",
-          "nifi.security.identity.mapping.value.dn" : "{{ nifi_secid_mapping_value_dn | default('') }}",
-          "nifi.security.identity.mapping.transform.dn" : "{{ nifi_secid_mapping_transform_dn | default('') }}"
+          "nifi.security.identity.mapping.pattern.dn" : "{{ nifi_security_identity_mapping_pattern_dn | default('') }}",
+          "nifi.security.identity.mapping.value.dn" : "{{ nifi_security_identity_mapping_value_dn | default('') }}",
+          "nifi.security.identity.mapping.transform.dn" : "{{ nifi_security_identity_mapping_transform_dn | default('') }}"
         }
       }
     },
