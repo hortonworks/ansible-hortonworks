@@ -376,6 +376,20 @@
         "nifi.sensitive.props.key": "{{ nifi_security_options.sensitive_props_key }}"
       }
     },
+    { 
+      "nifi-ambari-ssl-config" : {
+        "nifi.initial.admin.identity": "{{ nifi_initial_admin_user | default('') }}",
+        "nifi.node.ssl.isenabled": "{{ enable_nifi_ssl | default(false) }}",
+        "nifi.security.keystore": "{{ keystore | default('')}}",
+        "nifi.security.keystorePasswd": "{{ keystore_pass | default('') }}",
+        "nifi.security.keystoreType": "{{ nifi_security_keystore_type | default('') }}",
+        "nifi.security.truststore": "{{ truststore | default('') }}",
+        "nifi.security.truststorePasswd": "{{ truststore_pass | default('') }}",
+        "nifi.security.truststoreType": "{{ nifi_security_truststore_type | default('') }}",
+        "nifi.toolkit.dn.suffix": "{{ nifi_dn_suffix | default('') }}",
+        "content": "{{ nifi_ambari_ssl_config_content | default ('') }}"
+      }
+    },
     {
       "nifi-env" : {
         "nifi_group" : "nifi",
@@ -387,7 +401,10 @@
         "properties_attributes" : { },
         "properties" : {
           "nifi.web.proxy.context.path" : "{{ nifi_web_proxy_context_path | default('') }}",
-          "nifi.web.proxy.host" : "{{ nifi_web_proxy_host | default('') }}"
+          "nifi.web.proxy.host" : "{{ nifi_web_proxy_host | default('') }}",
+          "nifi.security.identity.mapping.pattern.dn" : "{{ nifi_security_identity_mapping_pattern_dn | default('') }}",
+          "nifi.security.identity.mapping.value.dn" : "{{ nifi_security_identity_mapping_value_dn | default('') }}",
+          "nifi.security.identity.mapping.transform.dn" : "{{ nifi_security_identity_mapping_transform_dn | default('') }}"
         }
       }
     },
