@@ -1,6 +1,5 @@
 # Rules taken from: docs.hortonworks.com/HDPDocuments/HDP3/HDP-3.1.0/securing-credentials/content/ambari_sec_configuring_ambari_for_non_root.html
 # Note: However the official rules were incomplete when running a kerberized cluster (java cmd not allowed during DataNode startup).
-# Catch-all solution (at the bottom) grant permissions for all commands
 #
 # Ambari Commands
 {{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /bin/mkdir -p /etc/security/keytabs, /bin/ls /etc/security/keytabs, /bin/chmod * /etc/security/keytabs/*.keytab, /bin/chown * /etc/security/keytabs/*.keytab, /bin/chgrp * /etc/security/keytabs/*.keytab, /bin/rm -f /etc/security/keytabs/*.keytab, /bin/cp -p -f /var/lib/ambari-server/data/tmp/* /etc/security/keytabs/*.keytab
@@ -36,17 +35,17 @@
 # Run Kerberos
 {{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/bin/kinit *, /usr/bin/kadmin *
 
-#Grant the group permission to run the command using visudo
+# Grant the group permission to run the command using visudo
 {{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/sbin/ambari-server
 
 # Grant sudo power to HDP binaries (note version and build number as part of the path)
-{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-{{ hdp_build_number }}/hadoop/bin/
-{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-{{ hdp_build_number }}/hadoop-hdfs/bin/
-{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-{{ hdp_build_number }}/hadoop-yarn/bin/
-{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-{{ hdp_build_number }}/hadoop-mapreduce/bin/
-{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-{{ hdp_build_number }}/hive/bin/
-{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-{{ hdp_build_number }}/hive/scripts/llap/bin/
-{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-{{ hdp_build_number }}/hive-hcatalog/bin/
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-*/hadoop/bin/
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-*/hadoop-hdfs/bin/
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-*/hadoop-yarn/bin/
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-*/hadoop-mapreduce/bin/
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-*/hive/bin/
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-*/hive/scripts/llap/bin/
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-*/hive-hcatalog/bin/
 
 # Some YARN components need sudo rights to /bin/su
 {{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /bin/su *
