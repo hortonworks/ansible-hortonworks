@@ -39,15 +39,15 @@
 {{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/sbin/ambari-server
 
 # Grant sudo power to HDP binaries (note version and build number as part of the path)
-{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-*/hadoop/bin/
-{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-*/hadoop-hdfs/bin/
-{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-*/hadoop-yarn/bin/
-{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-*/hadoop-mapreduce/bin/
-{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-*/hive/bin/
-{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-*/hive/scripts/llap/bin/
-{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/{{ hdp_version }}-*/hive-hcatalog/bin/
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/*/hadoop/bin/
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/*/hadoop-hdfs/bin/
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/*/hadoop-yarn/bin/
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/*/hadoop-mapreduce/bin/
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/*/hive/bin/
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/*/hive/scripts/llap/bin/
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdp/*/hive-hcatalog/bin/
 # NiFi Ranger scripts
-{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdf/{{ hdf_version }}-*/nifi/ext/ranger/scripts/
+{{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /usr/hdf/*/nifi/ext/ranger/scripts/
 
 # Some YARN components need sudo rights to /bin/su
 {{ambari_user}} ALL=(ALL) NOPASSWD:SETENV: /bin/su *
