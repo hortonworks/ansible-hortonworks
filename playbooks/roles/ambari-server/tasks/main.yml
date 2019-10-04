@@ -180,6 +180,17 @@
     line: 'ambari-server.user={{ambari_server_user}}'
   notify: Restart ambari-server
 
+- name: Set the owner for the ambari folders
+  file:
+    state: directory
+    path: "{{ item }}"
+    owner: "{{ ambari_server_user }}"
+    recurse: yes
+  with_items:
+   - "/var/lib/ambari-server"
+   - "/var/run/ambari-server"
+   - "{{ base_log_dir }}/ambari-server"
+
 - meta: flush_handlers
 
 - name: Make sure the ambari-server service is started
