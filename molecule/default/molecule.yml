@@ -1,17 +1,94 @@
 ---
+# Molecule config for a single-node HDP cluster
+#
+# TODO Try multi-node cluster (so we can use the 2-node master/slave blueprint in default group_vars/all)
+#
 dependency:
   name: galaxy
 driver:
   name: docker
 lint:
   name: yamllint
+# Using geerlingguy's image that provides centos7 with ansible AND systemd
 platforms:
-  - name: instance
-    image: centos:7
+  - name: "${MOLECULE_DISTRO:-centos7}-hdp01"
+    image: "geerlingguy/docker-${MOLECULE_DISTRO:-centos7}-ansible:latest"
+    pre_build_image: True
+    privileged: True
+    volume_mounts:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
+    command: "/usr/sbin/init"
+    groups:
+      - hadoop-cluster
+      - hdp-master
+      # TODO either use 2 nodes, or provide group_vars with 1-node blueprint !
+      #- hdp-slave
+    networks:
+      - name: molecule_hdp
+    network_mode: bridge
+    # Host networking did not work on my Macbook (it hang at task waiting for the Ambari Agents registration)
+    #network_mode: host
+    published_ports:
+      # Ambari
+      - 0.0.0.0:8080:8080/tcp
+      # YARN
+      - 0.0.0.0:8088:8088/tcp
+      # HDFS
+      - 0.0.0.0:50070:50070/tcp
+      - 0.0.0.0:50075:50075/tcp
+      # Spark-History
+      - 0.0.0.0:18081:18081/tcp
+      # Knox
+      - 0.0.0.0:8443:8443/tcp
+      # Zeppelin
+      - 0.0.0.0:9995:9995/tcp
+      # Ranger
+      - 0.0.0.0:6080:6080/tcp
+      # NiFi
+      - 0.0.0.0:9090:9090/tcp
+      # NiFi-Registry
+      - 0.0.0.0:18080:18080/tcp      
+    #Not needed:
+    #exposed_ports:
+
 provisioner:
   name: ansible
+  config_options:
+    defaults:
+      gathering: smart
+      fact_caching: jsonfile
+      fact_caching_connection: /tmp/facts_cache
+    ssh_connection:
+      pipelining: True
+
+  options:
+    diff: true
+    v: True
+  inventory:
+    group_vars:
+      # Note: Need to use specific inventory group_vars here, since (due to vars precedence) inventory group_vars/all will be overriden by the playbook group_vars/all !
+      # However we still need to use 'all' group_vars so that the 'set_variables.yml' playbook (running on host=localhost) can see them!
+      all:
+        cluster_name: 'cluster-name that wont be used since the var is overriden anyway by playbook group_vars'
+      hadoop-cluster:
+        cluster_name: 'cluster_name_overriden_by_import_playbook_vars'
+
   lint:
     name: ansible-lint
+scenario:
+  name: default
+  test_sequence:
+    # - lint
+    #- destroy
+    - dependency
+    - syntax
+    - create
+    - prepare
+    - converge
+    #- idempotence
+    # - side_effect
+    - verify
+    #- destroy
 verifier:
   name: testinfra
   lint:
