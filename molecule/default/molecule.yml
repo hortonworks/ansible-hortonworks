@@ -20,9 +20,7 @@ platforms:
     command: "/usr/sbin/init"
     groups:
       - hadoop-cluster
-      - hdp-master
-      # TODO either use 2 nodes, or provide group_vars with 1-node blueprint !
-      #- hdp-slave
+      - hdp-singlenode
     networks:
       - name: molecule_hdp
     network_mode: bridge

@@ -1,12 +1,24 @@
 ---
+## Notes:
+# - deployment with blueprint playbooks/group_vars/example-hdp3-singlenode-with-nifi, hung during services startup with docker mem max at 9GB
+#
+# Important: Any variable overrides must be read not just for 'all' hosts, but also on 'localhost' (used in the set_variables.yml playbooks)
 - name: Pre-reqs
-  hosts: all
+  hosts: "localhost:all"
+  vars:
+    blueprint_vars_file: example-hdp3-singlenode
+    #blueprint_vars_file: example-hdp3-singlenode-with-nifi
+    # Note: To install Ranger, you need to set a non-embedded DB
+    #blueprint_vars_file: example-hdp3-singlenode-with-ranger-atlas
   tasks:
-    - name: checks
-      debug:
-        var: cloud_name
     - debug:
-        var: is_vm_docker_containers
+        var: cloud_name
+    - name: "load blueprint vars for the selected blueprint cfg file {{blueprint_vars_file}}"
+      include_vars: ../../playbooks/group_vars/{{blueprint_vars_file}}
+    - debug:
+        var: blueprint_dynamic
+        verbosity: 1
+          
 - name: Converge
   # Note: To override the repo's "playbook group_vars" it's easier to use a "vars:" block here, as inventory vars have lower precedence!
   # Note: Another reason for vars *here* is: the 'set_variables.yml' playbook runs on 'localhost', so only sees 'all' group_vars 
@@ -14,35 +26,5 @@
   vars:
         is_vm_docker_containers: "yes"
         cloud_name: static
-        java: 'openjdk'        
+        java: 'openjdk'
         ambari_version: '2.7.3.0'
-        blueprint_dynamic:
-          - host_group: "hdp-master"
-            clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT']
-            #clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'HIVE_CLIENT', 'SPARK2_CLIENT']
-            services:
-              - ZOOKEEPER_SERVER
-              - NAMENODE
-              - SECONDARY_NAMENODE
-              - RESOURCEMANAGER
-              - APP_TIMELINE_SERVER
-              - YARN_REGISTRY_DNS
-              - TIMELINE_READER
-              - HISTORYSERVER
-              - SPARK2_JOBHISTORYSERVER
-              - HIVE_SERVER
-              - HIVE_METASTORE
-              - OOZIE_SERVER
-              - KNOX_GATEWAY
-              - AMBARI_SERVER
-              - INFRA_SOLR
-              - METRICS_COLLECTOR
-              - METRICS_GRAFANA
-              - METRICS_MONITOR
-              - HST_SERVER
-              - ACTIVITY_ANALYZER
-              - ACTIVITY_EXPLORER
-              - HST_AGENT
-              - DATANODE
-              - NODEMANAGER
-              - METRICS_MONITOR
