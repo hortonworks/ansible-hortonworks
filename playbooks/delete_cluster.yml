@@ -1,0 +1,147 @@
+---
+- hosts: hdp-master
+  tasks:
+  - shell: "systemctl stop ambari-server; yes | ambari-server reset"
+  ignore_errors: true
+
+- hosts: hdp-cluster
+  tasks:
+#  - name: stop all
+#    uri:
+#      url: http://node1.dev9.acs.sd.spawar.navy.mil:8080/api/v1/clusters/acs_five/services
+#      method: PUT
+#      user: admin
+#      password: admin
+#      headers: 
+#        X-Requested-By: "ambari"
+#      body: "{{ lookup('file','stop.json') }}"
+#      force_basic_auth: yes
+#      status_code: 201
+#      body_format: json
+#    shell: "curl -i -u admin:admin -H 'X-Requested-By: ambari'  -X PUT  -d '\{'RequestInfo':\{'context':'_PARSE_.STOP.ALL_SERVICES','operation_level':\{'level':'CLUSTER','cluster_name':'Sandbox'\}\},'Body':\{'ServiceInfo':\{'state':'INSTALLED'\}\}\}'  
+#    run_once: true
+  - name: cleanup
+    shell: PYTHONPATH=/usr/lib/ambari-agent/lib:/usr/lib/ambari-server/lib /usr/lib/ambari-agent/lib/ambari_agent/HostCleanup.py --silent --skip=users
+    ignore_errors: true
+
+  - name: remove packages
+    shell: "yum remove -y {{ item }}"
+    with_items:
+      - hive\*
+      - oozie\*
+      - pig\*
+      - zookeeper\*
+      - tez\*
+      - hbase\*
+      - ranger\*
+      - knox\*
+      - storm\*
+      - accumulo\*
+      - falcon\*
+      - ambari-metrics-hadoop-sink 
+      - smartsense-hst
+      - slider\*
+      - ambari-\*
+      - spark2\*
+      - spark_\*-yarn-shuffle
+      - ambari-infra-solr-client
+    ignore_errors: true
+
+  - name: stop services
+    service:
+      state: stopped
+      name: "{{ item }}"
+    with_items:
+      - ambari-agent
+      - ambari-server
+    ignore_errors: true
+
+  - name: remove packages
+    yum: 
+     state: absent
+     pkg: "{{ item }}"
+    with_items:
+      - ambari-agent
+      - ambari-server
+      - ambari-metrics\*
+
+  - name: remove files
+    file:
+     path: "{{ item }}"
+     state: absent
+    with_items:
+    - /etc/ambari-agent
+    - /etc/ambari-metrics-grafana
+    - /etc/ambari-server
+    - /etc/ams-hbase
+    - /etc/falcon
+    - /etc/flume
+    - /etc/hadoop
+    - /etc/hadoop-httpfs
+    - /etc/hbase
+    - /etc/hive 
+    - /etc/hive-hcatalog
+    - /etc/hive-webhcat
+    - /etc/hive2
+    - /etc/hst
+    - /etc/knox 
+    - /etc/livy
+    - /etc/mahout 
+    - /etc/oozie
+    - /etc/phoenix
+    - /etc/pig 
+    - /etc/ranger-admin
+    - /etc/ranger-usersync
+    - /etc/spark2
+    - /etc/tez
+    - /etc/tez_hive2
+    - /etc/zookeeper
+    - /hadoop
+    - /hdfs/hadoop
+    - /hdfs/lost+found
+    - /hdfs/var
+    - /local/opt/hadoop
+    - /tmp/hadoop
+    - /usr/bin/hadoop
+    - /usr/hdp
+    - /var/hadoop
+    - /usr/lib/ambari-agent
+    - /usr/lib/ambari-infra-solr-client
+    - /usr/lib/ambari-metrics-hadoop-sink
+    - /usr/lib/ambari-metrics-kafka-sink
+    - /usr/lib/ambari-server-backups
+    - /usr/lib/ams-hbase
+    - /usr/lib/mysql
+    - /var/lib/ambari-agent
+    - /var/lib/ambari-metrics-grafana
+    - /var/lib/ambari-server
+    - /var/lib/flume
+    - /var/lib/hadoop-hdfs
+    - /var/lib/hadoop-mapreduce
+    - /var/lib/hadoop-yarn 
+    - /var/lib/hive2
+    - /var/lib/knox
+    - /var/lib/smartsense
+    - /var/lib/storm
+    - /var/lib/storm
+    - /var/lib/storm
+    ignore_errors: true
+
+  - name: remove database
+    yum:
+     state: absent
+     pkg: "{{ item }}"
+    with_items:
+    - mysql
+    - mysql-server
+    - postgresql
+    ignore_errors: true
+
+  - name: remove dirs
+    file:
+     state: absent
+     path: "{{ item }}"
+    with_items:
+    - /var/lib/pgsql
+    - /var/lib/mysql
+    ignore_errors: true

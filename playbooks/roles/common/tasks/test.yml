@@ -1,0 +1,5 @@
+ ---
+- hosts: hdp-master
+  tasks:
+    - name: Start kinit
+      shell: "kinit admin/admin"

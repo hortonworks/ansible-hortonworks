@@ -1,0 +1,20 @@
+---
+- import_playbook: "set_variables.yml"
+
+- name: Apply the krb5-client role to the hadoop-cluster group
+  hosts: hadoop-cluster
+  any_errors_fatal: true
+  become: yes
+  roles:
+    - role: krb5-client
+      when: security == "mit-kdc"
+  tags: mit-kdc
+
+- name: Apply the mit-kdc role to the ambari-server group
+  hosts: hdp-kdc
+  any_errors_fatal: true
+  become: yes
+  roles:
+    - role: mit-kdc
+      when: security == "mit-kdc"
+  tags: mit-kdc

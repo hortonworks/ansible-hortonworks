@@ -8,6 +8,9 @@
 - import_playbook: "configure_ambari.yml"
   tags: ambari,blueprint
 
+- import_playbook: "instal-kdc.yml"
+  tags: kdc
+
 - import_playbook: "apply_blueprint.yml"
   tags: blueprint
 

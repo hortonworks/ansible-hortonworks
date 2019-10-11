@@ -863,13 +863,11 @@
         "spark_log_dir" : "{{ base_log_dir }}/spark2"
       }
     },
-{% if hdp_minor_version is version_compare('2.6', '>=') %}
     {
       "livy2-env" : {
         "livy2_log_dir" : "{{ base_log_dir }}/livy2"
       }
     },
-{% endif %}
 {% endif %}
     {
       "tez-env" : {
@@ -883,9 +881,9 @@
         "ha.zookeeper.quorum" : "{% for zk in zookeeper_groups %}%HOSTGROUP::{{ zk }}%:2181{% if not loop.last %},{% endif %}{% endfor %}",
         {% endif -%}
 {% if security|lower != "none" and security_options.http_authentication|default(no) %}
-        "hadoop.http.authentication.simple.anonymous.allowed" : "false",
+        "hadoop.http.authentication.simple.anonymous.allowed" : "true",
         "hadoop.http.authentication.signature.secret.file" : "/etc/security/http_secret",
-        "hadoop.http.authentication.type" : "kerberos",
+        "hadoop.http.authentication.type" : "simple",
         "hadoop.http.authentication.kerberos.keytab" : "/etc/security/keytabs/spnego.service.keytab",
         "hadoop.http.authentication.kerberos.principal" : "HTTP/_HOST@{{ security_options.realm }}",
         "hadoop.http.filter.initializers" : "org.apache.hadoop.security.AuthenticationFilterInitializer",

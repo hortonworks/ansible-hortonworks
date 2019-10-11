@@ -3,11 +3,11 @@
 ## cluster configuration ##
 ###########################
 
-cluster_name: 'mytestcluster'
+cluster_name: 'OCTOCluster'
 
-ambari_version: '2.7.4.0'                                 # must be the 4-part full version number
+ambari_version: '2.7.3.0'                                 # must be the 4-part full version number
 
-hdp_version: '3.1.4.0'                                    # must be the 4-part full version number
+hdp_version: '3.1.0.0'                                    # must be the 4-part full version number
 hdp_build_number: 'auto'                                  # the HDP build number from docs.hortonworks.com (if set to 'auto', Ansible will try to get it from the repository)
 
 hdf_version: '3.4.1.1'                                    # must be the 4-part full version number
@@ -23,7 +23,7 @@ repo_base_url: 'http://public-repo-1.hortonworks.com'     # change this if using
 ## general configuration ##
 ###########################
 
-external_dns: yes                                         # set to yes to use the existing DNS (when no, it will update the /etc/hosts file - must be set to 'no' when using Azure)
+external_dns: no                                         # set to yes to use the existing DNS (when no, it will update the /etc/hosts file - must be set to 'no' when using Azure)
 disable_firewall: no                                      # set to yes to disable the existing local firewall service (iptables, firewalld, ufw)
 timezone: UTC
 
@@ -63,12 +63,6 @@ database_options:
   superset_db_name: 'superset'
   superset_db_username: 'superset'
   superset_db_password: 'superset'
-  rangeradmin_db_name: 'ranger'
-  rangeradmin_db_username: 'ranger'
-  rangeradmin_db_password: 'ranger'
-  rangerkms_db_name: 'rangerkms'
-  rangerkms_db_username: 'rangerkms'
-  rangerkms_db_password: 'rangerkms'
   registry_db_name: 'registry'
   registry_db_username: 'registry'
   registry_db_password: 'registry'
@@ -76,18 +70,30 @@ database_options:
   streamline_db_username: 'streamline'
   streamline_db_password: 'streamline'
 
+database: 'mysql'                                         # can be set to 'embedded', 'postgres', 'mysql' or 'mariadb'
+database_options:
+  add_repo: yes                                           # if set to 'no', Ansible will not add a repo file (containing the public URL)
+  external_hostname: ''
+  rangeradmin_db_name: 'ranger'
+  rangeradmin_db_username: 'ranger'
+  rangeradmin_db_password: 'ranger'
+  rangerkms_db_name: 'rangerkms'
+  rangerkms_db_username: 'rangerkms'
+  rangerkms_db_password: 'rangerkms'
+
 
 #####################################
 ## kerberos security configuration ##                     # useful if blueprint is dynamic, but can also be used to deploy the MIT KDC
 #####################################
 
-security: 'none'                                          # can be set to 'none', 'mit-kdc', 'ipa' or 'active-directory'
+kerberos_password: 'octosecure'
+security: 'mit-kdc'                                       # can be set to 'none', 'mit-kdc', 'ipa' or 'active-directory'
 security_options:
-  external_hostname: ''                                   # if this is empty, Ansible will install and prepare the MIT KDC on the Ambari node
-  realm: 'EXAMPLE.COM'
+  external_hostname: 'hdp-kdc1'                            # if this is empty, Ansible will install and prepare the MIT KDC on the Ambari node
+  realm: 'OCTO.COM'
   admin_principal: 'admin'                                # the Kerberos principal that has the permissions to create new users (don't append the realm)
-  admin_password: "{{ default_password }}"
-  kdc_master_key: "{{ default_password }}"                # only used when security is set to 'mit-kdc'
+  admin_password: "{{ kerberos_password }}"
+  kdc_master_key: "{{ kerberos_password }}"               # only used when security is set to 'mit-kdc'
   ldap_url: 'ldaps://ad.example.com:636'                  # only used when security is set to 'active-directory'
   container_dn: 'OU=hadoop,DC=example,DC=com'             # only used when security is set to 'active-directory'
   http_authentication: yes                                # set to yes to enable HTTP authentication (SPNEGO)
@@ -177,7 +183,7 @@ blueprint_name: '{{ cluster_name }}_blueprint'            # the name of the blue
 blueprint_file: 'blueprint_dynamic.j2'                    # the blueprint JSON file - 'blueprint_dynamic.j2' is a Jinja2 template that generates the required JSON
 blueprint_dynamic:                                        # properties for the dynamic blueprint - these are only used by the 'blueprint_dynamic.j2' template to generate the JSON
   - host_group: "hdp-master"
-    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT']
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT']
     services:
       - ZOOKEEPER_SERVER
       - NAMENODE
@@ -187,29 +193,40 @@ blueprint_dynamic:                                        # properties for the d
       - YARN_REGISTRY_DNS
       - TIMELINE_READER
       - HISTORYSERVER
-      - SPARK2_JOBHISTORYSERVER
       - HIVE_SERVER
       - HIVE_METASTORE
       - OOZIE_SERVER
+      - HBASE_MASTER
+      - HBASE_REGIONSERVER
+      - SPARK2_JOBHISTORYSERVER
+      - ZEPPELIN_MASTER
       - KNOX_GATEWAY
-      - AMBARI_SERVER
-      - INFRA_SOLR
-      - METRICS_COLLECTOR
-      - METRICS_GRAFANA
-      - METRICS_MONITOR
+      - KAFKA_BROKER
       - HST_SERVER
       - ACTIVITY_ANALYZER
       - ACTIVITY_EXPLORER
+      - RANGER_ADMIN
+      - RANGER_USERSYNC
+      - RANGER_KMS_SERVER
       - HST_AGENT
+      - AMBARI_SERVER
+      - INFRA_SOLR
+      - SUPERSET
+      - METRICS_COLLECTOR
+      - METRICS_GRAFANA
+      - METRICS_MONITOR
   - host_group: "hdp-slave"
-    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'OOZIE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT']
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'INFRA_SOLR_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT']
     services:
       - DATANODE
       - NODEMANAGER
       - METRICS_MONITOR
       - HST_AGENT
-
-
+      - HBASE_REGIONSERVER
+  - host_group: "hdp-kdc"
+    clients: ['KERBEROS_CLIENT']
+    services:
+      - KERBEROS_CLIENT
 
 
 ############################

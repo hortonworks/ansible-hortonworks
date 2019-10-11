@@ -1,0 +1,5 @@
+[hdp-master]
+hdp-master1 ansible_host=178.128.84.215 ansible_user=root ansible_ssh_private_key_file="~/.ssh/id_rsa" rack=/default-rack
+
+[hdp-kdc]
+hdp-kdc1 ansible_host=178.128.24.70 ansible_user=root ansible_ssh_private_key_file="~/.ssh/id_rsa" rack=/default-rack

@@ -13,6 +13,10 @@ packages:
 
 openjdk_package: java-1.8.0-openjdk-devel
 
+extjs_package_rpm : http://public-repo-1.hortonworks.com/HDP-UTILS-GPL-1.1.0.22/repos/centos6/extjs/extjs-2.2-1.noarch.rpm
+
 ntp_service_name: ntpd
 
 firewall_service_name: iptables
+
+hostname: hdp-master1

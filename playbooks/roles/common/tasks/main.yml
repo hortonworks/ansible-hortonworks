@@ -23,6 +23,11 @@
   include_tasks: java.yml
   when: java != "embedded"
 
+- name: Install Extjs for Oozie UI
+  yum:
+    name: "{{ extjs_package_rpm }}"
+    state: present
+
 - name: Make sure the NTP service is started
   service:
     name: "{{ ntp_service_name }}"
@@ -44,6 +49,41 @@
   with_items:
     - "{{ groups['hadoop-cluster']|sort(reverse=True) }}"
   when: not external_dns
+
+- name: clear default hosts in /etc/hosts [1]
+  lineinfile:
+    dest: /etc/hosts
+    regexp: "^127.0.0.1 (?!localhost)"
+    state: absent
+
+- name: clear default hosts in /etc/hosts [2]
+  lineinfile:
+    dest: /etc/hosts
+    regexp: "^::1 (?!localhost)"
+    state: absent
+
+- name : Modifie the sshd_config Add PasswordAuthentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    backup: yes
+    regexp: '^PasswordAuthentication '
+    insertafter: '^#PermitEmptyPasswords '
+    line: 'PasswordAuthentication yes'
+    validate: '/usr/sbin/sshd -T -f %s'
+
+- name : Modifie the sshd_config Add PermitRootLogin
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    backup: yes
+    regexp: '^PermitRootLogin '
+    insertafter: '^PasswordAuthentication '
+    line: 'PermitRootLogin yes'
+    validate: '/usr/sbin/sshd -T -f %s'
+
+- name : Restart sshd
+  systemd:
+    name: sshd
+    state: reloaded
 
 - name: Make sure /etc/security/limits.d exists
   file:
@@ -98,7 +138,7 @@
       ignore_errors: true
   when: disable_firewall and firewall_service_name is defined
 
-- name: Disable selinux
+- name: Disable SElinux
   selinux:
     state: disabled
   when: ansible_os_family|lower == "redhat" and ansible_distribution|lower != "amazon" and is_vm_docker_containers != "yes"
@@ -117,14 +157,14 @@
   when: ((ansible_os_family|lower == "redhat" and ansible_distribution_major_version|int >= 7) or
         (ansible_distribution|lower == "amazon" and ansible_distribution_version|int >= 2) or
         (ansible_os_family|lower == "debian" and ansible_distribution_major_version|int >= 7) or
-        (ansible_os_family|lower == "suse" and ansible_distribution_major_version|int >= 12)) and 
+        (ansible_os_family|lower == "suse" and ansible_distribution_major_version|int >= 12)) and
         is_vm_docker_containers != "yes"
   notify: Generate the Grub config file
 
 - name: Set timezone to "{{ timezone }}"
   timezone:
     name: "{{ timezone }}"
-    
+
 - meta: flush_handlers
 
 - name: Configure tuned (RHEL/CentOS 7)

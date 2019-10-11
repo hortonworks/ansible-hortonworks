@@ -61,20 +61,22 @@
   service:
     name: "{{ kdc_service_name }}"
     state: started
+  ignore_errors: false
 
 - name: Make sure the kdc service is enabled
   service:
     name: "{{ kdc_service_name }}"
     enabled: yes
-  ignore_errors: true
+  ignore_errors: false
 
 - name: Make sure the kadmin service is started
   service:
     name: "{{ kadmin_service_name }}"
     state: started
+  ignore_errors: false
 
 - name: Make sure the kadmin service is enabled
   service:
     name: "{{ kadmin_service_name }}"
     enabled: yes
-  ignore_errors: true
+  ignore_errors: false

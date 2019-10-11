@@ -7,8 +7,11 @@
 ######################################################
 
 [hdp-master]
-master01 ansible_host=192.168.0.2 ansible_user=root ansible_ssh_private_key_file="~/.ssh/id_rsa" rack=/default-rack
+hdp-master1 ansible_host=178.128.84.215 ansible_user=root ansible_ssh_private_key_file="~/.ssh/id_rsa" rack=/default-rack
 
 [hdp-slave]
-slave01 ansible_host=192.168.0.3 ansible_user=root ansible_ssh_private_key_file="~/.ssh/id_rsa" rack=/default-rack
-#slave02 ansible_host=192.168.0.4 ansible_user=root ansible_ssh_pass=changeme
+hdp-slave1 ansible_host=178.128.92.14 ansible_user=root ansible_ssh_private_key_file="~/.ssh/id_rsa" rack=/default-rack
+hdp-slave2 ansible_host=178.128.90.27 ansible_user=root ansible_ssh_private_key_file="~/.ssh/id_rsa" rack=/default-rack
+
+[hdp-kdc]
+hdp-kdc1 ansible_host=178.128.24.70 ansible_user=root ansible_ssh_private_key_file="~/.ssh/id_rsa" rack=/default-rack
