@@ -6,9 +6,12 @@
 - name: Pre-reqs
   hosts: "localhost:all"
   vars:
-    blueprint_vars_file: example-hdp3-singlenode
+    ## Note: As travis provide only 7.5GB VMs, to get a working deployment (including started services started) you have to use a more minimal blueprint:
+    blueprint_vars_file: example-hdp3-singlenode-no-monitoring
+    ## Note: All below blueprints require ~12GB dedicated RAM
+    #blueprint_vars_file: example-hdp3-singlenode
     #blueprint_vars_file: example-hdp3-singlenode-with-nifi
-    # Note: To install Ranger, you need to set a non-embedded DB
+    ## Note: To install Ranger, you need to set a non-embedded DB
     #blueprint_vars_file: example-hdp3-singlenode-with-ranger-atlas
   tasks:
     - debug:
@@ -28,3 +31,5 @@
         cloud_name: static
         java: 'openjdk'
         ambari_version: '2.7.3.0'
+        # Currently postgres startup fails in database 'role' with error "Unable to start service postgresql-9.6"
+        #database: 'postgres'
