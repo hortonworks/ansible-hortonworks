@@ -1,7 +1,9 @@
 ---
 # Molecule config for a single-node HDP cluster
 #
-# TODO Try multi-node cluster (so we can use the 2-node master/slave blueprint in default group_vars/all)
+# Notes:
+# - Linters are set enabled=false because the roles currently contains many lint warnings
+# - The 'destroy' action is commented out to avoid accidentally destroying your molecule cluster
 #
 dependency:
   name: galaxy
@@ -9,12 +11,13 @@ driver:
   name: docker
 lint:
   name: yamllint
+  enabled: false
 # Using geerlingguy's image that provides centos7 with ansible AND systemd
 platforms:
   - name: "${MOLECULE_DISTRO:-centos7}-hdp01"
     image: "geerlingguy/docker-${MOLECULE_DISTRO:-centos7}-ansible:latest"
-    pre_build_image: True
-    privileged: True
+    pre_build_image: true
+    privileged: true
     volume_mounts:
       - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
     command: "/usr/sbin/init"
@@ -51,17 +54,17 @@ platforms:
 
 provisioner:
   name: ansible
+  enabled: false
   config_options:
     defaults:
       gathering: smart
       fact_caching: jsonfile
       fact_caching_connection: /tmp/facts_cache
     ssh_connection:
-      pipelining: True
-
+      pipelining: true
   options:
     diff: true
-    v: True
+    v: true
   inventory:
     group_vars:
       # Note: Need to use specific inventory group_vars here, since (due to vars precedence) inventory group_vars/all will be overriden by the playbook group_vars/all !
@@ -70,23 +73,25 @@ provisioner:
         cluster_name: 'cluster-name that wont be used since the var is overriden anyway by playbook group_vars'
       hadoop-cluster:
         cluster_name: 'cluster_name_overriden_by_import_playbook_vars'
-
+  # ansible-lint config
   lint:
     name: ansible-lint
+    enabled: false
+
 scenario:
   name: default
   test_sequence:
-    # - lint
-    #- destroy
+    - lint
+    # - destroy
     - dependency
     - syntax
     - create
     - prepare
     - converge
-    #- idempotence
+    # - idempotence
     # - side_effect
     - verify
-    #- destroy
+    # - destroy
 verifier:
   name: testinfra
   lint:
