@@ -993,7 +993,7 @@
         "log4j.rootLogger" : "{{ zookeper_root_logger | default('INFO, CONSOLE') }}"
       }
     },
-{% if groups['spark_maser'] is defined and 
+{% if groups['spark_master'] is defined and 
       groups['spark_master']|length > 0 %}
     {
       "spark2-defaults": {
