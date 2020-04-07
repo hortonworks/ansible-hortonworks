@@ -993,6 +993,8 @@
         "log4j.rootLogger" : "{{ zookeper_root_logger | default('INFO, CONSOLE') }}"
       }
     },
+{% if groups['spark_master'] is defined and 
+      groups['spark_master']|length > 0 %}
     {
       "spark2-defaults": {
         "spark.history.retainedApplications" : "{{ retainedApplications | default('50')}}",
@@ -1010,6 +1012,7 @@
         "spark.history.fs.logDirectory" : "{{ spark_eventlog_dir | default('hdfs:///spark2-history/') }}"
       }
     }
+{% endif %}
   ],
   "host_groups" : [
     {% for blueprint_item in blueprint_dynamic if groups[blueprint_item.host_group] is defined and groups[blueprint_item.host_group]|length > 0 -%}

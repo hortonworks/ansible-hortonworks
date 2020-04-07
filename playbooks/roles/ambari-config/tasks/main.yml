@@ -127,20 +127,20 @@
         return_content: no
       when: ambari_version is version_compare('2.6', '<')
 
-#    - name: Upload the HDF Version Definition file for HDF-only clusters (Ambari 2.6+)
-#      template:
-#        src: "{{ item }}"
-#        dest: "/tmp/cluster_vdf.xml"
-#        mode: 0640
-#        force: yes
-#      with_first_found:
-#        - files:
-#            - "vdf-HDF-{{ hdf_version }}.xml.j2"
-#            - "vdf-HDF-{{ hdf_minor_version }}-latest.xml.j2"
-#            - "vdf-HDF-{{ hdf_major_version }}-latest.xml.j2"
-#          paths:
-#            - ../templates
-#      when: ambari_version is version_compare('2.6', '>=') and not install_hdp|default(false)
+    - name: Upload the HDF Version Definition file for HDF-only clusters (Ambari 2.6+)
+      template:
+        src: "{{ item }}"
+        dest: "/tmp/cluster_vdf.xml"
+        mode: 0640
+        force: yes
+      with_first_found:
+        - files:
+            - "vdf-HDF-{{ hdf_version }}.xml.j2"
+            - "vdf-HDF-{{ hdf_minor_version }}-latest.xml.j2"
+            - "vdf-HDF-{{ hdf_major_version }}-latest.xml.j2"
+          paths:
+            - ../templates
+      when: ambari_version is version_compare('2.6', '>=') and not install_hdp|default(false)
     - debug: msg="I SHOULD NOT PRINT THIS"
       when: ambari_version is version_compare('2.6', '>=') and not install_hdp|default(false)
   when: install_hdf is defined and install_hdf
