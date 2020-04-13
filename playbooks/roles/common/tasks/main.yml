@@ -15,7 +15,7 @@
 - name: Install required packages
   package:
     name: "{{ item }}"
-    update_cache: yes
+    update_cache: True
     state: present
   with_items: "{{ packages | join(',') }}"
 
@@ -31,7 +31,7 @@
 - name: Make sure the NTP service is enabled
   service:
     name: "{{ ntp_service_name }}"
-    enabled: yes
+    enabled: True
   ignore_errors: true
 
 - name: Add mappings to /etc/hosts
@@ -54,7 +54,7 @@
 - name: Set nofile and nproc limits
   blockinfile:
     path: /etc/security/limits.d/99-hadoop.conf
-    create: yes
+    create: True
     mode: 0644
     block: |
       * soft nofile 32768
@@ -68,8 +68,8 @@
     name: vm.swappiness
     value: "{{ swappiness }}"
     state: present
-    reload: yes
-    ignoreerrors: yes
+    reload: True
+    ignoreerrors: True
 
 - block:
     - name: Stop the firewall service
@@ -88,13 +88,13 @@
 - name: Disable selinux
   selinux:
     state: disabled
-  when: disable_selinux|default(yes) and ansible_os_family|lower == "redhat" and ansible_distribution|lower != "amazon"
+  when: disable_selinux|default(True) and ansible_os_family|lower == "redhat" and ansible_distribution|lower != "amazon"
 
 - name: Set selinux to permissive
   selinux:
     policy: targeted
     state: permissive
-  when: not disable_selinux|default(yes) and ansible_os_family|lower == "redhat" and ansible_distribution|lower != "amazon"
+  when: not disable_selinux|default(True) and ansible_os_family|lower == "redhat" and ansible_distribution|lower != "amazon"
 
 - name: Disable Transparent Huge Pages until the next reboot
   shell: echo never > /sys/kernel/mm/transparent_hugepage/enabled && echo never > /sys/kernel/mm/transparent_hugepage/defrag
@@ -123,7 +123,7 @@
       fetch:
         src: /etc/security/http_secret
         dest: /tmp/hadoop_http_secret
-        flat: yes
+        flat: True
         fail_on_missing: no
       delegate_to: "{{ groups['ambari-server']|first }}"
       run_once: true
@@ -141,7 +141,7 @@
       copy:
         src: /tmp/hadoop_http_secret
         dest: /etc/security/http_secret
-        force: yes
+        force: True
         mode: 0444
 
     - name: Delete the local http secret key
