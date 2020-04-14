@@ -925,6 +925,7 @@
 {% if storm_mode is defined %}
         "storm.cluster.mode" : "{{ storm_mode | default('distributed') }}",
 {% endif %}
+        "storm.scheduler" : “org.apache.storm.scheduler.resource.ResourceAwareScheduler”,
         "storm.local.dir" : "{{ storm_localdir | default('/hadoop/storm') }}",
 {% if storm_nimbus_opts is defined %}
         "nimbus.childopts" : "{{ storm_nimbus_opts }}",
