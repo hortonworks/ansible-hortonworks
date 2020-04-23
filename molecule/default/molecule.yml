@@ -1,0 +1,98 @@
+---
+# Molecule config for a single-node HDP cluster
+#
+# Notes:
+# - Linters are set enabled=false because the roles currently contains many lint warnings
+# - The 'destroy' action is commented out to avoid accidentally destroying your molecule cluster
+#
+dependency:
+  name: galaxy
+driver:
+  name: docker
+lint:
+  name: yamllint
+  enabled: false
+# Using geerlingguy's image that provides centos7 with ansible AND systemd
+platforms:
+  - name: "${MOLECULE_DISTRO:-centos7}-hdp01"
+    image: "geerlingguy/docker-${MOLECULE_DISTRO:-centos7}-ansible:latest"
+    pre_build_image: true
+    privileged: true
+    volume_mounts:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
+    command: "/usr/sbin/init"
+    groups:
+      - hadoop-cluster
+      - hdp-singlenode
+    networks:
+      - name: molecule_hdp
+    network_mode: bridge
+    # Host networking did not work on my Macbook (it hang at task waiting for the Ambari Agents registration)
+    #network_mode: host
+    published_ports:
+      # Ambari
+      - 0.0.0.0:8080:8080/tcp
+      # YARN
+      - 0.0.0.0:8088:8088/tcp
+      # HDFS
+      - 0.0.0.0:50070:50070/tcp
+      - 0.0.0.0:50075:50075/tcp
+      # Spark-History
+      - 0.0.0.0:18081:18081/tcp
+      # Knox
+      - 0.0.0.0:8443:8443/tcp
+      # Zeppelin
+      - 0.0.0.0:9995:9995/tcp
+      # Ranger
+      - 0.0.0.0:6080:6080/tcp
+      # NiFi
+      - 0.0.0.0:9090:9090/tcp
+      # NiFi-Registry
+      - 0.0.0.0:18080:18080/tcp      
+    #Not needed:
+    #exposed_ports:
+
+provisioner:
+  name: ansible
+  enabled: false
+  config_options:
+    defaults:
+      gathering: smart
+      fact_caching: jsonfile
+      fact_caching_connection: /tmp/facts_cache
+    ssh_connection:
+      pipelining: true
+  options:
+    diff: true
+    v: true
+  inventory:
+    group_vars:
+      # Note: Need to use specific inventory group_vars here, since (due to vars precedence) inventory group_vars/all will be overriden by the playbook group_vars/all !
+      # However we still need to use 'all' group_vars so that the 'set_variables.yml' playbook (running on host=localhost) can see them!
+      all:
+        cluster_name: 'cluster-name that wont be used since the var is overriden anyway by playbook group_vars'
+      hadoop-cluster:
+        cluster_name: 'cluster_name_overriden_by_import_playbook_vars'
+  # ansible-lint config
+  lint:
+    name: ansible-lint
+    enabled: false
+
+scenario:
+  name: default
+  test_sequence:
+    - lint
+    # - destroy
+    - dependency
+    - syntax
+    - create
+    - prepare
+    - converge
+    # - idempotence
+    # - side_effect
+    - verify
+    # - destroy
+verifier:
+  name: testinfra
+  lint:
+    name: flake8
