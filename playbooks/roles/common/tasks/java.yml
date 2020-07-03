@@ -11,6 +11,16 @@
     state: present
   when: java == "openjdk"
 
+- name: Apply workaround for Kerberos issues introduced in OpenJDK 1.8u242 (JDK-8215032)
+  lineinfile:
+    path: /usr/lib/jvm/jre/lib/security/java.security
+    regexp: '^sun.security.krb5.disableReferrals'
+    line: sun.security.krb5.disableReferrals=true
+  when: 
+    - java == "openjdk"
+  # Later we can add logic to only apply this patch when needed (requires some new vars):
+  # - openjdk_version == '1.8.0' and openjdk_update|int >= 242
+
 - block:
     - name: Create the {{ oraclejdk_options.base_folder }} directory
       file:
