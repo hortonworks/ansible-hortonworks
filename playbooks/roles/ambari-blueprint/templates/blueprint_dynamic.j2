@@ -604,6 +604,7 @@
         "javax.jdo.option.ConnectionDriverName": "org.postgresql.Driver",
         "javax.jdo.option.ConnectionURL": "jdbc:postgresql://{{ database_options.external_hostname|default(ansible_fqdn,true) }}:{{ postgres_port }}/{{ database_options.hive_db_name }}",
         {% endif -%}
+        "ambari.hive.db.schema.name": "{{ database_options.hive_db_name }}",
         "javax.jdo.option.ConnectionUserName": "{{ database_options.hive_db_username }}",
         "javax.jdo.option.ConnectionPassword": "{{ database_options.hive_db_password }}",
         {% endif -%}

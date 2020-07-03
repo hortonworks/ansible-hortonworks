@@ -1,0 +1,22 @@
+---
+sudo: required
+
+language: python
+
+services:
+  - docker
+
+install:
+  # molecule version >v2.22 required for compatibility with ansible 2.8.x (provided in the used docker image)
+  - pip install molecule==2.22
+  # Use ansible 2.8 due to issue in 2.9.0 in the blueprint role task setting the 'cluster_template' fact
+  # Related issue (most probably): https://github.com/ansible/ansible/issues/64169
+  - pip install ansible==2.8.2
+  - pip install docker
+script:
+  - molecule test
+  # TODO test 2nd scenario (multi-node !?)
+  #- molecule test --scenario-name xxx
+
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/

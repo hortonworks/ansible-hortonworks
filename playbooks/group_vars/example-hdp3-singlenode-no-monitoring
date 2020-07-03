@@ -1,0 +1,33 @@
+###########
+# Blueprint derived from "example-hdp3-singlenode" but without components: HST*,METRICS*, OOZIE, HBASE*, KNOX
+#
+# These variables would be used by the 'blueprint_dynamic.j2' Jinja2 template to generate the blueprint JSON.
+# This blueprint will build a single node HDP instance with Ambari and some of the more common services.
+#
+###########
+
+blueprint_name: '{{ cluster_name }}_blueprint'                  # the name of the blueprint as it will be stored in Ambari
+blueprint_file: 'blueprint_dynamic.j2'                          # the blueprint JSON file - 'blueprint_dynamic.j2' is a Jinja2 template that generates the required JSON
+blueprint_dynamic:                                              # properties for the dynamic blueprint - these are only used by the 'blueprint_dynamic.j2' template to generate the JSON
+  - host_group: "hdp-singlenode"
+    #clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'SPARK2_CLIENT', 'HBASE_CLIENT']
+    clients: ['ZOOKEEPER_CLIENT', 'HDFS_CLIENT', 'YARN_CLIENT', 'MAPREDUCE2_CLIENT', 'TEZ_CLIENT', 'PIG', 'SQOOP', 'HIVE_CLIENT', 'SPARK2_CLIENT']
+    services:
+      - AMBARI_SERVER
+      - ZOOKEEPER_SERVER
+      - NAMENODE
+      - SECONDARY_NAMENODE
+      - DATANODE
+      - RESOURCEMANAGER
+      - NODEMANAGER
+      - APP_TIMELINE_SERVER
+      - YARN_REGISTRY_DNS
+      - TIMELINE_READER
+      - HISTORYSERVER
+      - HIVE_SERVER
+      - HIVE_METASTORE
+      # - HBASE_MASTER
+      # - HBASE_REGIONSERVER
+      - SPARK2_JOBHISTORYSERVER
+      - ZEPPELIN_MASTER
+      # - KNOX_GATEWAY

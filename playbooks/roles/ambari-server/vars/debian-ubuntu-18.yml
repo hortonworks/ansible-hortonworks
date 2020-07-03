@@ -1,0 +1,16 @@
+---
+openjdk_path: /usr/lib/jvm/java-8-openjdk-amd64
+
+postgres_packages:
+  - postgresql-client
+  - libpq-dev
+  - python-psycopg2
+  - python3-psycopg2
+  - libpostgresql-jdbc-java
+postgres_jdbc_location: /usr/share/java/postgresql.jar
+
+mysql_packages:
+  - python-mysqldb
+  - python3-mysqldb
+  - libmysql-java
+mysql_jdbc_location: /usr/share/java/mysql-connector-java.jar

@@ -1,0 +1,35 @@
+---
+## Notes:
+# - deployment with blueprint playbooks/group_vars/example-hdp3-singlenode-with-nifi, hung during services startup with docker mem max at 9GB
+#
+# Important: Any variable overrides must be read not just for 'all' hosts, but also on 'localhost' (used in the set_variables.yml playbooks)
+- name: Pre-reqs
+  hosts: "localhost:all"
+  vars:
+    ## Note: As travis provide only 7.5GB VMs, to get a working deployment (including started services started) you have to use a more minimal blueprint:
+    blueprint_vars_file: example-hdp3-singlenode-no-monitoring
+    ## Note: All below blueprints require ~12GB dedicated RAM
+    #blueprint_vars_file: example-hdp3-singlenode
+    #blueprint_vars_file: example-hdp3-singlenode-with-nifi
+    ## Note: To install Ranger, you need to set a non-embedded DB
+    #blueprint_vars_file: example-hdp3-singlenode-with-ranger-atlas
+  tasks:
+    - debug:
+        var: cloud_name
+    - name: "load blueprint vars for the selected blueprint cfg file {{ blueprint_vars_file }}"
+      include_vars: ../../playbooks/group_vars/{{ blueprint_vars_file }}
+    - debug:
+        var: blueprint_dynamic
+        verbosity: 1
+
+- name: Converge
+  # Note: To override the repo's "playbook group_vars" it's easier to use a "vars:" block here, as inventory vars have lower precedence!
+  # Note: Another reason for vars *here* is: the 'set_variables.yml' playbook runs on 'localhost', so only sees 'all' group_vars 
+  import_playbook: ../../playbooks/install_cluster.yml
+  vars:
+        is_vm_docker_containers: "yes"
+        cloud_name: static
+        java: 'openjdk'
+        ambari_version: '2.7.3.0'
+        # Currently postgres startup fails in database 'role' with error "Unable to start service postgresql-9.6"
+        #database: 'postgres'
