@@ -1,2 +1,2 @@
 ---
-ambari_repo_url: "{{ repo_base_url }}/ambari/centos{{ ansible_distribution_major_version }}/2.x/updates/{{ ambari_version }}"
+ambari_repo_url: "{{ repo_base_url }}/ambari/2.x/{{ ambari_version }}/centos{{ ansible_distribution_major_version }}/"
