@@ -1,0 +1,3 @@
+---
+ambari_user: ambari
+ambari_user_sudoers: ambari_sudoers.j2

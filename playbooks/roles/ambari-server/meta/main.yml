@@ -2,3 +2,7 @@
 dependencies:
   - role: ambari-repo
     when: ambari_repo_enabled | default(True) | bool
+  - role: ambari-user
+    ambari_user: "{{ ambari_server_user }}"
+    when: ambari_server_user != 'root'
+    

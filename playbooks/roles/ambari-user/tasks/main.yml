@@ -1,0 +1,11 @@
+---
+- name: Create Ambari user named {{ ambari_user }}
+  user:
+      name: "{{ ambari_user }}"
+      system: yes
+
+- name: Create sudoers configuration for user {{ ambari_user }}
+  template:
+    src: "{{ ambari_user_sudoers }}"
+    dest: "/etc/sudoers.d/{{ ambari_user }}"
+    mode: 0600

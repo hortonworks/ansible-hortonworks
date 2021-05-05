@@ -99,6 +99,7 @@
       template:
         src: "{{ item }}"
         dest: "/tmp/cluster_vdf.xml"
+        owner: "{{ ambari_server_user | default('root') }}"
         mode: 0640
         force: yes
       with_first_found:
@@ -159,6 +160,7 @@
             src: "{{ item }}"
             dest: "/tmp/cluster_vdf.xml"
             mode: 0640
+            owner: "{{ ambari_server_user | default('root') }}"
             force: yes
           with_first_found:
             - files:

@@ -169,8 +169,27 @@
   lineinfile:
     path: /etc/ambari-server/conf/ambari.properties
     state: present
-    line: 'server.startup.web.timeout=120'
+    line: 'server.startup.web.timeout={{ambari_server_startup_web_timeout}}'
   notify: Restart ambari-server
+
+- name: Set the Ambari Server user
+  lineinfile:
+    path: /etc/ambari-server/conf/ambari.properties
+    state: present
+    regexp: '^ambari-server.user='
+    line: 'ambari-server.user={{ambari_server_user}}'
+  notify: Restart ambari-server
+
+- name: Set the owner for the ambari folders
+  file:
+    state: directory
+    path: "{{ item }}"
+    owner: "{{ ambari_server_user }}"
+    recurse: yes
+  with_items:
+   - "/var/lib/ambari-server"
+   - "/var/run/ambari-server"
+   - "{{ base_log_dir }}/ambari-server"
 
 - meta: flush_handlers
 
