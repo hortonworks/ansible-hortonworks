@@ -12,6 +12,15 @@
       set_fact:
         ambari_groups: []
 
+    - name: Check inventory_to_use vars file
+      stat:
+        path: "group_vars/{{ inventory_to_use }}"
+      register: inventory_to_use_vars
+
+    - name: Include cluster vars
+      include_vars: "group_vars/{{ inventory_to_use }}"
+      when: inventory_to_use_vars.stat.exists == True
+
     - block:
         - name: Populate the ambari_groups list (dynamic blueprint)
           set_fact:
